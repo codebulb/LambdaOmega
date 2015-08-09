@@ -13,6 +13,17 @@ LambdaOmega consists of only a few classes. For brevity reasons, most of their n
 *	`U` (“Utils”) provides additional miscellaneous helper methods.
 *	`Promise` is a wrapper and a drop-in replacement for CompletableFuture, providing several simplifications and fixes for the API. It can be used independently of all the other classes. It’s discussed in a separate section.
 
+## How to use it
+LambdaOmega is not released yet; however, if you feel adventurous, can use [JitPack](https://jitpack.io/) to add its SNAPSHOT dependency to your Maven project:
+```
+<dependency>
+    <groupId>com.github.codebulb</groupId>
+    <artifactId>LambdaOmega</artifactId>
+    <version>aeb4090f62</version>
+</dependency>
+```
+Replace the `version` by the current commit hash to get the newest SNAPSHOT. Visit [JitPack's docs](https://jitpack.io/docs/) for more information.
+
 ## Getting started with Collections
 The heart of LambdaOmega are the wrapper classes `L` and `M` which wrap around vanilla Java Collection `List` or `Map`, respectively (decorator pattern) to provide a more concise and more enjoyable API to the underlying collection.
 You can wrap an L around everything which can be turned into a List: a List, a `Stream`, varargs:
