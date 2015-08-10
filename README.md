@@ -48,7 +48,7 @@ Note that `l(Collection)` returns a one-element L with the collection provided b
 ```
 L<Integer> flatList = L(list(0, 1, 2));
 ```
-Some wrapper methods return another wrapper (e.g. of type L) or this; these are “intermediate” functions. You can chain another function call after them (builder pattern). Other wrapper methods return the underlying Java collection (e.g. of type List) or any other type; these are “terminal” functions. The wrapper API adheres to a simple method naming schema:
+Some wrapper methods return another wrapper (e.g. of type L) or `this`; these are “intermediate” functions. You can chain another function call after them (builder pattern). Other wrapper methods return the underlying Java collection (e.g. of type List) or any other type; these are “terminal” functions. The wrapper API adheres to a simple method naming schema:
 * methods with names starting with an `UpperCase` letter are **intermediate** functions
 * methods with names consisting of a `single letter` are **intermediate** functions as well. These are typically shorthand aliases for another intermediate function.
 * methods with names starting with a `lowerCase` letter are **terminal** functions
@@ -61,7 +61,7 @@ List<Integer> outcome = l(0, 1, 2).add(3);
 ```
 This is a terminal function. Using the equivalent intermediate function, we can chain method calls:
 ```
-L<Integer> modifiedList = l(0, 1, 2).Add(3).add(4, 5);
+L<Integer> modifiedList = l(0, 1, 2).Add(3).Add(4, 5);
 ```
 There’s a shorthand for the `Add()` method:
 ```
@@ -69,8 +69,10 @@ L<Integer> modifiedList2 = l(0, 1, 2).a(3).a(4, 5);
 ```
 When constructing a Map, you make intense use of method chaining:
 ```
-Map<String, Integer> map = m("a", 0).a("b", 1).add("c", 2);
+Map<String, Integer> map = m("a", 0).Insert("b", 1).i("c", 2).m;
 ```
+(we cover Map' `insert()` method in a bit.)
+
 There’s a two-arg constructor for empty Maps of an explicit key / value type. If the “key” class is omitted, it’s assumed to be String:
 ```
 M<String, Integer> emptyM = m(Integer.class);
@@ -86,11 +88,11 @@ Some of these methods exist both as intermediate and terminal function. For the 
 
 We’ve already met the `add` / `Add` / `a` method on L. There’s also `addAll` / `AddAll` / `A`; all of these also works with varargs:
 ```
-List<Integer> zeroToSix = l(0, 1, 2).AddAll (list(3, 4)).addAll(l(5, 6));
+List<Integer> zeroToSix = l(0, 1, 2).A(list(3, 4)).addAll(l(5, 6));
 ```
 For M, there’s an add method variant named `insert` / `Insert` / `I` / `insertAll` / `InsertAll` / `I` which will invoke `put()`, but only after a check preventing you from inserting the same key twice; otherwise, a `MapEntryKeyAlreadyPresentException` is thrown and the map is not modified. This method comes in handy e.g. in unit tests when you explicitly build a map and you want to make sure that you don’t accidentally insert the same key twice. Note that this check costs significantly more performance than just performing put().
 ```
-m("a", 0).i("b", 1).I(m("c", 2).i("d", 3), m("c", 9)); // exception!
+m("a", 0).i("b", 1).I(m("c", 2).i("d", 3), m("c", 9)); // exception because of "c"!
 ```
 For L or M, you can set a single element with `set` / `Set` / `s` / `put` / `Put` / `p` or set all elements included in a Map data structure with `setAll` / `SetAll` / `S` / `putAll` / `PutAll` / `P`.
 ```
@@ -119,9 +121,9 @@ There are a lot of additional methods for L and M. For more information, visit t
 
 
 ## A List is a Map and a Map is a List
-Now comes the fun part. Because the LambdaOmega API lives independently of vanilla Java Colletion / Map API, it features its own API which is more simple, consistent and powerful at the same time, whilst keeping it as close to the original Java APIs as possible.
+Now comes the fun part. Because the LambdaOmega API lives independently of vanilla Java Collection / Map API, it features its own API which is more simple, consistent and powerful at the same time, whilst keeping it as close to the original Java APIs as possible.
 
-Most importantly, a List is also a Map from int to T, and a Map is also a List of entries. More precisely, both L and M implement the `SequencedI` (Collection-like access) inteface as well as the `IndexedI` (Map-like access) interface.
+Most importantly, a List is also a Map from int to T, and a Map is also a List of entries. More precisely, both L and M implement the `SequencedI` (Collection-like access) interface as well as the `IndexedI` (Map-like access) interface.
 Thus, you can call L methods such as `indexOf()` on a M:
 ```
 String c = m("a", 0).i("b", 1).i("c", 2).indexOf(2);
@@ -130,7 +132,7 @@ and M methods such as `insert()` on a L:
 ```
 L<String> abcd = l("a", "b").I(m(2, "c").i(3, "d"));
 ```
-Finally, indexed access using get() is actually provided by the ReadonlyIndexedI interface which is implemented by L, M, and F, thus you can use “one interface to rule them all”:
+Finally, indexed access using get() is actually provided by the `ReadonlyIndexedI` interface which is implemented by L, M, and F, thus you can use “one interface to rule them all”:
 ```
 ReadonlyIndexedI<Integer, String> indexed = m(0, "a").i(1, "b");
 String b = indexed.g(1);
@@ -148,7 +150,7 @@ To execute a forEach loop:
 ```
 l("a", "b", "c").forEach(it -> println(it));
 ```
-(`U.println()` is a shorthand for System.out.println.)
+(`U.println()` is a shorthand for `System.out.println()`.)
 
 Keep in mind that a L is also a Map, thus there’s a variant of the forEach loop which takes both a key and value argument whereby in a L, the key is the index (this method is thus equivalent to a Groovy `forEachWithIndex()` loop).
 ```
@@ -158,13 +160,13 @@ Again note how intermediary functions are marked by a name starting with an Uppe
 ```
 List<Integer> list246 = l(0, 1, 2).Map(it -> it + 1).map(it -> it * 2);
 ```
-Some functions incorporate syntax changes to facilitate their usage. With mapEntries(), you can map list elements to a Map. Note that the lambda returns a M.E Map Entry which is much simpler than having two separate return values as in the corresponding vanilla Java method.
+Some functions incorporate syntax changes (when compared to their vanilla Java couterpart) to facilitate their usage. With mapEntries(), you can map list elements to a Map. Note that the lambda returns a `M.E` Map Entry which is much simpler than having two separate return values as in the corresponding vanilla Java method.
 ```
 Map<String, Integer> stringsToSize = l("a", "ab", "abc").mapEntries(it -> e(it, it.length()));
 ```
 (`e()` is a shorthand to create a M.E with key, value.)
 
-`find()` returns null or a result instead of an Option:
+`find()` returns null or a result instead of an `Option`:
 ```
 Integer negative = l(1, 2, -1, 3).find(it -> it < 0);
 ```
@@ -176,7 +178,7 @@ There are also additional functional operations such as `flatten()`, `flattenDee
 ```
 List<Integer> list123456 = l(0, 1, l(2, 3, l(4)), list(5, 6)).<Integer> flattenDeep();
 ```
-There’s also a `withDefault()` method which allows you for any ReadonlyIndexedI to register a function the return value of which is returned if a get access would return null or get out of bounds (as inspired by Groovy). You can use this e.g. to easily create a Map of Lists:
+There’s also a `WithDefault()` method which allows you for any ReadonlyIndexedI to register a function the return value of which is returned if a get() access would return null or get out of bounds (as inspired by Groovy). You can use this e.g. to easily create a Map of Lists:
 ```
 M<String, L> withDefault = m(L.class).WithDefault(it -> l());
 withDefault.g("a").a(1);
@@ -193,9 +195,9 @@ List<Integer> list012 = r(0).to(3).list;
 ```
 Support for range access has been added to L:
 ```
-List<String> listbcd = l("a", "b", "c", "d", "e").get(r(1).to(3));
+List<String> listBcd = l("a", "b", "c", "d", "e").get(r(1).to(3));
 ```
-## 2d vectors
+## 2D vectors
 The V2 class represents a 2-dimensional vector = a 2-ary tuple:
 ```
 V2<String, Integer> vector = v("a", 0);
