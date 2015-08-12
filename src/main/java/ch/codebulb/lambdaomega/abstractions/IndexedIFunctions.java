@@ -3,8 +3,8 @@ package ch.codebulb.lambdaomega.abstractions;
 import ch.codebulb.lambdaomega.C;
 import static ch.codebulb.lambdaomega.F.*;
 import ch.codebulb.lambdaomega.M;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -16,13 +16,13 @@ import java.util.stream.Collectors;
 /**
  * Adds a contract to work with functional interfaces to a {@link IndexedI}.
  */
-public interface IndexedIFunctions<K, V> extends IndexedI<K, V> {
+public interface IndexedIFunctions<K, V> extends IndexedI<K, V>, FunctionsI {
     public default void forEach(BiConsumer<K, V> action) {
         getEntries().forEach(consumer(action));
     }
     
-    public default <R> List<R> map(BiFunction<K, V, R> function) {
-        return getEntries().stream().map(function(function)).collect(Collectors.toList());
+    public default <R> Collection<R> map(BiFunction<K, V, R> function) {
+        return getEntries().stream().map(function(function)).collect(createCollector());
     }
     
     public default <RK, RV> Map<RK, RV> mapEntries(BiFunction<K, V, M.E<RK, RV>> function) {

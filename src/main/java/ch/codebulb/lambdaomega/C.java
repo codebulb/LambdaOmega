@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * The "C" stands for "common collection". This is the base class of all LambdaOmega collections which implements common functionality.<p/>
+ * The "C" stands for "common collection". This is the base class of all LambdaOmega collections which implements common functionality.<p>
  * 
  * It also provides common static helper methods for collections.
  *
@@ -102,6 +102,10 @@ public abstract class C<T, K, V> implements StreamableI, ReadonlyIndexedI<K, V> 
     
     public static <T> List<T> toList(T... ts) {
         return Arrays.asList(ts);
+    }
+    
+    public static <T> List<T> toList(Stream<T> stream) {
+        return stream.collect(Collectors.toList());
     }
     
     public static <T> Set<T> toSet(Collection<T> collection) {

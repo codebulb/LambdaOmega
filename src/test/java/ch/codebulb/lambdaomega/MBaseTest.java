@@ -4,6 +4,7 @@ import static ch.codebulb.lambdaomega.L.*;
 import static ch.codebulb.lambdaomega.M.*;
 import static ch.codebulb.lambdaomega.TestUtil.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -263,6 +264,19 @@ public class MBaseTest {
         assertEquals(false, m("a", 0).i("b", 1).i("c", 2).containsValue(3));
         assertEquals(true, m("a", 0).i("b", 1).i("c", 2).containsKey("a"));
         assertEquals(false, m("a", 0).i("b", 1).i("c", 2).containsKey("d"));
+    }
+    
+    @Test
+    public void testWithDefault() {
+        M<String, List<String>> mapWithDefault = m("a", list("a?")).i("b", list("b?")).i("c", list("c?")).WithDefault(it -> list(it + '!'));
+        assertEquals(list("a?"), mapWithDefault.get("a"));
+        assertEquals(list("e!"), mapWithDefault.get("e"));
+        
+        mapWithDefault.get("a").add("y");
+        assertEquals(list("a?", "y"), mapWithDefault.get("a"));
+        mapWithDefault.get("e").add("z");
+        // original entry has been changed
+        assertEquals(list("e!", "z"), mapWithDefault.get("e"));
     }
     
     @Test

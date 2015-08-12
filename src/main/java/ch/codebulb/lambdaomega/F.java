@@ -13,7 +13,7 @@ import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
 
 /**
- * The "F" stands for "function". Provides a common interface for all {@link FunctionalInterface} implementations.<p/>
+ * The "F" stands for "function". Provides a common interface for all {@link FunctionalInterface} implementations.<p>
  * 
  * It also provides common static helper methods for functions.
  *

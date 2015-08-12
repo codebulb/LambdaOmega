@@ -14,7 +14,7 @@ import java.util.stream.Stream;
  * An abstraction for a sequentially accessed data structure. This interface makes no assumptions about the data structure's ordering.
  * It is loosely inspired by {@link Collection}.
  */
-public interface SequentialI<T> extends StreamableI {
+public interface SequentialI<T> {
     public Collection<T> toCollection();
     
     public default List<T> toList() {

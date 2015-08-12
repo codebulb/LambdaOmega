@@ -5,6 +5,7 @@ import ch.codebulb.lambdaomega.L;
 import ch.codebulb.lambdaomega.M;
 import static ch.codebulb.lambdaomega.M.m;
 import ch.codebulb.lambdaomega.V2;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -53,11 +54,11 @@ public interface SequentialIFunctionsS<T> extends SequentialIFunctions<T> {
         return L(sortBy(keyExtractors));
     }
     
-    public default <K> M<K, List<T>> GroupBy(Function<? super T, ? extends K> classifier) {
+    public default <K> M<K, ? extends Collection<T>> GroupBy(Function<? super T, ? extends K> classifier) {
         return m(groupBy(classifier));
     }
     
-    public default M<Boolean, List<T>> Partition(Predicate<? super T> predicate) {
+    public default M<Boolean, ? extends Collection<T>> Partition(Predicate<? super T> predicate) {
         return m(partition(predicate));
     }
 }

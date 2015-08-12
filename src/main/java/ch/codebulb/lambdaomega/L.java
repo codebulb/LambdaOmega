@@ -1,7 +1,11 @@
 package ch.codebulb.lambdaomega;
 
 import static ch.codebulb.lambdaomega.F.compareAsc;
+import static ch.codebulb.lambdaomega.F.function;
+import static ch.codebulb.lambdaomega.F.predicate;
+import static ch.codebulb.lambdaomega.F.toDoubleFunction;
 import ch.codebulb.lambdaomega.M.E;
+import static ch.codebulb.lambdaomega.M.e;
 import ch.codebulb.lambdaomega.abstractions.IndexedI;
 import ch.codebulb.lambdaomega.abstractions.IndexedListIS;
 import ch.codebulb.lambdaomega.abstractions.OrderedSequentialS;
@@ -9,15 +13,22 @@ import ch.codebulb.lambdaomega.abstractions.SequentialI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.function.ToDoubleBiFunction;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -277,28 +288,175 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
 
     @Override
     public void forEach(BiConsumer<Integer, T> action) {
+        stream().forEach(consumer(action));
+    }
+
+    @Override
+    public <R> List<R> map(BiFunction<Integer, T, R> function) {
+        return C.toList(stream().map(function(function)));
+    }
+
+    @Override
+    public <RK, RV> Map<RK, RV> mapEntries(BiFunction<Integer, T, E<RK, RV>> function) {
+        return stream().map(function(function)).collect(Collectors.toMap(it -> it.k, it -> it.v));
+    }
+
+    @Override
+    public E<Integer, T> find(BiPredicate<Integer, T> predicate) {
+        Optional<M.E<Integer, T>> found = stream()
+                .map(function((index, it) -> e(index, it)))
+                .filter(F.predicate(predicate)).findFirst();
+        if (found.isPresent()) {
+            return found.get();
+        }
+        else {
+            return null;
+        }
+    }
+
+    @Override
+    public Map<Integer, T> findAll(BiPredicate<Integer, T> predicate) {
+        return stream()
+                .map(function((index, it) -> e(index, it)))
+                .filter(F.predicate(predicate))
+                .collect(Collectors.toMap(it -> it.k, it -> it.v));
+    }
+
+    @Override
+    public E<Integer, T> min(BiFunction<Integer, T, Comparable>... keyExtractors) {
+        return Collections.min(stream()
+                .map(function((index, it) -> e(index, it))).collect(Collectors.toList()), 
+                compareAsc(C.map(keyExtractors, it -> F.function(it))));
+    }
+
+    @Override
+    public E<Integer, T> max(BiFunction<Integer, T, Comparable>... keyExtractors) {
+        return Collections.max(stream()
+                .map(function((index, it) -> e(index, it))).collect(Collectors.toList()), 
+                compareAsc(C.map(keyExtractors, it -> F.function(it))));
+    }
+    
+    @Override
+    public int count(BiPredicate<Integer, T> predicate) {
+        return findAll(predicate(predicate)).size();
+    }
+
+    @Override
+    public boolean every(BiPredicate<Integer, T> predicate) {
+        return stream().allMatch(predicate(predicate));
+    }
+
+    @Override
+    public boolean some(BiPredicate<Integer, T> predicate) {
+        return stream().anyMatch(predicate(predicate));
+    }
+
+    @Override
+    public boolean none(BiPredicate<Integer, T> predicate) {
+        return stream().noneMatch(predicate(predicate));
+    }
+    
+    private <R> Function<T, R> function(BiFunction<Integer, T, R> function) {
+        Function<T, R> f;
         if (!isParallel()) {
             // use fast sequential counting
-            stream().forEach(new Consumer<T>() {
+            f = new Function<T, R>() {
+                int i = 0;
+                @Override
+                public R apply(T t) {
+                    return function.apply(i++, t);
+                }
+            };
+        }
+        else {
+            // retrieve each index individually
+            f = new Function<T, R>() {
+                List<T> list = stream().collect(Collectors.toList());
+                @Override
+                public R apply(T t) {
+                    return function.apply(list.indexOf(t), t);
+                }
+            };
+        }
+        return f;
+    }
+    
+    private Consumer<T> consumer(BiConsumer<Integer, T> action) {
+        Consumer<T> f;
+        if (!isParallel()) {
+            // use fast sequential counting
+            f = new Consumer<T>() {
                 int i = 0;
                 @Override
                 public void accept(T t) {
                     action.accept(i++, t);
                 }
-            });
+            };
         }
         else {
             // retrieve each index individually
-            stream().forEach(new Consumer<T>() {
+            f = new Consumer<T>() {
                 List<T> list = stream().collect(Collectors.toList());
                 @Override
                 public void accept(T t) {
                     action.accept(list.indexOf(t), t);
                 }
-            });
+            };
         }
+        return f;
+    }
+    
+    private Predicate<T> predicate(BiPredicate<Integer, T> predicate) {
+        Predicate<T> f;
+        if (!isParallel()) {
+            // use fast sequential counting
+            f = new Predicate<T>() {
+                int i = 0;
+                @Override
+                public boolean test(T t) {
+                    return predicate.test(i++, t);
+                }
+            };
+        }
+        else {
+            // retrieve each index individually
+            f = new Predicate<T>() {
+                List<T> list = stream().collect(Collectors.toList());
+                @Override
+                public boolean test(T t) {
+                    return predicate.test(list.indexOf(t), t);
+                }
+            };
+        }
+        return f;
     }
 
+    @Override
+    public double sum(ToDoubleBiFunction<? super Integer, ? super T> mapper) {
+        ToDoubleFunction<T> function;
+        if (!isParallel()) {
+            // use fast sequential counting
+            function = new ToDoubleFunction<T>() {
+                int i = 0;
+                @Override
+                public double applyAsDouble(T t) {
+                    return mapper.applyAsDouble(i++, t);
+                }
+            };
+        }
+        else {
+            // retrieve each index individually
+            function = new ToDoubleFunction<T>() {
+                List<T> list = stream().collect(Collectors.toList());
+                @Override
+                public double applyAsDouble(T t) {
+                    return mapper.applyAsDouble(list.indexOf(t), t);
+                }
+            };
+        }
+        return stream().collect(Collectors.summingDouble(function));
+    }
+    
     @Override
     public L<T> S(IndexedI<? extends Integer, ? extends T>... m) {
         return (L<T>) IndexedListIS.super.S(m);

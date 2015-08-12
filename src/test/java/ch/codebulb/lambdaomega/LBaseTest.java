@@ -4,6 +4,7 @@ import static ch.codebulb.lambdaomega.L.*;
 import static ch.codebulb.lambdaomega.M.*;
 import static ch.codebulb.lambdaomega.R.r;
 import static ch.codebulb.lambdaomega.TestUtil.*;
+import java.util.List;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -222,6 +223,19 @@ public class LBaseTest {
         
         assertEquals(3, l("a", "b", "c", "a").lastIndexOf("a"));
         assertEquals(-1, l("a", "b", "c").lastIndexOf("d"));
+    }
+    
+    @Test
+    public void testWithDefault() {
+        L<List<Integer>> listWithDefault = l(list(5), list(6), list(7)).WithDefault(it -> list(it * 2));
+        assertEquals(list(5), listWithDefault.get(0));
+        assertEquals(list(10), listWithDefault.get(5));
+        
+        listWithDefault.get(0).add(9);
+        assertEquals(list(5, 9), listWithDefault.get(0));
+        listWithDefault.get(5).add(9);
+        // return a newly created element
+        assertEquals(list(10), listWithDefault.get(5));
     }
     
     @Test

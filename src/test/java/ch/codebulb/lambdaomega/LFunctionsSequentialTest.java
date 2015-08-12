@@ -11,16 +11,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-// TODO Add List-as-IndexedI tests
-public class LFunctionsTest {
+/**
+ * Test cases for the {@link L} implementation for {@link SequentialIFunctions}.
+ */
+public class LFunctionsSequentialTest {
     private List<Integer> actual = list();
     private List<Integer> expected;
     private List<Integer> explicit;
-    private final Map<String, Integer> actualMap = map(String.class, Integer.class);
     
     @BeforeClass
     public static void beforeClass() {
@@ -113,9 +115,12 @@ public class LFunctionsTest {
     @Test
     public void testFind() {
         assertEquals(1, l(0, 1, 2, -1).find(it -> it > 0));
+        assertNull(l(0, 1, 2).find(it -> it < 0));
         
         assertEquals(list(1, 2), l(0, 1, 2, -1).findAll(it -> it > 0));
         assertEquals(list(1, 2), l(0, 1, 2, -1).FindAll(it -> it > 0).l);
+        assertEquals(list(1, 2), l(0, 1, 2, -1).filter(it -> it > 0));
+        assertEquals(list(1, 2), l(0, 1, 2, -1).Filter(it -> it > 0).l);
         assertEquals(list(0, -1), l(0, 1, 2, -1).reject(it -> it > 0));
         assertEquals(list(0, -1), l(0, 1, 2, -1).Reject(it -> it > 0).l);
     }
@@ -162,13 +167,6 @@ public class LFunctionsTest {
         assertFalse(l(0, -1, -2).some(it -> it > 0));
         assertTrue(l(0, -1, -2).none(it -> it > 0));
         assertFalse(l(0, -1, 2).none(it -> it > 0));
-    }
-    
-    @Test
-    public void testWithDefault() {
-        L<Integer> listWithDefault = l(5, 6, 7).WithDefault(it -> it * 2);
-        assertEquals(5, listWithDefault.get(0));
-        assertEquals(10, listWithDefault.get(5));
     }
     
     @AfterClass

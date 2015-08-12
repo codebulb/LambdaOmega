@@ -16,13 +16,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * Adds a contract to work with functional interfaces to a {@link SequentialIAdd}.
  */
-public interface SequentialIFunctions<T> extends SequentialIAdd<T> {
+public interface SequentialIFunctions<T> extends SequentialIAdd<T>, FunctionsI {
     public default String join(CharSequence delimiter) {
         return stream().map(it -> it.toString()).collect(Collectors.joining(delimiter));
     }
@@ -31,8 +32,8 @@ public interface SequentialIFunctions<T> extends SequentialIAdd<T> {
         stream().forEach(function);
     }
     
-    public default <R> List<R> map(Function<T, R> function) {
-        return stream().map(function).collect(Collectors.toList());
+    public default <R> Collection<R> map(Function<T, R> function) {
+        return stream().map(function).collect(createCollector());
     }
     
     public default T reduce(T identity, BinaryOperator<T> accumulator) {
@@ -90,15 +91,15 @@ public interface SequentialIFunctions<T> extends SequentialIAdd<T> {
         }
     }
     
-    public default List<T> findAll(Predicate<T> predicate) {
-        return stream().filter(predicate).collect(Collectors.toList());
+    public default Collection<T> findAll(Predicate<T> predicate) {
+        return stream().filter(predicate).collect(createCollector());
     }
     
-    public default List<T> filter(Predicate<T> predicate) {
+    public default Collection<T> filter(Predicate<T> predicate) {
         return findAll(predicate);
     }
     
-    public default List<T> reject(Predicate<T> predicate) {
+    public default Collection<T> reject(Predicate<T> predicate) {
         return findAll(predicate.negate());
     }
     
@@ -136,12 +137,12 @@ public interface SequentialIFunctions<T> extends SequentialIAdd<T> {
         return stream().collect(Collectors.summingDouble(mapper));
     }
     
-    public default <K> Map<K, List<T>> groupBy(Function<? super T, ? extends K> classifier) {
-        return stream().collect(Collectors.groupingBy(classifier));
+    public default <K> Map<K, ? extends Collection<T>> groupBy(Function<? super T, ? extends K> classifier) {
+        return stream().collect(Collectors.groupingBy(classifier, createCollector()));
     }
     
-    public default Map<Boolean, List<T>> partition(Predicate<? super T> predicate) {
-        return stream().collect(Collectors.groupingBy(it -> predicate.test(it)));
+    public default Map<Boolean, ? extends Collection<T>> partition(Predicate<? super T> predicate) {
+        return stream().collect(Collectors.groupingBy(it -> predicate.test(it), createCollector()));
     }
     
     public default boolean every(Predicate<? super T> predicate) {

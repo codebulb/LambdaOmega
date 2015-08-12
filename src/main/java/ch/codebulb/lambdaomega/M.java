@@ -12,7 +12,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +51,7 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
     
     public static <K, V> M<K, V> m(E<K, V>... entries) {
         M<K, V> map = m();
-        Arrays.stream(entries).forEach(it -> map.i(it.k, it.v));
+        C.toStream(entries).forEach(it -> map.i(it.k, it.v));
         return map;
     }
     
@@ -129,8 +133,6 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
         });
         return toList();
     }
-    
-    
 
     @Override
     public List<E<K, V>> addAll(Collection<? extends E<K, V>>... c) {
@@ -149,7 +151,79 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
         });
         return toList();
     }
+    
+    @Override
+    // Use Set as the return type for operation on entries because entries are kept in a Set.
+    public <R> Collector<R, ?, Set<R>> createCollector() {
+        return Collectors.toSet();
+    }
 
+    @Override
+    @Deprecated
+    public String join(CharSequence delimiter) {
+        throw new UnsupportedOperationException("Because the order of entries of a map is not defined, "
+                + "joining them leads to undefined results; therefore, it is forbidden.");
+    }
+
+    @Override
+    public <R> Set<R> map(Function<E<K, V>, R> function) {
+        return (Set<R>)SequentialIS.super.map(function);
+    }
+
+    @Override
+    @Deprecated
+    public <N> List<N> flatten() {
+        throw new UnsupportedOperationException("Flatten is not supported by map.");
+    }
+
+    @Override
+    @Deprecated
+    public <N> List<N> flattenDeep() {
+        throw new UnsupportedOperationException("Flatten is not supported by map.");
+    }
+
+    @Override
+    @Deprecated
+    public <N> L<N> FlattenDeep() {
+        return SequentialIS.super.FlattenDeep();
+    }
+
+    @Override
+    @Deprecated
+    public <N> L<N> Flatten() {
+        return SequentialIS.super.Flatten();
+    }
+
+    @Override
+    public <R> Map<R, Set<E<K, V>>> groupBy(Function<? super E<K, V>, ? extends R> classifier) {
+        return (Map<R, Set<E<K, V>>>)SequentialIS.super.groupBy(classifier);
+    }
+
+    @Override
+    public Map<Boolean, Set<E<K, V>>> partition(Predicate<? super E<K, V>> predicate) {
+        return (Map<Boolean, Set<E<K, V>>>)SequentialIS.super.partition(predicate);
+    }
+
+    @Override
+    public Set<E<K, V>> findAll(Predicate<E<K, V>> predicate) {
+        return (Set<E<K, V>>) SequentialIS.super.findAll(predicate);
+    }
+
+    @Override
+    public Set<E<K, V>> filter(Predicate<E<K, V>> predicate) {
+        return (Set<E<K, V>>) SequentialIS.super.filter(predicate);
+    }
+    
+    @Override
+    public Set<E<K, V>> reject(Predicate<E<K, V>> predicate) {
+        return (Set<E<K, V>>) SequentialIS.super.reject(predicate);
+    }
+
+    @Override
+    public <R> Set<R> map(BiFunction<K, V, R> function) {
+        return (Set<R>)IndexedListIS.super.map(function);
+    }
+    
     @Override
     public M<K, V> A(SequentialI<? extends E<K, V>>... c) {
         return (M<K, V>) SequentialIS.super.A(c);
@@ -417,7 +491,7 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
         return new E(entry.getKey(), entry.getValue());
     }
 
-    public static class E<K, V> {
+    public static class E<K, V> implements Comparable<E<K, V>> {
         public final K k;
         public final V v;
 
@@ -428,6 +502,14 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
         
         public Map.Entry<K, V> toEntry() {
             return new AbstractMap.SimpleEntry<>(k, v);
+        }
+
+        public K getK() {
+            return k;
+        }
+
+        public V getV() {
+            return v;
         }
 
         @Override
@@ -459,6 +541,28 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
         @Override
         public String toString() {
             return "e(" + k + ", " + v + ')';
+        }
+
+        @Override
+        public int compareTo(E<K, V> obj) {
+            if (obj == null) {
+                return 1;
+            }
+            
+            if (!(k instanceof Comparable)) {
+                throw new ClassCastException(k.getClass().getName() + " cannot be cast to java.lang.Comparable");
+            }
+            int ret = ((Comparable<K>)k).compareTo(obj.k);
+            if (ret != 0) {
+                return ret;
+            }
+            
+            if (!(v instanceof Comparable)) {
+                throw new ClassCastException(v.getClass().getName() + " cannot be cast to java.lang.Comparable");
+            }
+            ret = ((Comparable<V>)v).compareTo(obj.v);
+            
+            return ret;
         }
     }
 }
