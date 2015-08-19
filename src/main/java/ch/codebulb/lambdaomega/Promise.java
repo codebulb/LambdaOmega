@@ -63,8 +63,12 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.thenApplyAsync(fn, executor));
     }
     
-    public <U> Promise<U> completed(Function<? super T, ? extends U> fn) {
+    public <U> Promise<U> completed(Function<? super T, ? extends U> fn, boolean async) {
         return completed(fn, false, null);
+    }
+    
+    public <U> Promise<U> completed(Function<? super T, ? extends U> fn) {
+        return completed(fn, false);
     }
 
     public Promise<Void> completed(Consumer<? super T> action, boolean async, Executor executor) {
@@ -74,8 +78,12 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.thenAcceptAsync(action, executor));
     }
     
-    public Promise<Void> completed(Consumer<? super T> action) {
+    public Promise<Void> completed(Consumer<? super T> action, boolean async) {
         return completed(action, false, null);
+    }
+    
+    public Promise<Void> completed(Consumer<? super T> action) {
+        return completed(action, false);
     }
 
     public Promise<Void> completed(Runnable action, boolean async, Executor executor) {
@@ -85,8 +93,12 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.thenRunAsync(action, executor));
     }
     
-    public Promise<Void> completed(Runnable action) {
+    public Promise<Void> completed(Runnable action, boolean async) {
         return completed(action, false, null);
+    }
+    
+    public Promise<Void> completed(Runnable action) {
+        return completed(action, false);
     }
 
     public Promise<T> completedExceptionally(Function<? extends Throwable, ? extends T> fn) {
@@ -100,8 +112,12 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.handleAsync(fn, executor));
     }
     
-    public <U> Promise<U> completed(BiFunction<? super T, Throwable, ? extends U> fn) {
+    public <U> Promise<U> completed(BiFunction<? super T, Throwable, ? extends U> fn, boolean async) {
         return completed(fn, false, null);
+    }
+    
+    public <U> Promise<U> completed(BiFunction<? super T, Throwable, ? extends U> fn) {
+        return completed(fn, false);
     }
 
     public Promise<T> completed(BiConsumer<? super T, ? super Throwable> action, boolean async, Executor executor) {
@@ -114,19 +130,37 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.whenCompleteAsync(action, executor));
     }
     
-    public Promise<T> completed(BiConsumer<? super T, ? super Throwable> action) {
+    public Promise<T> completed(BiConsumer<? super T, ? super Throwable> action, boolean async) {
         return completed(action, false, null);
     }
+    
+    public Promise<T> completed(BiConsumer<? super T, ? super Throwable> action) {
+        return completed(action, false);
+    }
 
-    public <U> Promise<U> then(Function<? super T, ? extends CompletionStage<U>> fn, boolean async, Executor executor) {
-        return apply(async, executor,
-                () -> wrapped.thenCompose(fn),
-                () -> wrapped.thenComposeAsync(fn),
-                () -> wrapped.thenComposeAsync(fn, executor));
+    public <U> Promise<U> then(Function<? super T, ? extends Promise<U>> fn, boolean async, Executor executor) {
+        Supplier<CompletableFuture<U>> syncS = () -> wrapped.thenCompose(f(fn));
+        Supplier<CompletableFuture<U>> asyncS = () -> wrapped.thenComposeAsync(f(fn));
+        Supplier<CompletableFuture<U>> asyncES = () -> wrapped.thenComposeAsync(f(fn), executor);
+        
+        return apply(async, executor, syncS, asyncS, asyncES);
     }
     
-    public <U> Promise<U> then(Function<? super T, ? extends CompletionStage<U>> fn) {
+    private <U> Function<? super T, ? extends CompletionStage<U>> f(Function<? super T, ? extends Promise<U>> fn) {
+        return new Function<T, CompletionStage<U>>() {
+            @Override
+            public CompletionStage<U> apply(T t) {
+                return fn.apply(t).wrapped;
+            }
+        };
+    }
+    
+    public <U> Promise<U> then(Function<? super T, ? extends Promise<U>> fn, boolean async) {
         return then(fn, false, null);
+    }
+    
+    public <U> Promise<U> then(Function<? super T, ? extends Promise<U>> fn) {
+        return then(fn, false);
     }
     
     public static <T> Promise<List<T>> allOf(Promise<T>... cfs) {
@@ -139,37 +173,49 @@ public class Promise<T> extends OmegaObject {
         );
     }
 
-    public <U, V> Promise<V> and(CompletionStage<? extends U> other, BiFunction<? super T, ? super U, ? extends V> fn, boolean async, Executor executor) {
+    public <U, V> Promise<V> and(Promise<? extends U> other, BiFunction<? super T, ? super U, ? extends V> fn, boolean async, Executor executor) {
         return apply(async, executor,
-                () -> wrapped.thenCombine(other, fn),
-                () -> wrapped.thenCombineAsync(other, fn),
-                () -> wrapped.thenCombineAsync(other, fn, executor));
+                () -> wrapped.thenCombine(other.wrapped, fn),
+                () -> wrapped.thenCombineAsync(other.wrapped, fn),
+                () -> wrapped.thenCombineAsync(other.wrapped, fn, executor));
     }
     
-    public <U, V> Promise<V> and(CompletionStage<? extends U> other, BiFunction<? super T, ? super U, ? extends V> fn) {
+    public <U, V> Promise<V> and(Promise<? extends U> other, BiFunction<? super T, ? super U, ? extends V> fn, boolean async) {
         return and(other, fn, false, null);
     }
     
-    public <U> Promise<Void> and(CompletionStage<? extends U> other, BiConsumer<? super T, ? super U> action, boolean async, Executor executor) {
-        return apply(async, executor,
-                () -> wrapped.thenAcceptBoth(other, action),
-                () -> wrapped.thenAcceptBothAsync(other, action),
-                () -> wrapped.thenAcceptBothAsync(other, action, executor));
+    public <U, V> Promise<V> and(Promise<? extends U> other, BiFunction<? super T, ? super U, ? extends V> fn) {
+        return and(other, fn, false);
     }
     
-    public <U> Promise<Void> and(CompletionStage<? extends U> other, BiConsumer<? super T, ? super U> action) {
+    public <U> Promise<Void> and(Promise<? extends U> other, BiConsumer<? super T, ? super U> action, boolean async, Executor executor) {
+        return apply(async, executor,
+                () -> wrapped.thenAcceptBoth(other.wrapped, action),
+                () -> wrapped.thenAcceptBothAsync(other.wrapped, action),
+                () -> wrapped.thenAcceptBothAsync(other.wrapped, action, executor));
+    }
+    
+    public <U> Promise<Void> and(Promise<? extends U> other, BiConsumer<? super T, ? super U> action, boolean async) {
         return and(other, action, false, null);
+    }
+    
+    public <U> Promise<Void> and(Promise<? extends U> other, BiConsumer<? super T, ? super U> action) {
+        return and(other, action, false);
     }
 
-    public Promise<Void> and(CompletionStage<?> other, Runnable action, boolean async, Executor executor) {
+    public Promise<Void> and(Promise<?> other, Runnable action, boolean async, Executor executor) {
         return apply(async, executor,
-                () -> wrapped.runAfterBoth(other, action),
-                () -> wrapped.runAfterBothAsync(other, action),
-                () -> wrapped.runAfterBothAsync(other, action, executor));
+                () -> wrapped.runAfterBoth(other.wrapped, action),
+                () -> wrapped.runAfterBothAsync(other.wrapped, action),
+                () -> wrapped.runAfterBothAsync(other.wrapped, action, executor));
     }
     
-    public Promise<Void> and(CompletionStage<?> other, Runnable action) {
+    public Promise<Void> and(Promise<?> other, Runnable action, boolean async) {
         return and(other, action, false, null);
+    }
+    
+    public Promise<Void> and(Promise<?> other, Runnable action) {
+        return and(other, action, false);
     }
     
     public static <T> Promise<T> anyOf(Promise<T>... cfs) {
@@ -179,37 +225,49 @@ public class Promise<T> extends OmegaObject {
         ));
     }
 
-    public <U> Promise<U> or(CompletionStage<? extends T> other, Function<? super T, U> fn, boolean async, Executor executor) {
+    public <U> Promise<U> or(Promise<? extends T> other, Function<? super T, U> fn, boolean async, Executor executor) {
         return apply(async, executor,
-                () -> wrapped.applyToEither(other, fn),
-                () -> wrapped.applyToEitherAsync(other, fn),
-                () -> wrapped.applyToEitherAsync(other, fn, executor));
+                () -> wrapped.applyToEither(other.wrapped, fn),
+                () -> wrapped.applyToEitherAsync(other.wrapped, fn),
+                () -> wrapped.applyToEitherAsync(other.wrapped, fn, executor));
     }
     
-    public <U> Promise<U> or(CompletionStage<? extends T> other, Function<? super T, U> fn) {
+    public <U> Promise<U> or(Promise<? extends T> other, Function<? super T, U> fn, boolean async) {
         return or(other, fn, false, null);
     }
-
-    public Promise<Void> or(CompletionStage<? extends T> other, Consumer<? super T> action, boolean async, Executor executor) {
-        return apply(async, executor,
-                () -> wrapped.acceptEither(other, action),
-                () -> wrapped.acceptEitherAsync(other, action),
-                () -> wrapped.acceptEitherAsync(other, action, executor));
-    }
     
-    public Promise<Void> or(CompletionStage<? extends T> other, Consumer<? super T> action) {
-        return or(other, action, false, null);
+    public <U> Promise<U> or(Promise<? extends T> other, Function<? super T, U> fn) {
+        return or(other, fn, false);
     }
 
-    public Promise<Void> or(CompletionStage<?> other, Runnable action, boolean async, Executor executor) {
+    public Promise<Void> or(Promise<? extends T> other, Consumer<? super T> action, boolean async, Executor executor) {
         return apply(async, executor,
-                () -> wrapped.runAfterEither(other, action),
-                () -> wrapped.runAfterEitherAsync(other, action),
-                () -> wrapped.runAfterEitherAsync(other, action, executor));
+                () -> wrapped.acceptEither(other.wrapped, action),
+                () -> wrapped.acceptEitherAsync(other.wrapped, action),
+                () -> wrapped.acceptEitherAsync(other.wrapped, action, executor));
     }
     
-    public Promise<Void> or(CompletionStage<?> other, Runnable action) {
+    public Promise<Void> or(Promise<? extends T> other, Consumer<? super T> action, boolean async) {
         return or(other, action, false, null);
+    }
+    
+    public Promise<Void> or(Promise<? extends T> other, Consumer<? super T> action) {
+        return or(other, action, false);
+    }
+
+    public Promise<Void> or(Promise<?> other, Runnable action, boolean async, Executor executor) {
+        return apply(async, executor,
+                () -> wrapped.runAfterEither(other.wrapped, action),
+                () -> wrapped.runAfterEitherAsync(other.wrapped, action),
+                () -> wrapped.runAfterEitherAsync(other.wrapped, action, executor));
+    }
+    
+    public Promise<Void> or(Promise<?> other, Runnable action, boolean async) {
+        return or(other, action, false, null);
+    }
+    
+    public Promise<Void> or(Promise<?> other, Runnable action) {
+        return or(other, action, false);
     }
     
     /**

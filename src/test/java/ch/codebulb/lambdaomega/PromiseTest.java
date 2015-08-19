@@ -74,7 +74,7 @@ public class PromiseTest {
         expectedPromise.join();
         
         actualPromise.completed(it -> {return actual1.a(it);});
-        executeAsync(actualPromiseAsync.completed(it -> {return actual2.a(it);}, true, null),
+        executeAsync(actualPromiseAsync.completed(it -> {return actual2.a(it);}, true),
         actualPromiseAsyncExec.completed(it -> {return actual3.a(it);}, true, DEFAULT_EXECUTOR));
         actualPromise.complete(OUTPUT);
         actualPromiseAsync.complete(OUTPUT);
@@ -128,7 +128,7 @@ public class PromiseTest {
         expectedPromise.join();
         
         actualPromise.completed(() -> {actual1.a(OUTPUT);});
-        executeAsync(actualPromiseAsync.completed(() -> {actual2.a(OUTPUT);}, true, null),
+        executeAsync(actualPromiseAsync.completed(() -> {actual2.a(OUTPUT);}, true),
             actualPromiseAsyncExec.completed(() -> {actual3.a(OUTPUT);}, true, DEFAULT_EXECUTOR));
         actualPromise.complete(ANY_OUTPUT);
         actualPromiseAsync.complete(ANY_OUTPUT);
@@ -147,7 +147,7 @@ public class PromiseTest {
         expectedPromise.join();
         
         actualPromise.completed((it) -> OUTPUT_MODIFIED).completed(it -> {actual1.a(it);});
-        executeAsync(actualPromiseAsync.completed((it) -> OUTPUT_MODIFIED).completed(it -> {actual2.a(it);}, true, null),
+        executeAsync(actualPromiseAsync.completed((it) -> OUTPUT_MODIFIED).completed(it -> {actual2.a(it);}, true),
         actualPromiseAsyncExec.completed((it) -> OUTPUT_MODIFIED).completed(it -> {actual3.a(it);}, true, DEFAULT_EXECUTOR));
         actualPromise.complete(ANY_OUTPUT);
         actualPromiseAsync.complete(ANY_OUTPUT);
@@ -190,7 +190,7 @@ public class PromiseTest {
         expectedPromise.join();
         
         actualPromise.completed((it, err) -> {if (err != null) {fail();}; return actual1.a(it);});
-        executeAsync(actualPromiseAsync.completed((it, err) -> {if (err != null) {fail();}; return actual2.a(it);}, true, null),
+        executeAsync(actualPromiseAsync.completed((it, err) -> {if (err != null) {fail();}; return actual2.a(it);}, true),
         actualPromiseAsyncExec.completed((it, err) -> {if (err != null) {fail();}; return actual3.a(it);}, true, DEFAULT_EXECUTOR));
         actualPromise.complete(OUTPUT);
         actualPromiseAsync.complete(OUTPUT);
@@ -215,7 +215,7 @@ public class PromiseTest {
         }
         
         actualPromise.completed((it, err) -> {if (err == null) {fail();}; return actual1.a(err.getClass().getSimpleName());});
-        executeAsync(actualPromiseAsync.completed((it, err) -> {if (err == null) {fail();}; return actual2.a(err.getClass().getSimpleName());}, true, null),
+        executeAsync(actualPromiseAsync.completed((it, err) -> {if (err == null) {fail();}; return actual2.a(err.getClass().getSimpleName());}, true),
         actualPromiseAsyncExec.completed((it, err) -> {if (err == null) {fail();}; return actual3.a(err.getClass().getSimpleName());}, true, DEFAULT_EXECUTOR));
         actualPromise.completeExceptionally(new MyCompletableFutureTestException());
         actualPromiseAsync.completeExceptionally(new MyCompletableFutureTestException());
@@ -234,7 +234,7 @@ public class PromiseTest {
         expectedPromise.join();
         
         actualPromise.completed((it) -> OUTPUT_MODIFIED).completed((it, err) -> {if (err != null) {fail();}; actual1.a(it);});
-        executeAsync(actualPromiseAsync.completed((it) -> OUTPUT_MODIFIED).completed((it, err) -> {if (err != null) {fail();}; actual2.a(it);}, true, null),
+        executeAsync(actualPromiseAsync.completed((it) -> OUTPUT_MODIFIED).completed((it, err) -> {if (err != null) {fail();}; actual2.a(it);}, true),
         actualPromiseAsyncExec.completed((it) -> OUTPUT_MODIFIED).completed((it, err) -> {if (err != null) {fail();}; actual3.a(it);}, true, DEFAULT_EXECUTOR));
         actualPromise.complete(ANY_OUTPUT);
         actualPromiseAsync.complete(ANY_OUTPUT);
@@ -262,7 +262,7 @@ public class PromiseTest {
         actualPromise.completedExceptionally((MyCompletableFutureTestException it) -> {throw new MyWrappedCompletableFutureTestException(it);})
                 .completed((it, err) -> {if (err == null) {fail();}; return actual1.a(err.getCause().getClass().getSimpleName());});
         executeAsync(actualPromiseAsync.completedExceptionally((MyCompletableFutureTestException it) -> {throw new MyWrappedCompletableFutureTestException(it);})
-                .completed((it, err) -> {if (err == null) {fail();}; return actual2.a(err.getCause().getClass().getSimpleName());}, true, null),
+                .completed((it, err) -> {if (err == null) {fail();}; return actual2.a(err.getCause().getClass().getSimpleName());}, true),
         actualPromiseAsyncExec.completedExceptionally((MyCompletableFutureTestException it) -> {throw new MyWrappedCompletableFutureTestException(it);})
                 .completed((it, err) -> {if (err == null) {fail();}; return actual3.a(err.getCause().getClass().getSimpleName());}, true, DEFAULT_EXECUTOR));
         actualPromise.completeExceptionally(new MyCompletableFutureTestException());
@@ -291,9 +291,9 @@ public class PromiseTest {
         actualPromise2.completed(it -> {actual.a(it);});
         Promise<String> actualPromise3 = new Promise<>();
         actualPromise3.completed(it -> {actual.a(it);});
-        actualPromise.then(it -> actualPromise1.wrapped);
-        executeAsync(actualPromiseAsync.then(it -> actualPromise2.wrapped, true, null),
-        actualPromiseAsyncExec.then(it -> actualPromise3.wrapped, true, DEFAULT_EXECUTOR));
+        actualPromise.then(it -> actualPromise1);
+        executeAsync(actualPromiseAsync.then(it -> actualPromise2, true),
+        actualPromiseAsyncExec.then(it -> actualPromise3, true, DEFAULT_EXECUTOR));
         actualPromise.complete(ANY_OUTPUT);
         actualPromiseAsync.complete(ANY_OUTPUT);
         actualPromiseAsyncExec.complete(ANY_OUTPUT);
@@ -345,9 +345,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.and(actualPromise1.wrapped, (a, b) -> OUTPUT_MODIFIED).completed(it -> {return actual.a(it);});
-        executeAsync(actualPromise.and(actualPromiseAsync.wrapped, (a, b) -> OUTPUT_MODIFIED).completed(it -> {return actual.a(it);}),
-        actualPromiseAsyncExec.and(actualPromise1.wrapped, (a, b) -> OUTPUT_MODIFIED).completed(it -> {return actual.a(it);}));
+        actualPromise.and(actualPromise1, (a, b) -> OUTPUT_MODIFIED).completed(it -> {return actual.a(it);});
+        executeAsync(actualPromise.and(actualPromiseAsync, (a, b) -> OUTPUT_MODIFIED).completed(it -> {return actual.a(it);}),
+        actualPromiseAsyncExec.and(actualPromise1, (a, b) -> OUTPUT_MODIFIED).completed(it -> {return actual.a(it);}));
         actualPromise1.complete(ANY_OUTPUT);
         actualPromise.complete(ANY_OUTPUT);
         actualPromiseAsync.complete(ANY_OUTPUT);
@@ -369,9 +369,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.and(actualPromise1.wrapped, (a, b) -> {actual.a(a);});
-        executeAsync(actualPromise.and(actualPromiseAsync.wrapped, (a, b) -> {actual.a(a);}),
-        actualPromiseAsyncExec.and(actualPromise1.wrapped, (a, b) -> {actual.a(a);}));
+        actualPromise.and(actualPromise1, (a, b) -> {actual.a(a);});
+        executeAsync(actualPromise.and(actualPromiseAsync, (a, b) -> {actual.a(a);}),
+        actualPromiseAsyncExec.and(actualPromise1, (a, b) -> {actual.a(a);}));
         actualPromise1.complete(ANY_OUTPUT);
         actualPromise.complete(OUTPUT);
         actualPromiseAsync.complete(OUTPUT);
@@ -393,9 +393,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.and(actualPromise1.wrapped, () -> {actual.a(OUTPUT);});
-        executeAsync(actualPromise.and(actualPromiseAsync.wrapped, () -> {actual.a(OUTPUT);}),
-        actualPromiseAsyncExec.and(actualPromise1.wrapped, () -> {actual.a(OUTPUT);}));
+        actualPromise.and(actualPromise1, () -> {actual.a(OUTPUT);});
+        executeAsync(actualPromise.and(actualPromiseAsync, () -> {actual.a(OUTPUT);}),
+        actualPromiseAsyncExec.and(actualPromise1, () -> {actual.a(OUTPUT);}));
         actualPromise1.complete(ANY_OUTPUT);
         actualPromise.complete(ANY_OUTPUT);
         actualPromiseAsync.complete(ANY_OUTPUT);
@@ -440,9 +440,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.or(actualPromise1.wrapped, (it) -> it).completed(it -> {return actual.a(it);});
-        executeAsync(actualPromise.or(actualPromiseAsync.wrapped, (it) -> it).completed(it -> {return actual.a(it);}),
-        actualPromiseAsyncExec.or(actualPromise1.wrapped, (it) -> it).completed(it -> {return actual.a(it);}));
+        actualPromise.or(actualPromise1, (it) -> it).completed(it -> {return actual.a(it);});
+        executeAsync(actualPromise.or(actualPromiseAsync, (it) -> it).completed(it -> {return actual.a(it);}),
+        actualPromiseAsyncExec.or(actualPromise1, (it) -> it).completed(it -> {return actual.a(it);}));
         actualPromise1.complete(OUTPUT);
         actualPromise.complete(OUTPUT);
         actualPromiseAsync.complete(OUTPUT);
@@ -464,9 +464,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.or(actualPromise1.wrapped, (it) -> {actual.a(it);});
-        executeAsync(actualPromise.or(actualPromiseAsync.wrapped, (it) -> {actual.a(it);}),
-        actualPromiseAsyncExec.or(actualPromise1.wrapped, (it) -> {actual.a(it);}));
+        actualPromise.or(actualPromise1, (it) -> {actual.a(it);});
+        executeAsync(actualPromise.or(actualPromiseAsync, (it) -> {actual.a(it);}),
+        actualPromiseAsyncExec.or(actualPromise1, (it) -> {actual.a(it);}));
         actualPromise1.complete(OUTPUT);
         actualPromise.complete(OUTPUT);
         actualPromiseAsync.complete(OUTPUT);
@@ -488,9 +488,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.or(actualPromise1.wrapped, () -> {actual.a(OUTPUT);});
-        executeAsync(actualPromise.or(actualPromiseAsync.wrapped, () -> {actual.a(OUTPUT);}),
-        actualPromiseAsyncExec.or(actualPromise1.wrapped, () -> {actual.a(OUTPUT);}));
+        actualPromise.or(actualPromise1, () -> {actual.a(OUTPUT);});
+        executeAsync(actualPromise.or(actualPromiseAsync, () -> {actual.a(OUTPUT);}),
+        actualPromiseAsyncExec.or(actualPromise1, () -> {actual.a(OUTPUT);}));
         actualPromise1.complete(ANY_OUTPUT);
         actualPromise.complete(ANY_OUTPUT);
         actualPromiseAsync.complete(ANY_OUTPUT);
