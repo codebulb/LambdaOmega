@@ -1,9 +1,6 @@
 package ch.codebulb.lambdaomega;
 
 import static ch.codebulb.lambdaomega.F.compareAsc;
-import static ch.codebulb.lambdaomega.F.function;
-import static ch.codebulb.lambdaomega.F.predicate;
-import static ch.codebulb.lambdaomega.F.toDoubleFunction;
 import ch.codebulb.lambdaomega.M.E;
 import static ch.codebulb.lambdaomega.M.e;
 import ch.codebulb.lambdaomega.abstractions.IndexedI;
@@ -111,7 +108,7 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
             throw new UnsupportedOperationException("Methods which use #toMap() must be overridden for performance reasons.");
         }
         else {
-            throw new UnsupportedOperationException("#toMap() is not supported for L.");
+            return toInternalMap();
         }
     }
     
@@ -139,7 +136,7 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
     
     @Override
     public T get(Integer index) {
-        if (containsKey(index)) {
+        if (containsAnyKey(index)) {
             return l.get(index);
         }
         else {
@@ -149,7 +146,7 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
     
     @Override
     public <VN extends T> VN getOrDefault(Integer key, T defaultValue) {
-        if (containsKey(key)) {
+        if (containsAnyKey(key)) {
             return (VN) l.get(key);
         }
         else {
@@ -166,14 +163,44 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
     public Set<Integer> getKeys() {
         return new HashSet<>(R.r(0).to(size()).list);
     }
+
+    @Override
+    public Set<E<Integer, T>> getEntries() {
+        if (!isParallel()) {
+            // use fast sequential counting
+            return Map(new Function<T, E<Integer, T>>() {
+                int i = 0;
+                @Override
+                public E<Integer, T> apply(T t) {
+                    return M.e(i++, t);
+                }
+            }).toSet();
+        }
+        else {
+            // retrieve each index individually
+            return Map(new Function<T, E<Integer, T>>() {
+                @Override
+                public E<Integer, T> apply(T t) {
+                    return M.e(indexOf(t), t);
+                }
+            }).toSet();
+        }
+    }
+    
+    
     
     @Override
-    public boolean containsKey(Integer... keys) {
+    public boolean containsAnyKey(Integer... keys) {
         return C.toStream(keys).anyMatch(it -> it >= 0 && size() > it);
+    }
+
+    @Override
+    public boolean containsAnyKey(Collection<Integer>... key) {
+        return C.toStream(key).anyMatch(c -> C.toStream(c).anyMatch(it -> it >= 0 && size() > it));
     }
     
     @Override
-    public boolean containsValue(T... values) {
+    public boolean containsAnyValue(T... values) {
         return C.toStream(values).anyMatch(it -> l.contains(it));
     }
 
@@ -202,7 +229,7 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
     @Override
     public T putIfAbsent(Integer key, T value) {
         T currentValue = get(key);
-        if (containsKey(key) && currentValue == null) {
+        if (containsAnyKey(key) && currentValue == null) {
             set(key, value);
             return currentValue;
         }
@@ -213,8 +240,8 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
 
     @Override
     public Map<Integer, T> insert(Integer index, T element) {
-        if (containsKey(index)) {
-            throw new M.MapEntryKeyAlreadyPresentException(index, l.get(index));
+        if (containsAnyKey(index)) {
+            throw new IndexAlreadyPresentException(index, l.get(index));
         }
         add(element);
         return toInternalMap();
@@ -233,7 +260,7 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
 
     @Override
     public T replace(Integer key, T value) {
-        if (!containsKey(key)) {
+        if (!containsAnyKey(key)) {
             return null;
         }
         T currentValue = get(key);
@@ -243,7 +270,7 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
 
     @Override
     public boolean replace(Integer key, T oldValue, T newValue) {
-        if (containsKey(key) && l.get(key).equals(oldValue)) {
+        if (containsAnyKey(key) && l.get(key).equals(oldValue)) {
             set(key, newValue);
             return true;
         }
@@ -276,6 +303,12 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
     }
     
     @Override
+    public Map<Integer, T> deleteAllKeys(SequentialI<? extends Integer>... keys) {
+        l(keys).<Integer> Flatten().SortAscBy().forEach((it, i) -> l.remove(it-i));
+        return toInternalMap();
+    }
+    
+    @Override
     public Map<Integer, T> deleteValue(T... value) {
         remove(value);
         return toInternalMap();
@@ -283,6 +316,12 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
     @Override
     public Map<Integer, T> deleteAllValues(Collection<? extends T>... values) {
         removeAll(values);
+        return toInternalMap();
+    }
+
+    @Override
+    public Map<Integer, T> deleteAllValues(SequentialI<? extends T>... values) {
+        C.toStream(values).forEach(c -> C.toStream(c.toCollection()).forEach(it -> deleteValue(it)));
         return toInternalMap();
     }
 
@@ -508,18 +547,18 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
     }
 
     @Override
-    public M<Integer, T> DeleteAllValues(SequentialI<? extends T>... values) {
-        return (M<Integer, T>) IndexedListIS.super.DeleteAllValues(values);
+    public L<T> DeleteAllValues(SequentialI<? extends T>... values) {
+        return (L<T>) IndexedListIS.super.DeleteAllValues(values);
     }
 
     @Override
-    public M<Integer, T> DeleteAllValues(Collection<? extends T>... values) {
-        return (M<Integer, T>) IndexedListIS.super.DeleteAllValues(values);
+    public L<T> DeleteAllValues(Collection<? extends T>... values) {
+        return (L<T>) IndexedListIS.super.DeleteAllValues(values);
     }
 
     @Override
-    public M<Integer, T> DeleteValue(T... value) {
-        return (M<Integer, T>) IndexedListIS.super.DeleteValue(value);
+    public L<T> DeleteValue(T... value) {
+        return (L<T>) IndexedListIS.super.DeleteValue(value);
     }
 
     @Override

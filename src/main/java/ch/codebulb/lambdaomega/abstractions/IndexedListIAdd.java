@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
  */
 public interface IndexedListIAdd<K, V> extends IndexedListI<K, V> {
     public default Map<K, V> insert(K index, V element) {
-        if (containsKey(index)) {
-            throw new M.MapEntryKeyAlreadyPresentException(index, toMap().get(index));
+        if (containsAnyKey(index)) {
+            throw new IndexAlreadyPresentException(index, toMap().get(index));
         }
         return put(index, element);
     }
@@ -20,7 +20,7 @@ public interface IndexedListIAdd<K, V> extends IndexedListI<K, V> {
     default Map<K, V> insertAll(List<Map<? extends K, ? extends V>> m) {
         M.E<K, V> duplicate = findDuplicateKeyInclThis(m);
         if (duplicate != null) {
-            throw new M.MapEntryKeyAlreadyPresentException(duplicate.k, duplicate.v);
+            throw new IndexAlreadyPresentException(duplicate.k, duplicate.v);
         }
         return putAll(m);
     }
@@ -58,5 +58,17 @@ public interface IndexedListIAdd<K, V> extends IndexedListI<K, V> {
     
     public default IndexedListIAdd<K, V> I(IndexedI<? extends K, ? extends V>... m) {
         return InsertAll(m);
+    }
+    
+    public static class IndexAlreadyPresentException extends RuntimeException {
+        // cannot use generics in Throwable
+        public final Object key;
+        public final Object previousValue;
+
+        public IndexAlreadyPresentException(Object key, Object previousValue) {
+            super("Duplicate key found in map. Use #set(...) to override a value. Key: " + key + ", previous value: " + previousValue);
+            this.key = key;
+            this.previousValue = previousValue;
+        }
     }
 }

@@ -6,8 +6,8 @@ import ch.codebulb.lambdaomega.abstractions.SequentialIS;
 import ch.codebulb.lambdaomega.abstractions.IndexedListIS;
 import ch.codebulb.lambdaomega.abstractions.SequentialI;
 import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +83,7 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
     
     @Override
     public <VN extends V> VN get(K key) {
-        if (containsKey(key)) {
+        if (containsAnyKey(key)) {
             return (VN) m.get(key);
         }
         else {
@@ -94,62 +94,66 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
     }
 
     @Override
-    public List<E<K, V>> add(E<K, V>... e) {
+    public Set<E<K, V>> add(E<K, V>... e) {
         C.toStream(e).forEach(it -> put(it.k, it.v));
-        return toList();
+        return toSet();
     }
 
     @Override
-    public List<E<K, V>> clear() {
+    public Set<E<K, V>> clear() {
         m.clear();
-        return toList();
+        return toSet();
     }
 
     @Override
-    public List<E<K, V>> remove(E<K, V>... value) {
+    public Set<E<K, V>> remove(E<K, V>... value) {
         return removeAll(C.toList(value));
     }
 
     @Override
-    public List<E<K, V>> removeAll(Collection<? extends E<K, V>>... c) {
+    public Set<E<K, V>> removeAll(Collection<? extends E<K, V>>... c) {
         C.toStream(c).forEach(col -> {
             Map<K, V> asMap = C.toStream(col).map(it -> e(it.k, it.v)).collect(Collectors.toMap(it -> it.k, it -> it.v));
             asMap.forEach((k, v) -> m.remove(k, v));
         });
-        return toList();
+        return toSet();
     }
 
     @Override
-    public List<E<K, V>> retainAll(Collection<? extends E<K, V>>... c) {
+    public Set<E<K, V>> retainAll(Collection<? extends E<K, V>>... c) {
+        Map<K, V> allMap = new HashMap<>();
         C.toStream(c).forEach(col -> {
             Map<K, V> asMap = C.toStream(col).map(it -> e(it.k, it.v)).collect(Collectors.toMap(it -> it.k, it -> it.v));
-            List<K> found = L.list();
-            asMap.forEach((k, v) -> {
-                if (!Objects.equals(m.get(k), v)) {
-                    found.add(k);
-                }
-            });
-            found.stream().forEach(k -> m.remove(k));
+            allMap.putAll(asMap);
         });
-        return toList();
+        
+        List<K> found = L.list();
+        m.forEach((k, v) -> {
+            if (!Objects.equals(allMap.get(k), v)) {
+                found.add(k);
+            }
+        });
+        found.stream().forEach(k -> m.remove(k));
+        
+        return toSet();
     }
 
     @Override
-    public List<E<K, V>> addAll(Collection<? extends E<K, V>>... c) {
+    public Set<E<K, V>> addAll(Collection<? extends E<K, V>>... c) {
         C.toStream(c).forEach(col -> {
             Map<K, V> asMap = C.toStream(col).map(it -> e(it.k, it.v)).collect(Collectors.toMap(it -> it.k, it -> it.v));
             putAll(asMap);
         });
-        return toList();
+        return toSet();
     }
     
     @Override
-    public List<E<K, V>> addAll(SequentialI<? extends E<K, V>>... c) {
+    public Set<E<K, V>> addAll(SequentialI<? extends E<K, V>>... c) {
         C.toStream(c).forEach(col -> {
             Map<K, V> asMap = C.toStream(col.toCollection()).map(it -> e(it.k, it.v)).collect(Collectors.toMap(it -> it.k, it -> it.v));
             putAll(asMap);
         });
-        return toList();
+        return toSet();
     }
     
     @Override
@@ -373,35 +377,40 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
     public M<K, V> Put(K key, V value) {
         return (M<K, V>) IndexedListIS.super.Put(key, value);
     }
-
+    
     @Override
-    public L<E<K, V>> R(SequentialI<? extends E<K, V>>... c) {
-        return (L<E<K, V>>) SequentialIS.super.R(c);
+    public Set<E<K, V>> removeAll(SequentialI<? extends E<K, V>>... c) {
+        return (Set<E<K, V>>) SequentialIS.super.removeAll(c);
     }
 
     @Override
-    public L<E<K, V>> RemoveAll(SequentialI<? extends E<K, V>>... c) {
-        return (L<E<K, V>>) SequentialIS.super.RemoveAll(c);
+    public M<K, V> R(SequentialI<? extends E<K, V>>... c) {
+        return (M<K, V>) SequentialIS.super.R(c);
     }
 
     @Override
-    public L<E<K, V>> R(Collection<? extends E<K, V>>... c) {
-        return (L<E<K, V>>) SequentialIS.super.R(c);
+    public M<K, V> RemoveAll(SequentialI<? extends E<K, V>>... c) {
+        return (M<K, V>) SequentialIS.super.RemoveAll(c);
     }
 
     @Override
-    public L<E<K, V>> RemoveAll(Collection<? extends E<K, V>>... c) {
-        return (L<E<K, V>>) SequentialIS.super.RemoveAll(c);
+    public M<K, V> R(Collection<? extends E<K, V>>... c) {
+        return (M<K, V>) SequentialIS.super.R(c);
     }
 
     @Override
-    public L<E<K, V>> r(E<K, V>... value) {
-        return (L<E<K, V>>) SequentialIS.super.r(value);
+    public M<K, V> RemoveAll(Collection<? extends E<K, V>>... c) {
+        return (M<K, V>) SequentialIS.super.RemoveAll(c);
     }
 
     @Override
-    public L<E<K, V>> Remove(E<K, V>... value) {
-        return (L<E<K, V>>) SequentialIS.super.Remove(value);
+    public M<K, V> r(E<K, V>... value) {
+        return (M<K, V>) SequentialIS.super.r(value);
+    }
+
+    @Override
+    public M<K, V> Remove(E<K, V>... value) {
+        return (M<K, V>) SequentialIS.super.Remove(value);
     }
 
     @Override
@@ -469,18 +478,6 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
     @Override
     public String toString() {
         return "M" + m.toString();
-    }
-    
-    public static class MapEntryKeyAlreadyPresentException extends RuntimeException {
-        // cannot use generics in Throwable
-        public final Object key;
-        public final Object previousValue;
-
-        public MapEntryKeyAlreadyPresentException(Object key, Object previousValue) {
-            super("Duplicate key found in map. Use #set(...) to override a value. Key: " + key + ", previous value: " + previousValue);
-            this.key = key;
-            this.previousValue = previousValue;
-        }
     }
     
     public static <K, V> E<K, V> e(K k, V v) {

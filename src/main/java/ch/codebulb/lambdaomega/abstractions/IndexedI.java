@@ -31,20 +31,12 @@ public interface IndexedI<K, V> extends ReadonlyIndexedI<K, V> {
         return toMap().entrySet().stream().map(it -> e(it)).collect(Collectors.toSet());
     }
 
-    public default boolean containsKey(K... key) {
+    public default boolean containsAnyKey(K... key) {
         return C.toStream(key).anyMatch(it -> toMap().containsKey(it));
     }
-    
-    public default boolean containsAnyKey(Collection<K>... key) {
-        return C.toStream(key).anyMatch(c -> C.toStream(c).anyMatch(it -> toMap().containsKey(it)));
-    }
 
-    public default boolean containsValue(V... value) {
+    public default boolean containsAnyValue(V... value) {
         return C.toStream(value).anyMatch(it -> toMap().containsValue(it));
-    }
-    
-    public default boolean containsAnyValue(Collection<V>... value) {
-        return C.toStream(value).anyMatch(c -> C.toStream(c).anyMatch(it -> toMap().containsValue(it)));
     }
     
     public default K getKey(V value) {

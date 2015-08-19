@@ -1,22 +1,20 @@
 package ch.codebulb.lambdaomega.abstractions;
 
 import ch.codebulb.lambdaomega.C;
-import static ch.codebulb.lambdaomega.L.l;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Adds a contract to work with "add" / "insert" functionality to a {@link SequentialI}.
  */
 public interface SequentialIAdd<T> extends SequentialI<T> {
-    public default List<T> add(T... e) {
+    public default Collection<T> add(T... e) {
         C.toStream(e).forEach(it -> toCollection().add(it));
-        return toList();
+        return toCollection();
     }
     
-    public default List<T> addAll(Collection<? extends T>... c) {
+    public default Collection<T> addAll(Collection<? extends T>... c) {
         C.toStream(c).forEach(it -> toCollection().addAll(it));
-        return toList();
+        return toCollection();
     }
     
     public default SequentialIAdd<T> Add(T... e) {
@@ -37,9 +35,9 @@ public interface SequentialIAdd<T> extends SequentialI<T> {
         return AddAll(c);
     }
     
-    public default List<T> addAll(SequentialI<? extends T>... c) {
+    public default Collection<T> addAll(SequentialI<? extends T>... c) {
         C.toStream(c).forEach(it -> toCollection().addAll(it.toCollection()));
-        return toList();
+        return toCollection();
     }
     
     public default SequentialIAdd<T> AddAll(SequentialI<? extends T>... c) {

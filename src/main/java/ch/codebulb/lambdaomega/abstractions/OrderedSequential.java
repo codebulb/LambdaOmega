@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -18,6 +18,26 @@ import java.util.stream.Collectors;
  * Adds a contract for access to an ordered data structure to a {@link SequentialIS}.
  */
 public interface OrderedSequential<T> extends SequentialIS<T> {
+    public default List<T> toList() {
+        return C.toList(toCollection());
+    }
+    
+    public default Object[] toArray() {
+        return toCollection().toArray();
+    }
+    
+    public default <T> T[] toArray(T[] a) {
+        return toCollection().toArray(a);
+    }
+    
+    public default T[] toArray(IntFunction<T[]> generator) {
+        return stream().toArray(generator);
+    }
+    
+    public default R toRange() {
+        return R.r(0).to(toCollection().size());
+    }
+    
     public default int lastIndexOf(T o) {
         return toList().lastIndexOf(o);
     }
@@ -27,11 +47,7 @@ public interface OrderedSequential<T> extends SequentialIS<T> {
     }
 
     public default List<T> subList(int fromIndex, int toIndex) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
-    public default R toRange() {
-        return R.r(0).to(toCollection().size());
+        return toList().subList(fromIndex, toIndex);
     }
     
     public default List<T> get(R range) {
@@ -84,4 +100,43 @@ public interface OrderedSequential<T> extends SequentialIS<T> {
         return (Map<Boolean, List<T>>)SequentialIS.super.partition(predicate);
     }
     
+    @Override
+    public default List<T> removeAll(SequentialI<? extends T>... c) {
+        return (List<T>)SequentialIS.super.removeAll(c);
+    }
+    
+    @Override
+    public default List<T> clear() {
+        return (List<T>)SequentialIS.super.clear();
+    }
+    
+    @Override
+    public default List<T> remove(T... value) {
+        return (List<T>)SequentialIS.super.remove(value);
+    }
+    
+    @Override
+    public default List<T> removeAll(Collection<? extends T>... c) {
+        return (List<T>)SequentialIS.super.removeAll(c);
+    }
+    
+    @Override
+    public default List<T> retainAll(Collection<? extends T>... c) {
+        return (List<T>)SequentialIS.super.retainAll(c);
+    }
+    
+    @Override
+    public default List<T> add(T... e) {
+        return (List<T>)SequentialIS.super.add(e);
+    }
+    
+    @Override
+    public default List<T> addAll(Collection<? extends T>... c) {
+        return (List<T>)SequentialIS.super.addAll(c);
+    }
+
+    @Override
+    public default List<T> addAll(SequentialI<? extends T>... c) {
+        return (List<T>)SequentialIS.super.addAll(c);
+    }
 }

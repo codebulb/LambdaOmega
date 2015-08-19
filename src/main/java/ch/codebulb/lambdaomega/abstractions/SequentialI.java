@@ -1,12 +1,12 @@
 package ch.codebulb.lambdaomega.abstractions;
 
 import ch.codebulb.lambdaomega.C;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Spliterator;
-import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,10 +16,6 @@ import java.util.stream.Stream;
  */
 public interface SequentialI<T> {
     public Collection<T> toCollection();
-    
-    public default List<T> toList() {
-        return C.toList(toCollection());
-    }
     
     public default Set<T> toSet() {
         return C.toSet(toCollection());
@@ -40,18 +36,6 @@ public interface SequentialI<T> {
     public default Spliterator<T> spliterator() {
         return toCollection().spliterator();
     }
-
-    public default Object[] toArray() {
-        return toCollection().toArray();
-    }
-    
-    public default <T> T[] toArray(T[] a) {
-        return toCollection().toArray(a);
-    }
-    
-    public default T[] toArray(IntFunction<T[]> generator) {
-        return stream().toArray(generator);
-    }
     
     public default int size() {
         return toCollection().size();
@@ -69,23 +53,26 @@ public interface SequentialI<T> {
         return C.toStream(c).allMatch(it -> toCollection().containsAll(it));
     }
     
-    public default List<T> clear() {
+    public default Collection<T> clear() {
         toCollection().clear();
-        return toList();
+        return toCollection();
     }
 
-    public default List<T> remove(T... value) {
+    public default Collection<T> remove(T... value) {
         C.toStream(value).forEach(it -> toCollection().remove(it));
-        return toList();
+        return toCollection();
     }
     
-    public default List<T> removeAll(Collection<? extends T>... c) {
+    public default Collection<T> removeAll(Collection<? extends T>... c) {
         C.toStream(c).forEach(it -> toCollection().removeAll(it));
-        return toList();
+        return toCollection();
     }
     
-    public default List<T> retainAll(Collection<? extends T>... c) {
-        C.toStream(c).forEach(it -> toCollection().retainAll(it));
-        return toList();
+    public default Collection<T> retainAll(Collection<? extends T>... c) {
+        List<T> all = new ArrayList<>();
+        C.toStream(c).forEach(it -> all.addAll(it));
+        
+        toCollection().retainAll(all);
+        return toCollection();
     }
 }

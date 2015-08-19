@@ -1,9 +1,6 @@
 package ch.codebulb.lambdaomega.abstractions;
 
 import ch.codebulb.lambdaomega.C;
-import ch.codebulb.lambdaomega.L;
-import static ch.codebulb.lambdaomega.L.L;
-import ch.codebulb.lambdaomega.U;
 import java.util.Collection;
 import java.util.Map;
 
@@ -11,6 +8,14 @@ import java.util.Map;
  * Adds syntactic sugar to a {@link IndexedIFunctionsS}.
  */
 public interface IndexedIS<K, V> extends IndexedIFunctionsS<K, V> {
+    public default boolean containsAnyKey(Collection<K>... key) {
+        return C.toStream(key).anyMatch(c -> C.toStream(c).anyMatch(it -> toMap().containsKey(it)));
+    }
+    
+    public default boolean containsAnyValue(Collection<V>... value) {
+        return C.toStream(value).anyMatch(c -> C.toStream(c).anyMatch(it -> containsAnyValue(it)));
+    }
+    
     public default IndexedI<K, V> Put(K key, V value) {
         put(key, value);
         return this;

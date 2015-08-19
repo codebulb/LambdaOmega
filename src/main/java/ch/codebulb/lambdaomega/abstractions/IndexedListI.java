@@ -3,12 +3,9 @@ package ch.codebulb.lambdaomega.abstractions;
 import ch.codebulb.lambdaomega.C;
 import ch.codebulb.lambdaomega.M;
 import static ch.codebulb.lambdaomega.M.e;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,17 +46,5 @@ public interface IndexedListI<K, V> extends IndexedIS<K, V> {
             }
         }
         return null;
-    }
-    
-    public static class MapEntryKeyAlreadyPresentException extends RuntimeException {
-        // cannot use generics in Throwable
-        public final Object key;
-        public final Object previousValue;
-
-        public MapEntryKeyAlreadyPresentException(Object key, Object previousValue) {
-            super("Duplicate key found in map. Use #set(...) to override a value. Key: " + key + ", previous value: " + previousValue);
-            this.key = key;
-            this.previousValue = previousValue;
-        }
-    }    
+    }  
 }
