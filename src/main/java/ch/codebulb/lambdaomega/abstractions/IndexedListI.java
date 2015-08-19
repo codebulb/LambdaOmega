@@ -63,6 +63,10 @@ public interface IndexedListI<K, V> extends IndexedIS<K, V> {
         return null;
     }  
     
+    /**
+     * Signals that an attempt to {@link IndexedListI#insert(Object, Object)} an object with an already existing index / key
+     * has been detected and rejected.
+     */
     public static class IndexAlreadyPresentException extends RuntimeException {
         // cannot use generics in Throwable
         public final Object key;

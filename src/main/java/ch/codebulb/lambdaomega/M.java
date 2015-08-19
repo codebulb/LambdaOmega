@@ -488,6 +488,12 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
         return new E(entry.getKey(), entry.getValue());
     }
 
+    /**
+     * The "E" stands for "entry". Represents a single {@link Map} entry and can be converted to a {@link Entry}.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     */
     public static class E<K, V> implements Comparable<E<K, V>> {
         public final K k;
         public final V v;

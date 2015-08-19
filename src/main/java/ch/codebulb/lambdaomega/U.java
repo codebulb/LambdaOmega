@@ -19,6 +19,12 @@ public class U {
         return new Choice<>(predicate, function);
     }
     
+    /**
+     * Represents a simple choice tree. This structure can be used as an alternative to
+     * an <code>if</code> / <code>else if</code> / <code>else</code> structure with optionally enforced choice.
+     *
+     * @param <T> the return type
+     */
     public static class Choice<T> {
         private final L<V2<Boolean, Supplier<T>>> choices;
         
@@ -50,6 +56,9 @@ public class U {
             }
         }
         
+        /**
+         * Signals that none of the {@link Choice}s provided resolved to <code>true</code>.
+         */
         public static class NoValidChoiceException extends Exception {
             
         }

@@ -355,6 +355,12 @@ public class Promise<T> extends OmegaObject {
         return wrapped.toString();
     }
     
+    /**
+     * Contrary to the checked {@link Exception} {@link InterruptedException} originally thrown by {@link CompletableFuture}, a {@link Promise}
+     * will use this unchecked {@link RuntimeException} only. Reason: 
+     * <a href="http://www.codebulb.ch/2015/04/6-rules-of-exception-handling-by-example-part-2.html#checked">
+     * it's best practice to use unchecked exceptions for technical exceptions</a>.
+     */
     public static class InterruptedException extends RuntimeException {
         public InterruptedException(java.lang.InterruptedException inner) {
             super(inner);

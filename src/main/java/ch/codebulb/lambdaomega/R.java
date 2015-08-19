@@ -34,6 +34,9 @@ public class R extends OmegaObject {
         return new Rinit(startInclusive);
     }
     
+    /**
+     * An intermediary (builder) type used to build a {@link R} instance. Use {@link #r(int)} to create an {@link R} instance.
+     */
     public static class Rinit {
         private final int startInclusive;
 

@@ -3,6 +3,8 @@ package ch.codebulb.lambdaomega;
 import static ch.codebulb.lambdaomega.L.list;
 import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import ch.codebulb.lambdaomega.abstractions.ReadonlyIndexedI;
+import ch.codebulb.lambdaomega.abstractions.SequentialI;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -109,9 +111,19 @@ public class V2<X, Y> extends OmegaObject implements ReadonlyIndexedI<Integer, O
         return true;
     }
     
+    /**
+     * A sub-type of a {@link L} of {@link V2}, providing additional support to {@link #Add(Object, Object)} a {@link V2} by individual elements.
+     *
+     * @param <X> the type of the 1st element
+     * @param <Y> the type of the 2nd element
+     */
     public static class LV2<X, Y> extends L<V2<X, Y>> {
         public LV2(List<V2<X, Y>> list) {
             super(list);
+        }
+        
+        public LV2<X, Y> Add(X x, Y y) {
+          return (LV2<X, Y>) Add(V2.v(x, y));
         }
         
         public LV2<X, Y> a(X x, Y y) {
