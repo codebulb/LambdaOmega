@@ -117,7 +117,7 @@ Set<Integer> set = l(0, 1, 2).toSet();
 ```
 These conversion methods internally use the `C.to…(…)` static helper methods. You can call them directly to convert collection without the need to create intermediate L / M instances.
 
-There are a lot of additional methods for L and M. For more information, visit the [API docs](http://codebulb.github.io/pages/2015/08/LambdaOmega/doc/).
+There are a lot of additional methods for L and M. For more information, visit the [API docs](http://codebulb.github.io/pages/LambdaOmega/doc/).
 
 
 ## A List is a Map and a Map is a List
@@ -184,7 +184,7 @@ M<String, L> withDefault = m(L.class).WithDefault(it -> l());
 withDefault.g("a").a(1);
 println(withDefault); // prints M{a=L[1]}
 ```
-Take a look at the [API docs](http://codebulb.github.io/pages/2015/08/LambdaOmega/doc/) to see all available functional operations.
+Take a look at the [API docs](http://codebulb.github.io/pages/LambdaOmega/doc/) to see all available functional operations.
 
 ## Ranges
 The `R` class represents an int range. It’s basically syntactic sugar to create ranges using the Java 8 stream API.
@@ -216,4 +216,4 @@ Even though its core functionality is perfectly working already, there’s no st
 Please let me know what you think about this library. Do you think it is useful, useless, harmful, crazy, funny? I’m open to any kind of improvement proposals. I’ve started this project for my own pleasure and usage and to learn more about Java 8’s collection API. I will try to work on a complete, stable implementation in the near future, but I may as well leave it as it is for now. If you’re really enthusiastic about this library and you’d like to team up to get it finished, please let me know.
 
 ## For more information
-Please visit the **[accompanying blog post](http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html)** to learn more about why I created this library or check out the **[API docs](http://codebulb.github.io/pages/2015/08/LambdaOmega/doc/)**.
+Please visit the **[accompanying blog post](http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html)** to learn more about why I created this library or check out the **[API docs](http://codebulb.github.io/pages/LambdaOmega/doc/)**.
