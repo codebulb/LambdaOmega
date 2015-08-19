@@ -2,6 +2,7 @@ package ch.codebulb.lambdaomega;
 
 import static ch.codebulb.lambdaomega.L.l;
 import static ch.codebulb.lambdaomega.U.*;
+import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -18,7 +19,7 @@ import java.util.function.Supplier;
 /**
  * A drop-in-replacement of {@link CompletableFuture} with a simplified, more concise API.
  */
-public class Promise<T> {
+public class Promise<T> extends OmegaObject {
     public final CompletableFuture<T> wrapped;
     
     public static <T> Promise<T> wrap(CompletableFuture<T> inner) {

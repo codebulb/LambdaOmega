@@ -1,5 +1,6 @@
 package ch.codebulb.lambdaomega;
 
+import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import ch.codebulb.lambdaomega.abstractions.ReadonlyIndexedI;
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +24,7 @@ import java.util.function.ToDoubleFunction;
  * @param <R> the function return type
  */
 // TODO Complete implementation, supporting all available functional interfaces
-public class F<T, T1 extends T, T2 extends T, R> implements ReadonlyIndexedI<T, R> {
+public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements ReadonlyIndexedI<T, R> {
     private Function<T, R> function;
     private BiFunction<T1, T2, R> biFunction;
     private BiConsumer<T1, T2> biConsumer;

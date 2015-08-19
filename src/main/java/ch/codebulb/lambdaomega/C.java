@@ -1,6 +1,7 @@
 
 package ch.codebulb.lambdaomega;
 
+import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import ch.codebulb.lambdaomega.abstractions.ReadonlyIndexedI;
 import ch.codebulb.lambdaomega.abstractions.StreamableI;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import java.util.stream.StreamSupport;
  * @param <V> the type of a value for indexed access
  */
 // TODO Complete implementation with more converters
-public abstract class C<T, K, V> implements StreamableI, ReadonlyIndexedI<K, V> {
+public abstract class C<T, K, V> extends OmegaObject implements StreamableI, ReadonlyIndexedI<K, V> {
     private boolean parallel;
     protected Function<K, V> defaultValue;
     
@@ -62,10 +63,6 @@ public abstract class C<T, K, V> implements StreamableI, ReadonlyIndexedI<K, V> 
     public C<T, K, V> WithDefault(Function<K, V> defaultValue) {
         this.defaultValue = defaultValue;
         return this;
-    }
-    
-    public void println() {
-        U.println(this);
     }
     
     public <C extends Collection<T>> C to(Class<C> format) {

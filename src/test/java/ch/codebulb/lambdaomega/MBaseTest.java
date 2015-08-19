@@ -3,6 +3,7 @@ package ch.codebulb.lambdaomega;
 import static ch.codebulb.lambdaomega.L.*;
 import static ch.codebulb.lambdaomega.M.*;
 import static ch.codebulb.lambdaomega.TestUtil.*;
+import ch.codebulb.lambdaomega.abstractions.I;
 import java.util.List;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -31,7 +32,7 @@ public class MBaseTest {
     
     @Test
     public void testWithDefault() {
-        M<String, List<String>> mapWithDefault = m("a", list("a?")).i("b", list("b?")).i("c", list("c?")).WithDefault(it -> list(it + '!'));
+        I<String, List<String>> mapWithDefault = m("a", list("a?")).i("b", list("b?")).i("c", list("c?")).WithDefault(it -> list(it + '!'));
         assertEquals(list("a?"), mapWithDefault.get("a"));
         assertEquals(list("e!"), mapWithDefault.get("e"));
         

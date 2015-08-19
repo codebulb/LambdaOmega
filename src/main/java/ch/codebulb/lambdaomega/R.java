@@ -1,6 +1,7 @@
 package ch.codebulb.lambdaomega;
 
 import static ch.codebulb.lambdaomega.L.*;
+import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -8,7 +9,7 @@ import java.util.stream.IntStream;
 /**
  * The "R" stands for "range". An implementation of a wrapper API for an {@link IntStream} range. This is an immutable type.
  */
-public class R {
+public class R extends OmegaObject {
     public final int startInclusive;
     public final int endExclusive;
     public final IntStream r;

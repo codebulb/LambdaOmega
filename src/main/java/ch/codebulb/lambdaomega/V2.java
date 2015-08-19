@@ -1,6 +1,7 @@
 package ch.codebulb.lambdaomega;
 
 import static ch.codebulb.lambdaomega.L.list;
+import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import ch.codebulb.lambdaomega.abstractions.ReadonlyIndexedI;
 import java.util.List;
 import java.util.Objects;
@@ -12,7 +13,7 @@ import java.util.function.Function;
  * @param <X> the type of the 1st element
  * @param <Y> the type of the 2nd element
  */
-public class V2<X, Y> implements ReadonlyIndexedI<Integer, Object> {
+public class V2<X, Y> extends OmegaObject implements ReadonlyIndexedI<Integer, Object> {
     private X x;
     private Y y;
     private Function<Integer, Object> defaultValue;
