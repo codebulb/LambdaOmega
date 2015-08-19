@@ -14,6 +14,21 @@ import java.util.stream.Stream;
  * It is loosely inspired by some methods of {@link List} which may actually also fit a {@link Map}.
  */
 public interface IndexedListI<K, V> extends IndexedIS<K, V> {
+    public default Map<K, V> insert(K index, V element) {
+        if (containsAnyKey(index)) {
+            throw new IndexAlreadyPresentException(index, toMap().get(index));
+        }
+        return put(index, element);
+    }
+    
+    default Map<K, V> insertAll(List<Map<? extends K, ? extends V>> m) {
+        M.E<K, V> duplicate = findDuplicateKeyInclThis(m);
+        if (duplicate != null) {
+            throw new IndexAlreadyPresentException(duplicate.k, duplicate.v);
+        }
+        return putAll(m);
+    }
+    
     public default Map<K, V> set(K index, V element) {
         return put(index, element);
     }
@@ -47,4 +62,16 @@ public interface IndexedListI<K, V> extends IndexedIS<K, V> {
         }
         return null;
     }  
+    
+    public static class IndexAlreadyPresentException extends RuntimeException {
+        // cannot use generics in Throwable
+        public final Object key;
+        public final Object previousValue;
+
+        public IndexAlreadyPresentException(Object key, Object previousValue) {
+            super("Duplicate key found in map. Use #set(...) to override a value. Key: " + key + ", previous value: " + previousValue);
+            this.key = key;
+            this.previousValue = previousValue;
+        }
+    }
 }

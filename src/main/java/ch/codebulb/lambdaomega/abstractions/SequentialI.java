@@ -57,6 +57,16 @@ public interface SequentialI<T> {
         toCollection().clear();
         return toCollection();
     }
+    
+    public default Collection<T> add(T... e) {
+        C.toStream(e).forEach(it -> toCollection().add(it));
+        return toCollection();
+    }
+    
+    public default Collection<T> addAll(Collection<? extends T>... c) {
+        C.toStream(c).forEach(it -> toCollection().addAll(it));
+        return toCollection();
+    }
 
     public default Collection<T> remove(T... value) {
         C.toStream(value).forEach(it -> toCollection().remove(it));

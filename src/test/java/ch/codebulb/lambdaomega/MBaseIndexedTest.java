@@ -9,7 +9,7 @@ import static ch.codebulb.lambdaomega.TestUtil.EXPECTED_LIST;
 import static ch.codebulb.lambdaomega.TestUtil.EXPECTED_MAP;
 import static ch.codebulb.lambdaomega.TestUtil.EXPECTED_MAP_2_ELEMENTS;
 import static ch.codebulb.lambdaomega.TestUtil.assertEquals;
-import ch.codebulb.lambdaomega.abstractions.IndexedListIAdd;
+import ch.codebulb.lambdaomega.abstractions.IndexedListI.IndexAlreadyPresentException;
 import java.util.Map;
 import static org.junit.Assert.fail;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class MBaseIndexedTest {
             addMap.Insert("b", 2);
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex) {
+        catch (IndexAlreadyPresentException ex) {
             assertEquals("b", ex.key);
             assertEquals(1, ex.previousValue);
         }
@@ -40,7 +40,7 @@ public class MBaseIndexedTest {
             addMap.insert("b", 2);
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex)  {
+        catch (IndexAlreadyPresentException ex)  {
             assertEquals("b", ex.key);
             assertEquals(1, ex.previousValue);
         }
@@ -50,7 +50,7 @@ public class MBaseIndexedTest {
             addMap.i("b", 2);
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex)  {
+        catch (IndexAlreadyPresentException ex)  {
             assertEquals("b", ex.key);
             assertEquals(1, ex.previousValue);
         }
@@ -66,7 +66,7 @@ public class MBaseIndexedTest {
             addMap.InsertAll(m("b", 4).i("c", 2).m, m("a", 3).m);
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex) {
+        catch (IndexAlreadyPresentException ex) {
             assertEquals("b", ex.key);
             assertEquals(1, ex.previousValue);
         }
@@ -76,7 +76,7 @@ public class MBaseIndexedTest {
             addMap.insertAll(m("b", 4).i("c", 2).m, m("a", 3).m);
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex) {
+        catch (IndexAlreadyPresentException ex) {
             assertEquals("b", ex.key);
             assertEquals(1, ex.previousValue);
         }
@@ -86,7 +86,7 @@ public class MBaseIndexedTest {
             addMap.I(m("b", 4).i("c", 2).m, m("a", 3).m);
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex) {
+        catch (IndexAlreadyPresentException ex) {
             assertEquals("b", ex.key);
             assertEquals(1, ex.previousValue);
         }
@@ -97,7 +97,7 @@ public class MBaseIndexedTest {
             addMap.InsertAll(m("c", 2).i("d", 3).m, m("d", 4).m);
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex) {
+        catch (IndexAlreadyPresentException ex) {
             assertEquals("d", ex.key);
             assertEquals(3, ex.previousValue);
         }
@@ -107,7 +107,7 @@ public class MBaseIndexedTest {
             addMap.insertAll(m("c", 2).i("d", 3), m("d", 4));
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex) {
+        catch (IndexAlreadyPresentException ex) {
             assertEquals("d", ex.key);
             assertEquals(3, ex.previousValue);
         }
@@ -117,7 +117,7 @@ public class MBaseIndexedTest {
             addMap.I(m("c", 2).i("d", 3), m("d", 4));
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex) {
+        catch (IndexAlreadyPresentException ex) {
             assertEquals("d", ex.key);
             assertEquals(3, ex.previousValue);
         }
@@ -133,21 +133,21 @@ public class MBaseIndexedTest {
             addMap.InsertAll(m("b", 1).i("c", 2), m("a", 3));
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex) {}
+        catch (IndexAlreadyPresentException ex) {}
         assertEquals(EXPECTED_MAP_2_ELEMENTS, addMap.m);
         addMap = m("a", 0).i("b", 1);
         try {
             addMap.insertAll(m("b", 1).i("c", 2), m("a", 3));
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex) {}
+        catch (IndexAlreadyPresentException ex) {}
         assertEquals(EXPECTED_MAP_2_ELEMENTS, addMap.m);
         addMap = m("a", 0).i("b", 1);
         try {
             addMap.I(m("b", 1).i("c", 2), m("a", 3));
             fail();
         }
-        catch (IndexedListIAdd.IndexAlreadyPresentException ex) {}
+        catch (IndexAlreadyPresentException ex) {}
         assertEquals(EXPECTED_MAP_2_ELEMENTS, addMap.m);
         
         // Put at index

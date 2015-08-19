@@ -2,7 +2,6 @@ package ch.codebulb.lambdaomega.abstractions;
 
 import static ch.codebulb.lambdaomega.F.compare;
 import static ch.codebulb.lambdaomega.F.compareAsc;
-import static ch.codebulb.lambdaomega.L.L;
 import ch.codebulb.lambdaomega.M;
 import ch.codebulb.lambdaomega.V2;
 import java.util.ArrayList;
@@ -16,14 +15,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * Adds a contract to work with functional interfaces to a {@link SequentialIAdd}.
  */
-public interface SequentialIFunctions<T> extends SequentialIAdd<T>, FunctionsI {
+public interface SequentialIFunctions<T> extends SequentialI<T>, FunctionsI {
     public default String join(CharSequence delimiter) {
         return stream().map(it -> it.toString()).collect(Collectors.joining(delimiter));
     }

@@ -9,7 +9,7 @@ import static ch.codebulb.lambdaomega.S.set;
 import static ch.codebulb.lambdaomega.TestUtil.EXPECTED_LIST;
 import static ch.codebulb.lambdaomega.TestUtil.assertEquals;
 import ch.codebulb.lambdaomega.abstractions.IndexedI;
-import ch.codebulb.lambdaomega.abstractions.IndexedListIAdd.IndexAlreadyPresentException;
+import ch.codebulb.lambdaomega.abstractions.IndexedListI.IndexAlreadyPresentException;
 import org.junit.AfterClass;
 import static org.junit.Assert.fail;
 import org.junit.BeforeClass;
