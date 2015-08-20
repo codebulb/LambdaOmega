@@ -4,6 +4,7 @@ import ch.codebulb.lambdaomega.M.E;
 import ch.codebulb.lambdaomega.abstractions.IndexedI;
 import ch.codebulb.lambdaomega.abstractions.SequentialIS;
 import ch.codebulb.lambdaomega.abstractions.IndexedListIS;
+import ch.codebulb.lambdaomega.abstractions.ReadonlyIndexedI;
 import ch.codebulb.lambdaomega.abstractions.SequentialI;
 import java.util.AbstractMap;
 import java.util.Collection;
@@ -21,48 +22,86 @@ import java.util.stream.Collectors;
 
 /**
  * The "M" stands for "map". An implementation of a wrapper API for {@link Map} which provides both indexed access (from <code>K</code> to <code>V</code>)
- * and sequential access (of type {@link E} with generic parameters <code>K</code> to <code>V</code>).
+ * and sequential access (of type {@link E} with generic parameters <code>K</code> to <code>V</code>).<p/>
+ * 
+ * The constructor of this class is not visible; use one of the convenience {@link #m(Object, Object)} methods to create a new instance of this class.
+ * It's best practice to statically import these functions in client code.
  * 
  * @param <K> the key type
  * @param <V> the value type
  */
 public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V>>, IndexedListIS<K, V> {
+    /**
+     * The {@link Map} wrapped by this API.
+     */
     public final Map<K, V> m;
 
     private M(Map<K, V> map) {
         this.m = map;
     }
     
+    /**
+     * Creates an empty {@link M}.
+     * 
+     * @see {@link #m(Class, Class)}, {@link #m(Object, Object)}
+     */
     public static M m() {
         return m(new LinkedHashMap<>());
     }
     
+    /**
+     * Turns the map provided into an {@link M}.
+     */
     public static <K, V> M<K, V> m(Map<K, V> map) {
         return new M<>(map);
     }
     
-    public static <K, V> M<K, V> m(Class<K> keyClass, Class<V> valueClas) {
+    /**
+     * Creates an empty {@link M} of key type <code>keyClass</code> and value type <code>valueClass</code>.
+     * 
+     * @see #m()
+     */
+    public static <K, V> M<K, V> m(Class<K> keyClass, Class<V> valueClass) {
         return M.<K, V> m();
     }
     
-    public static <V> M<String, V> m(Class<V> valueClas) {
+    /**
+     * Creates an empty {@link M} of key type {@link String} and value type <code>valueClass</code>.
+     * 
+     * @see #m()
+     */
+    public static <V> M<String, V> m(Class<V> valueClass) {
         return M.<String, V> m();
     }
     
+    /**
+     * Creates a {@link M} consisting of the entries provided.
+     */
     public static <K, V> M<K, V> m(E<K, V>... entries) {
         M<K, V> map = m();
         C.toStream(entries).forEach(it -> map.i(it.k, it.v));
         return map;
     }
     
+    /**
+     * Creates an empty {@link M} ({@link #m()}) with subsequent {@link #WithDefault(Function)} invocation.
+     */
     public static <K, V> M<K, V> m(Function<K, V> defaultValue) {
         return (M<K, V>) M.<K, V>m().WithDefault(defaultValue);
     }
     
+    /**
+     * Creates an empty {@link Map} of key type <code>keyClass</code> and value type <code>valueClass</code>.
+     * 
+     * @see #m()
+     */
     public static <K, V> Map<K, V> map(Class<K> keyClass, Class<V> valueClas) {
         return new LinkedHashMap<>();
     }
     
+    /**
+     * Creates a {@link Map} consisting of the entries provided.
+     */
     public static <K, V> Map<K, V> map(E<K, V>... entries) {
         return m(entries).m;
     }
@@ -81,6 +120,10 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
         return m;
     }
     
+    /**
+     * Like {@link ReadonlyIndexedI#get(Object)}, but if there is a default value set with {@link #WithDefault(Function)},
+     * the newly returned value is also put into the map with the <code>key</code> provided.
+     */
     @Override
     public <VN extends V> VN get(K key) {
         if (containsAnyKey(key)) {
@@ -480,16 +523,25 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
         return "M" + m.toString();
     }
     
+    /**
+     * Creates an {@link E} with the key and value provided.
+     */
     public static <K, V> E<K, V> e(K k, V v) {
         return new E(k, v);
     }
     
+    /**
+     * Turns the {@link Entry} into an {@link E}.
+     */
     public static <K, V> E<K, V> e(Map.Entry<K, V> entry) {
         return new E(entry.getKey(), entry.getValue());
     }
 
     /**
-     * The "E" stands for "entry". Represents a single {@link Map} entry and can be converted to a {@link Entry}.
+     * The "E" stands for "entry". Represents a single {@link Map} entry and can be converted to a {@link Entry}. This is an immutable type.<p/>
+     * 
+     * The constructor of this class is not visible; use one of the convenience {@link M#e(Object, Object)} methods to create a new instance of this class.
+     * It's best practice to statically import this function in client code.
      *
      * @param <K> the key type
      * @param <V> the value type

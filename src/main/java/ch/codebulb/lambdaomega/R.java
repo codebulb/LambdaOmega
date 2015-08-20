@@ -7,7 +7,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * The "R" stands for "range". An implementation of a wrapper API for an {@link IntStream} range. This is an immutable type.
+ * The "R" stands for "range". An implementation of a wrapper API for an {@link IntStream} range. This is an immutable type.<p/>
+ * 
+ * The constructor of this class is not visible; use the convenience {@link #r(int)} method to create a new instance of this class.
+ * It's best practice to statically import this function in client code.
  */
 public class R extends OmegaObject {
     public final int startInclusive;
@@ -16,7 +19,7 @@ public class R extends OmegaObject {
     public final L<Integer> l;
     public final List<Integer> list;
     
-    public R(int startInclusive, int end, boolean endInclusive) {
+    R(int startInclusive, int end, boolean endInclusive) {
         this.startInclusive = startInclusive;
         this.endExclusive = endInclusive ? end : end - 1;
         r = createStream(startInclusive, end, endInclusive);
@@ -30,6 +33,10 @@ public class R extends OmegaObject {
                 IntStream.range(startInclusive, end);
     }
     
+    /**
+     * Starts creating a new {@link R}. Subsequently invoke {@link Rinit#with(int)} for an inclusive / closed range, 
+     * or {@link Rinit#to(int)} for an exclusive range.
+     */
     public static Rinit r(int startInclusive) {
         return new Rinit(startInclusive);
     }
@@ -48,18 +55,30 @@ public class R extends OmegaObject {
             return new R(startInclusive, end, endInclusive);
         }
         
+        /**
+         * Creates an exclusive {@link R}.
+         */
         public R to(int endExclusive) {
             return end(endExclusive, false);
         }
         
+        /**
+         * @see #to(int)
+         */
         public R excl(int endExclusive) {
             return to(endExclusive);
         }
         
+        /**
+         * Creates an inclusive / closed {@link R}.
+         */
         public R with(int endInclusive) {
             return end(endInclusive, true);
         }
         
+        /**
+         * @see #with(int)
+         */
         public R incl(int endInclusive) {
             return with(endInclusive);
         }
@@ -103,6 +122,4 @@ public class R extends OmegaObject {
     public String toString() {
         return "[" + startInclusive + "..<" + endExclusive + "]";
     }
-    
-    
 }

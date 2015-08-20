@@ -32,6 +32,9 @@ public abstract class C<T, K, V> extends OmegaObject implements StreamableI, Rea
     
     public abstract Collection<T> toCollection();
     
+    /**
+     * Depending on {@link #isParallel()}, returns a parallel or a sequential {@link Stream}.
+     */
     public Stream<T> stream() {
         return isParallel() ? toCollection().parallelStream() : toCollection().stream();
     }
@@ -41,20 +44,32 @@ public abstract class C<T, K, V> extends OmegaObject implements StreamableI, Rea
         return parallel;
     }
     
+    /**
+     * Turns the wrapped data structure parallel streamed.
+     */
     public C<T, K, V> Parallel() {
         parallel = true;
         return this;
     }
     
+    /**
+     * @see #Parallel()
+     */
     public C<T, K, V> Par() {
         return Parallel();
     }
     
+    /**
+     * Turns the wrapped data structure sequentially streamed.
+     */
     public C<T, K, V> Sequential() {
         parallel = false;
         return this;
     }
     
+    /**
+     * @see #Sequential()
+     */
     public C<T, K, V> Seq() {
         return Sequential();
     }
@@ -113,10 +128,18 @@ public abstract class C<T, K, V> extends OmegaObject implements StreamableI, Rea
         return toStream(ts).collect(Collectors.toSet());
     }
     
-    public static <T, R> List<R> map(T[] ts, Function<T, R> function) {
-        return C.toStream(ts).map(function).collect(Collectors.toList());
+    /**
+     * A shorthand for subsequent application of {@link #toStream(Object...)} on the <code>elements</code> provided,
+     * {@link Stream#map(Function)} with the <code>function</code> provided, and {@link Stream#collect(java.util.stream.Collector)}ing
+     * the results in a {@link List}.
+     */
+    public static <T, R> List<R> map(T[] elements, Function<T, R> function) {
+        return C.toStream(elements).map(function).collect(Collectors.toList());
     }
     
+    /**
+     * @see C#map(Object[], Function)
+     */
     public static <T, R> List<R> map(Collection<T> collection, Function<T, R> function) {
         return C.toStream(collection).map(function).collect(Collectors.toList());
     }

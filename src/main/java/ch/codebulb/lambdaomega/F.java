@@ -1,5 +1,6 @@
 package ch.codebulb.lambdaomega;
 
+import ch.codebulb.lambdaomega.M.E;
 import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import ch.codebulb.lambdaomega.abstractions.ReadonlyIndexedI;
 import java.util.Comparator;
@@ -14,9 +15,14 @@ import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
 
 /**
- * The "F" stands for "function". Provides a common interface for all {@link FunctionalInterface} implementations.<p>
+ * The "F" stands for "function". Provides a common interface for all {@link FunctionalInterface} implementations for which it acts as a wrapper.<p>
  * 
- * It also provides common static helper methods for functions.
+ * It also provides common static helper methods for functions.<p/>
+ * 
+ * The constructor of this class is not visible; use the convenience {@link #f(Function)} method to create a new instance of this class,
+ * or one of the other static helper constructor functions.
+ * 
+ * It's best practice to statically import these functions in client code.
  *
  * @param <T> the function input type
  * @param <T1> the type of the 1st function input if it takes two inputs; must be same as <code>T</code> otherwise
@@ -33,26 +39,29 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     
     private Function<T, R> defaultValue;
 
-    public F(Function<T, R> function) {
+    F(Function<T, R> function) {
         this.function = function;
     }
     
-    public F(BiFunction<T1, T2, R> biFunction) {
+    F(BiFunction<T1, T2, R> biFunction) {
         this.biFunction = biFunction;
     }
 
-    public F(BiConsumer<T1, T2> biConsumer) {
+    F(BiConsumer<T1, T2> biConsumer) {
         this.biConsumer = biConsumer;
     }
     
-    public F(BiPredicate<T1, T2> biPredicate) {
+    F(BiPredicate<T1, T2> biPredicate) {
         this.biPredicate = biPredicate;
     }
     
-    public F(ToDoubleBiFunction<T1, T2> toDoubleBiFunction) {
+    F(ToDoubleBiFunction<T1, T2> toDoubleBiFunction) {
         this.toDoubleBiFunction = toDoubleBiFunction;
     }
     
+    /**
+     * Invokes the wrapped function with the <code>input</code> provided.
+     */
     public R call(T input) {
         if (function != null) {
             return function.apply(input);
@@ -60,6 +69,10 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         throw new IllegalStateException("No appropriate original function is set.");
     }
     
+    /**
+     * Invokes the wrapped function with the <code>inputs</code> provided. Depending on how many parameters the actual wrapped function takes,
+     * the inputs are provided in their order, with surplus parameters being discarded.
+     */
     public R call(T... inputs) {
         if (biConsumer != null) {
             biConsumer.accept((T1)inputs[0], (T2)inputs[1]);
@@ -68,6 +81,9 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         throw new IllegalStateException("No appropriate original function is set.");
     }
     
+    /**
+     * Turns a wrapped {@link BiFunction} <i>f1: (K, V) &rarr; R</i> into a {@link Function} <i>f2: ({@link E}&lt;K, V&gt;) &rarr; R</i>.
+     */
     public Function<M.E<T1, T2>, R> function() {
         if (biFunction != null) {
             return (M.E<T1, T2> e) -> 
@@ -76,6 +92,9 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         throw new IllegalStateException("No appropriate original function is set.");
     }
     
+    /**
+     * Turns a wrapped {@link BiConsumer} <i>f1: (K, V) &rarr; <code>void</code></i> into a {@link Consumer} <i>f2: ({@link E}&lt;K, V&gt;) &rarr; <code>void</code></i>.
+     */
     public Consumer<M.E<T1, T2>> consumer() {
         if (biConsumer != null) {
             return (M.E<T1, T2> e) -> 
@@ -84,6 +103,9 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         throw new IllegalStateException("No appropriate original function is set.");
     }
     
+    /**
+     * Turns a wrapped {@link BiPredicate} <i>f1: (K, V) &rarr; <code>boolean</code></i> into a {@link Predicate} <i>f2: ({@link E}&lt;K, V&gt;) &rarr; <code>boolean</code></i>.
+     */
     public Predicate<M.E<T1, T2>> predicate() {
         if (biPredicate != null) {
             return (M.E<T1, T2> e) -> 
@@ -92,6 +114,9 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         throw new IllegalStateException("No appropriate original function is set.");
     }
     
+    /**
+     * Turns a wrapped {@link ToDoubleBiFunction} <i>f1: (K, V) &rarr; <code>double</code></i> into a {@link ToDoubleFunction} <i>f2: ({@link E}&lt;K, V&gt;) &rarr; <code>double</code></i>.
+     */
     public ToDoubleFunction<M.E<T1, T2>> toDoubleFunction() {
         if (toDoubleBiFunction != null) {
             return (M.E<T1, T2> e) -> 
@@ -100,6 +125,9 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         throw new IllegalStateException("No appropriate original function is set.");
     }
 
+    /**
+     * Like {@link ReadonlyIndexedI#get(Object)}, but invokes {@link #call(Object)} with the <code>key</code> provided.
+     */
     @Override
     public <VN extends R> VN get(T key) {
         VN ret = (VN) call(key);
@@ -109,6 +137,9 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         return ret;
     }
 
+    /**
+     * Like {@link ReadonlyIndexedI#get(Object)}, but invokes {@link #call(Object)} with the <code>key</code> provided.
+     */
     @Override
     public <VN extends R> VN getOrDefault(T key, R defaultValue) {
         VN ret = (VN) call(key);
@@ -117,6 +148,14 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         }
         return ret;
     }
+    
+    /**
+     * Like {@link ReadonlyIndexedI#get(Object...)}, but invokes {@link #call(Object)} with each of the <code>keys</code> provided.
+     */
+    @Override
+    public List<R> get(T... keys) {
+      return ReadonlyIndexedI.super.get(keys);
+    }
 
     @Override
     public F<T, T1, T2, R> WithDefault(Function<T, R> defaultValue) {
@@ -124,30 +163,51 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         return this;
     }
     
+    /**
+     * Creates a {@link F} which wraps the function provided.
+     */
     public static <T, R> F<T, T, T, R> f(Function<T, R> function) {
         return new F(function);
     }
     
+    /**
+     * @see #function()
+     */
+    public static <K, V, R> Function<M.E<K, V>, R> function(BiFunction<K, V, R> function) {
+      return new F(function).function();
+    }
+    
+    /**
+     * @see #consumer()
+     */
     public static <K, V> Consumer<M.E<K, V>> consumer(BiConsumer<K, V> function) {
         return new F(function).consumer();
     }
     
+    /**
+     * @see #predicate()
+     */
     public static <K, V> Predicate<M.E<K, V>> predicate(BiPredicate<K, V> function) {
         return new F(function).predicate();
     }
     
-    public static <K, V, R> Function<M.E<K, V>, R> function(BiFunction<K, V, R> function) {
-        return new F(function).function();
-    }
-    
+    /**
+     * @see #toDoubleFunction()
+     */
     public static <K, V> ToDoubleFunction<M.E<? extends K, ? extends V>> toDoubleFunction(ToDoubleBiFunction<? extends K, ? extends V> function) {
         return new F(function).toDoubleFunction();
     }
     
+    /**
+     * Returns an <i>ascending</i> {@link Comparator} built from subsequently applying the <code>keyExtractors</code> provided.
+     */
     public static <T> Comparator<T> compareAsc(Function<? super T, Comparable>... keyExtractors) {
         return compareAsc(C.toList(keyExtractors));
     }
     
+    /**
+     * @see #compareAsc(Function...)
+     */
     public static <T> Comparator<T> compareAsc(List<Function<? super T, Comparable>> keyExtractors) {
         Comparator comparator = null;
         for (Function<? super T, Comparable> keyExtractor : keyExtractors) {
@@ -165,6 +225,12 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         return comparator;
     }
     
+    /**
+     * Returns a {@link Comparator} built from subsequently applying the <code>keyExtractors</code> provided.
+     * Every keyExtractor is a function <i>f: (T) &rarr; {@link V2}&lt;f1, Boolean&gt;</i> where the return type is 
+     * a {@link V2}; its 1st element is the actual keyExtractor function <i>f1</i>, its 2nd element is a Boolean specifying the sort order for that specific
+     * keyExtractor: <code>true</code> for <i>ascending</i>.
+     */
     public static <T> Comparator<T> compare(Function<? super T, V2<Function<? super T, Comparable>, Boolean>>... keyExtractors) {
         Comparator<T> comparator = null;
         Comparator modificator = null;

@@ -3,14 +3,16 @@ package ch.codebulb.lambdaomega;
 import static ch.codebulb.lambdaomega.L.list;
 import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import ch.codebulb.lambdaomega.abstractions.ReadonlyIndexedI;
-import ch.codebulb.lambdaomega.abstractions.SequentialI;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * The "V2" stands for "2d vector". This is an implementation of a 2-dimensional vector = a 2-ary tuple.
+ * The "V2" stands for "2d vector". This is an implementation of a 2-dimensional vector = a 2-ary tuple.<p/>
+ * 
+ * The constructor of this class is not visible; use the convenience {@link #v(Object, Object)} method to create a new instance of this class.
+ * It's best practice to statically import this function in client code.
  *
  * @param <X> the type of the 1st element
  * @param <Y> the type of the 2nd element
@@ -20,15 +22,21 @@ public class V2<X, Y> extends OmegaObject implements ReadonlyIndexedI<Integer, O
     private Y y;
     private Function<Integer, Object> defaultValue;
 
-    public V2(X x, Y y) {
+    V2(X x, Y y) {
         this.x = x;
         this.y = y;
     }
     
+    /**
+     * Creates a {@link V2} consisting of the value pair <code>x</code>, <code>y</code>.
+     */
     public static <X, Y> V2<X, Y> v(X x, Y y) {
         return new V2(x, y);
     }
     
+    /**
+     * Turns this vector into a {@link LV2} with subsequent {@link LV2#a(Object, Object)} call.
+     */
     public LV2<X, Y> a(X x, Y y) {
         return new LV2(list(this)).a(x, y);
     }
@@ -118,14 +126,20 @@ public class V2<X, Y> extends OmegaObject implements ReadonlyIndexedI<Integer, O
      * @param <Y> the type of the 2nd element
      */
     public static class LV2<X, Y> extends L<V2<X, Y>> {
-        public LV2(List<V2<X, Y>> list) {
+        LV2(List<V2<X, Y>> list) {
             super(list);
         }
         
+        /**
+         * Creates a {@link V2} consisting of the value pair <code>x</code>, <code>y</code> and {@link #add(Object...)}s it.
+         */
         public LV2<X, Y> Add(X x, Y y) {
           return (LV2<X, Y>) Add(V2.v(x, y));
         }
         
+        /**
+         * @see #Add(Object, Object)
+         */
         public LV2<X, Y> a(X x, Y y) {
             return (LV2<X, Y>) a(V2.v(x, y));
         }
@@ -135,6 +149,4 @@ public class V2<X, Y> extends OmegaObject implements ReadonlyIndexedI<Integer, O
     public String toString() {
         return "(" + get0() + ", " + get1() + ")";
     }
-    
-    
  }

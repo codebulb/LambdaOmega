@@ -31,54 +31,94 @@ import java.util.stream.Stream;
 
 /**
  * The "L" stands for "list". An implementation of a wrapper API for {@link List} which provides both sequential access (of type <code>T</code>)
- * and indexed access (from {@link Integer} to <code>T</code>).
+ * and indexed access (from {@link Integer} to <code>T</code>).<p/>
+ * 
+ * The constructor of this class is not visible; use one of the convenience {@link #l(Object...)} methods to create a new instance of this class.
+ * It's best practice to statically import these functions in client code.
  *
  * @param <T> the entry type
  */
 public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, IndexedListIS<Integer, T> {
     static boolean TEST_DISABLE_HELPER_MAP_CONVERSION;
+    /**
+     * The {@link List} wrapped by this API.
+     */
     public final List<T> l;
     
     L(List<T> list) {
         this.l = new ArrayList<>(list);
     }
     
+    /**
+     * Creates an empty {@link L}.
+     * 
+     * @see #l(Object...)
+     */
     public static <T> L<T> l() {
         return new L<>(new ArrayList<>());
     }
     
+    /**
+     * Creates a new {@link L}. Use {@link #L(Collection)} to create a {@link L} out of an existing Collection rather than a nested {@link L}.
+     */
     public static <T> L<T> l(T... ts) {
         return L(C.toStream(ts));
     }
     
+    /**
+     * @see #l(Object...)
+     */
     public static <T> L<L<T>> l(L<T>... lists) {
         return L(Arrays.asList(lists).stream());
     }
     
+    /**
+     * @see #l(Object...)
+     */
     public static <T> L<T> L(Stream<T> stream) {
         return new L(stream.collect(Collectors.toList()));
     }
     
+    /**
+     * Turns the collection(s) provided into an {@link L} rather than creating a nested {@link L}.
+     */
     public static <T> L<T> L(Collection<T> collection) {
         return L(C.toStream(collection));
     }
     
+    /**
+     * @see #L(Collection)
+     */
     public static <T> L<List<T>> L(L<T>... lists) {
         return L.L(Arrays.asList(lists).stream().map(it -> it.l).collect(Collectors.toList()));
     }
     
+    /**
+     * Creates an empty {@link L} of the type provided.
+     * 
+     * @see #l(L...)
+     */
     public static <T> L<T> l(Class<T> clazz) {
         return l();
     }
     
+    /**
+     * Creates a {@link List}. Shorthand for {@link #l(L...)} followed by {@link #l}.
+     */
     public static <T> List<T> list(T... ts) {
         return l(ts).l;
     }
     
+    /**
+     * Creates a {@link L} by invoking the <code>generator</code> function provided <i><code>times</code></i> times with the current index.
+     */
     public static <T> L<T> l(int times, Function<Integer, T> generator) {
         return L(R.r(0).to(times).r.boxed().map(generator));
     }
-        
+    
+    /**
+     * Like {@link #l(int, Function)}, but turning the result into a {@link L}.
+     */
     public static <T> List<T> list(int times, Supplier<T> generator) {
         return L(Stream.generate(generator).limit(times)).l;
     }

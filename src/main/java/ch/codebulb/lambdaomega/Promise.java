@@ -17,7 +17,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * A drop-in-replacement of {@link CompletableFuture} with a simplified, more concise API.
+ * A drop-in-replacement for {@link CompletableFuture} with a simplified, more concise API. It wraps around a {@link CompletableFuture}.
  */
 public class Promise<T> extends OmegaObject {
     public final CompletableFuture<T> wrapped;
@@ -26,6 +26,9 @@ public class Promise<T> extends OmegaObject {
         return new Promise<>(inner);
     }
     
+    /**
+     * @see CompletableFuture#CompletableFuture()
+     */
     public Promise() {
         this(new CompletableFuture<>());
     }
@@ -34,6 +37,9 @@ public class Promise<T> extends OmegaObject {
         this.wrapped = inner;
     }
     
+    /**
+     * @see CompletableFuture#supplyAsync(Supplier, Executor)
+     */
     public static <U> Promise<U> completeAsync(Supplier<U> supplier, Executor executor) {
         if (executor == null) {
             throw new IllegalArgumentException("Executor parameter must not be null.");
@@ -41,10 +47,16 @@ public class Promise<T> extends OmegaObject {
         return new Promise<>(CompletableFuture.supplyAsync(supplier, executor));
     }
     
+    /**
+     * @see #completeAsync(Supplier, Executor)
+     */
     public static <U> Promise<U> completeAsync(Supplier<U> supplier) {
         return new Promise<>(CompletableFuture.supplyAsync(supplier));
     }
     
+    /**
+     * @see CompletableFuture#runAsync(Runnable, Executor)
+     */
     public static Promise<Void> completeAsync(Runnable runnable, Executor executor) {
         if (executor == null) {
             throw new IllegalArgumentException("Executor parameter must not be null.");
@@ -52,10 +64,16 @@ public class Promise<T> extends OmegaObject {
         return new Promise<>(CompletableFuture.runAsync(runnable, executor));
     }
     
+    /**
+     * @see #completeAsync(Runnable, Executor)
+     */
     public static Promise<Void> completeAsync(Runnable runnable) {
         return new Promise<>(CompletableFuture.runAsync(runnable));
     }
 
+    /**
+     * @see CompletableFuture#thenApply(Function)
+     */
     public <U> Promise<U> completed(Function<? super T, ? extends U> fn, boolean async, Executor executor) {
         return apply(async, executor,
                 () -> wrapped.thenApply(fn),
@@ -63,14 +81,23 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.thenApplyAsync(fn, executor));
     }
     
+    /**
+     * @see #completed(Function, boolean, Executor)
+     */
     public <U> Promise<U> completed(Function<? super T, ? extends U> fn, boolean async) {
         return completed(fn, false, null);
     }
     
+    /**
+     * @see #completed(Function, boolean, Executor)
+     */
     public <U> Promise<U> completed(Function<? super T, ? extends U> fn) {
         return completed(fn, false);
     }
 
+    /**
+     * @see CompletableFuture#thenAccept(Consumer)
+     */
     public Promise<Void> completed(Consumer<? super T> action, boolean async, Executor executor) {
         return apply(async, executor,
                 () -> wrapped.thenAccept(action),
@@ -78,14 +105,23 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.thenAcceptAsync(action, executor));
     }
     
+    /**
+     * @see #completed(Consumer, boolean, Executor)
+     */
     public Promise<Void> completed(Consumer<? super T> action, boolean async) {
         return completed(action, false, null);
     }
     
+    /**
+     * @see #completed(Consumer, boolean, Executor)
+     */
     public Promise<Void> completed(Consumer<? super T> action) {
         return completed(action, false);
     }
 
+    /**
+     * @see CompletableFuture#thenRun(Runnable)
+     */
     public Promise<Void> completed(Runnable action, boolean async, Executor executor) {
         return apply(async, executor,
                 () -> wrapped.thenRun(action),
@@ -93,18 +129,30 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.thenRunAsync(action, executor));
     }
     
+    /**
+     * @see #completed(Runnable, boolean, Executor)
+     */
     public Promise<Void> completed(Runnable action, boolean async) {
         return completed(action, false, null);
     }
     
+    /**
+     * @see #completed(Runnable, boolean, Executor)
+     */
     public Promise<Void> completed(Runnable action) {
         return completed(action, false);
     }
 
+    /**
+     * @see CompletableFuture#exceptionally(Function)
+     */
     public Promise<T> completedExceptionally(Function<? extends Throwable, ? extends T> fn) {
         return wrap(wrapped.exceptionally((Function<Throwable, ? extends T>) fn));
     }
 
+    /**
+     * @see CompletableFuture#handle(BiFunction)
+     */
     public <U> Promise<U> completed(BiFunction<? super T, Throwable, ? extends U> fn, boolean async, Executor executor) {
         return apply(async, executor,
                 () -> wrapped.handle(fn),
@@ -112,32 +160,47 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.handleAsync(fn, executor));
     }
     
+    /**
+     * @see #completed(BiFunction, boolean, Executor)
+     */
     public <U> Promise<U> completed(BiFunction<? super T, Throwable, ? extends U> fn, boolean async) {
         return completed(fn, false, null);
     }
     
+    /**
+     * @see #completed(BiFunction, boolean, Executor)
+     */
     public <U> Promise<U> completed(BiFunction<? super T, Throwable, ? extends U> fn) {
         return completed(fn, false);
     }
 
+    /**
+     * @see CompletableFuture#whenComplete(BiConsumer)
+     */
     public Promise<T> completed(BiConsumer<? super T, ? super Throwable> action, boolean async, Executor executor) {
-        if (!async && executor != null) {
-            throw new IllegalArgumentException("Unless async, executor must be null.");
-        }
         return apply(async, executor,
                 () -> wrapped.whenComplete(action),
                 () -> wrapped.whenCompleteAsync(action),
                 () -> wrapped.whenCompleteAsync(action, executor));
     }
     
+    /**
+     * @see #completed(BiConsumer, boolean, Executor)
+     */
     public Promise<T> completed(BiConsumer<? super T, ? super Throwable> action, boolean async) {
         return completed(action, false, null);
     }
     
+    /**
+     * @see #completed(BiConsumer, boolean, Executor)
+     */
     public Promise<T> completed(BiConsumer<? super T, ? super Throwable> action) {
         return completed(action, false);
     }
 
+    /**
+     * @see CompletableFuture#thenCompose(Function)
+     */
     public <U> Promise<U> then(Function<? super T, ? extends Promise<U>> fn, boolean async, Executor executor) {
         Supplier<CompletableFuture<U>> syncS = () -> wrapped.thenCompose(f(fn));
         Supplier<CompletableFuture<U>> asyncS = () -> wrapped.thenComposeAsync(f(fn));
@@ -155,14 +218,23 @@ public class Promise<T> extends OmegaObject {
         };
     }
     
+    /**
+     * @see #then(Function, boolean, Executor)
+     */
     public <U> Promise<U> then(Function<? super T, ? extends Promise<U>> fn, boolean async) {
         return then(fn, false, null);
     }
     
+    /**
+     * @see #then(Function, boolean, Executor)
+     */
     public <U> Promise<U> then(Function<? super T, ? extends Promise<U>> fn) {
         return then(fn, false);
     }
     
+    /**
+     * @see CompletableFuture#allOf(CompletableFuture...)
+     */
     public static <T> Promise<List<T>> allOf(Promise<T>... cfs) {
         Promise<Void> allDoneFuture = new Promise<>(
                 CompletableFuture.allOf(l(cfs).map(it -> it.wrapped)
@@ -173,6 +245,9 @@ public class Promise<T> extends OmegaObject {
         );
     }
 
+    /**
+     * @see CompletableFuture#thenCombine(CompletionStage, BiFunction)
+     */
     public <U, V> Promise<V> and(Promise<? extends U> other, BiFunction<? super T, ? super U, ? extends V> fn, boolean async, Executor executor) {
         return apply(async, executor,
                 () -> wrapped.thenCombine(other.wrapped, fn),
@@ -180,14 +255,23 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.thenCombineAsync(other.wrapped, fn, executor));
     }
     
+    /**
+     * @see #and(Promise, BiFunction, boolean, Executor)
+     */
     public <U, V> Promise<V> and(Promise<? extends U> other, BiFunction<? super T, ? super U, ? extends V> fn, boolean async) {
         return and(other, fn, false, null);
     }
     
+    /**
+     * @see #and(Promise, BiFunction, boolean, Executor)
+     */
     public <U, V> Promise<V> and(Promise<? extends U> other, BiFunction<? super T, ? super U, ? extends V> fn) {
         return and(other, fn, false);
     }
     
+    /**
+     * @see CompletableFuture#thenAcceptBoth(CompletionStage, BiConsumer)
+     */
     public <U> Promise<Void> and(Promise<? extends U> other, BiConsumer<? super T, ? super U> action, boolean async, Executor executor) {
         return apply(async, executor,
                 () -> wrapped.thenAcceptBoth(other.wrapped, action),
@@ -195,14 +279,23 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.thenAcceptBothAsync(other.wrapped, action, executor));
     }
     
+    /**
+     * @see #and(Promise, BiConsumer, boolean, Executor)
+     */
     public <U> Promise<Void> and(Promise<? extends U> other, BiConsumer<? super T, ? super U> action, boolean async) {
         return and(other, action, false, null);
     }
     
+    /**
+     * @see #and(Promise, BiConsumer, boolean, Executor)
+     */
     public <U> Promise<Void> and(Promise<? extends U> other, BiConsumer<? super T, ? super U> action) {
         return and(other, action, false);
     }
 
+    /**
+     * @see CompletableFuture#runAfterBoth(CompletionStage, Runnable)
+     */
     public Promise<Void> and(Promise<?> other, Runnable action, boolean async, Executor executor) {
         return apply(async, executor,
                 () -> wrapped.runAfterBoth(other.wrapped, action),
@@ -210,14 +303,23 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.runAfterBothAsync(other.wrapped, action, executor));
     }
     
+    /**
+     * @see #and(Promise, Runnable, boolean, Executor)
+     */
     public Promise<Void> and(Promise<?> other, Runnable action, boolean async) {
         return and(other, action, false, null);
     }
     
+    /**
+     * @see #and(Promise, Runnable, boolean, Executor)
+     */
     public Promise<Void> and(Promise<?> other, Runnable action) {
         return and(other, action, false);
     }
     
+    /**
+     * @see CompletableFuture#anyOf(CompletableFuture...)
+     */
     public static <T> Promise<T> anyOf(Promise<T>... cfs) {
         return (Promise<T>) new Promise<>(
                 CompletableFuture.anyOf(
@@ -225,6 +327,9 @@ public class Promise<T> extends OmegaObject {
         ));
     }
 
+    /**
+     * @see CompletableFuture#applyToEither(CompletionStage, Function)
+     */
     public <U> Promise<U> or(Promise<? extends T> other, Function<? super T, U> fn, boolean async, Executor executor) {
         return apply(async, executor,
                 () -> wrapped.applyToEither(other.wrapped, fn),
@@ -232,14 +337,23 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.applyToEitherAsync(other.wrapped, fn, executor));
     }
     
+    /**
+     * @see #or(Promise, Function, boolean, Executor)
+     */
     public <U> Promise<U> or(Promise<? extends T> other, Function<? super T, U> fn, boolean async) {
         return or(other, fn, false, null);
     }
     
+    /**
+     * @see #or(Promise, Function, boolean, Executor)
+     */
     public <U> Promise<U> or(Promise<? extends T> other, Function<? super T, U> fn) {
         return or(other, fn, false);
     }
 
+    /**
+     * @see CompletableFuture#acceptEither(CompletionStage, Consumer)
+     */
     public Promise<Void> or(Promise<? extends T> other, Consumer<? super T> action, boolean async, Executor executor) {
         return apply(async, executor,
                 () -> wrapped.acceptEither(other.wrapped, action),
@@ -247,14 +361,23 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.acceptEitherAsync(other.wrapped, action, executor));
     }
     
+    /**
+     * @see #or(Promise, Consumer, boolean, Executor)
+     */
     public Promise<Void> or(Promise<? extends T> other, Consumer<? super T> action, boolean async) {
         return or(other, action, false, null);
     }
     
+    /**
+     * @see #or(Promise, Consumer, boolean, Executor)
+     */
     public Promise<Void> or(Promise<? extends T> other, Consumer<? super T> action) {
         return or(other, action, false);
     }
 
+    /**
+     * @see CompletableFuture#runAfterEither(CompletionStage, Runnable)
+     */
     public Promise<Void> or(Promise<?> other, Runnable action, boolean async, Executor executor) {
         return apply(async, executor,
                 () -> wrapped.runAfterEither(other.wrapped, action),
@@ -262,10 +385,16 @@ public class Promise<T> extends OmegaObject {
                 () -> wrapped.runAfterEitherAsync(other.wrapped, action, executor));
     }
     
+    /**
+     * @see #or(Promise, Runnable, boolean, Executor)
+     */
     public Promise<Void> or(Promise<?> other, Runnable action, boolean async) {
         return or(other, action, false, null);
     }
     
+    /**
+     * @see #or(Promise, Runnable, boolean, Executor)
+     */
     public Promise<Void> or(Promise<?> other, Runnable action) {
         return or(other, action, false);
     }
@@ -294,42 +423,72 @@ public class Promise<T> extends OmegaObject {
             }
     }
     
+    /**
+     * @see CompletableFuture#getNumberOfDependents()
+     */
     public int getNumberOfDependents() {
         return wrapped.getNumberOfDependents();
     }
     
+    /**
+     * @see CompletableFuture#isCompletedExceptionally()
+     */
     public boolean isCompletedExceptionally() {
         return wrapped.isCompletedExceptionally();
     }
     
+    /**
+     * @see CompletableFuture#isCancelled()
+     */
     public boolean isCancelled() {
         return wrapped.isCancelled();
     }
     
+    /**
+     * @see CompletableFuture#cancel(boolean)
+     */
     public boolean cancel(boolean mayInterruptIfRunning) {
         return wrapped.cancel(mayInterruptIfRunning);
     }
     
+    /**
+     * @see CompletableFuture#toCompletableFuture()
+     */
     public CompletableFuture<T> toCompletableFuture() {
         return wrapped.toCompletableFuture();
     }
     
+    /**
+     * @see CompletableFuture#completeExceptionally(Throwable)
+     */
     public boolean completeExceptionally(Throwable ex) {
         return wrapped.completeExceptionally(ex);
     }
     
+    /**
+     * @see CompletableFuture#complete(Object)
+     */
     public boolean complete(T value) {
         return wrapped.complete(value);
     }
     
+    /**
+     * @see CompletableFuture#getNow(Object)
+     */
     public T getNow(T valueIfAbsent) {
         return wrapped.getNow(valueIfAbsent);
     }
     
+    /**
+     * @see CompletableFuture#join()
+     */
     public T join() {
         return wrapped.join();
     }
     
+    /**
+     * @see CompletableFuture#get(long, TimeUnit)
+     */
     public T get(long timeout, TimeUnit unit) throws ExecutionException, TimeoutException {
         try {
             return wrapped.get(timeout, unit);
@@ -338,6 +497,9 @@ public class Promise<T> extends OmegaObject {
         }
     }
     
+    /**
+     * @see CompletableFuture#get()
+     */
     public T get() throws ExecutionException {
         try {
             return wrapped.get();
@@ -346,6 +508,9 @@ public class Promise<T> extends OmegaObject {
         }
     }
 
+    /**
+     * @see CompletableFuture#isDone()
+     */
     public boolean isDone() {
         return wrapped.isDone();
     }

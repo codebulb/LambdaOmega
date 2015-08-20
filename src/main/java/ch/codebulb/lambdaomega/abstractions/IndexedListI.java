@@ -14,6 +14,13 @@ import java.util.stream.Stream;
  * It is loosely inspired by some methods of {@link List} which may actually also fit a {@link Map}.
  */
 public interface IndexedListI<K, V> extends IndexedIS<K, V> {
+    /**
+     * Invokes {@link #put(Object, Object)}, but only if the key with the <code>index</code> provided is not already present;
+     * throws an {@link IndexAlreadyPresentException} otherwise.<p/>
+     * 
+     * This method comes in handy to explicitly build a {@link M} (e.g. in a unit test) and prevent accidentally
+     * adding the same key twice.
+     */
     public default Map<K, V> insert(K index, V element) {
         if (containsAnyKey(index)) {
             throw new IndexAlreadyPresentException(index, toMap().get(index));
@@ -21,6 +28,9 @@ public interface IndexedListI<K, V> extends IndexedIS<K, V> {
         return put(index, element);
     }
     
+    /**
+     * @see #insert(Object, Object)
+     */
     default Map<K, V> insertAll(List<Map<? extends K, ? extends V>> m) {
         M.E<K, V> duplicate = findDuplicateKeyInclThis(m);
         if (duplicate != null) {
@@ -29,14 +39,23 @@ public interface IndexedListI<K, V> extends IndexedIS<K, V> {
         return putAll(m);
     }
     
+    /**
+     * Like {@link List#set(int, Object)} for a {@link List}-like object; or like {@link Map#put(Object, Object)} for a {@link Map}-like object.
+     */
     public default Map<K, V> set(K index, V element) {
         return put(index, element);
     }
     
+    /**
+     * @see #set(Object, Object)
+     */
     public default Map<K, V> setAll(Map<? extends K, ? extends V>... m) {
         return putAll(m);
     }
 
+    /**
+     * Like {@link List#indexOf(Object)} for a {@link List}-like object; or like {@link #getKey(Object)} for a {@link Map}-like object.<p/>
+     */
     public default K indexOf(V o) {
         return getKey(o);
     }

@@ -1,6 +1,7 @@
 package ch.codebulb.lambdaomega;
 
 import ch.codebulb.lambdaomega.abstractions.OmegaObject;
+
 import java.util.Set;
 
 /**
@@ -8,6 +9,11 @@ import java.util.Set;
  */
 // TODO Complete implementation
 public class S extends OmegaObject {
+    private S() {}
+    
+    /**
+     * Creates a {@link Set} consisting of the entries provided.
+     */
     public static <T> Set<T> set(T... ts) {
         return C.toSet(ts);
     }
