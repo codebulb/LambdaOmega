@@ -160,6 +160,7 @@ public class LBaseIndexedTest {
         L<Number> putList = l(3, 1, 2);
         assertEquals(m(0, 0).i(1, 1).i(2, 2).m, putList.put(0, 0), putList.toInternalMap());
         assertEquals(EXPECTED_LIST, l(3, 1, 2).Put(0, 0).l);
+        assertEquals(EXPECTED_LIST, l(3, 1, 2).p(0, 0).l);
         try {
             putList.put(3, 3);
             fail();
@@ -259,11 +260,16 @@ public class LBaseIndexedTest {
     @Test
     public void testGet() {
         assertEquals("a", l("a", "b", "c").get(0));
-        assertEquals(list("a", "c"), l("a", "b", "c").get(0, 2));
         assertEquals(list("a", "c"), l("a", "b", "c").Get(0, 2).l);
+        assertEquals(list("a", "c"), l("a", "b", "c").get(0, 2));
         assertEquals(list("a", "c"), l("a", "b", "c").g(0, 2).l);
-        assertEquals(list("b", "c"), l("a", "b", "c").get(r(1).to(2)));
         assertEquals(list("b", "c"), l("a", "b", "c").Get(r(1).to(2)).l);
+        assertEquals(list("b", "c"), l("a", "b", "c").get(r(1).to(2)));
+        assertEquals(list("b", "c"), l("a", "b", "c").g(r(1).to(2)).l);
+        
+        assertEquals(list("a", "c", "b"), l("a", "b", "c").getAll(list(0, 2), list(1)));
+        assertEquals(list("a", "c", "b"), l("a", "b", "c").GetAll(list(0, 2), list(1)).l);
+        assertEquals(list("a", "c", "b"), l("a", "b", "c").G(list(0, 2), list(1)).l);
         
         // get all
         assertEquals(EXPECTED_LIST, l(0, 1, 2).getValues());

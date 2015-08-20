@@ -35,10 +35,11 @@ public interface I<K, V> {
                 .flatMap(Collection::stream).collect(Collectors.toList());
     }
     
+    // We have to allow derived return values because we need that in V2
     /**
      * @see Map#getOrDefault(Object, Object)
      */
-    public <VN extends V> VN getOrDefault(K key, V defaultValue);
+    public <VN extends V> VN getOrDefault(K key, VN defaultValue);
     
     /**
      * Sets the function for creating a default value as an alternative to an otherwise unsuccessful {@link #get(Object)} invocation.
@@ -47,13 +48,6 @@ public interface I<K, V> {
      * @return <code>this (modified)</code>
      */
     public ReadonlyIndexedI<K, V> WithDefault(Function<K, V> defaultValue);
-    
-    /**
-     * @see #get(Object)
-     */
-    public default <VN extends V> VN g(K key) {
-        return get(key);
-    }
     
     /**
      * @see #get(Object)

@@ -37,7 +37,7 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     private BiPredicate<T1, T2> biPredicate;
     private ToDoubleBiFunction<T1, T2> toDoubleBiFunction;
     
-    private Function<T, R> defaultValue;
+    private Function<T, R> defaultFunction;
 
     F(Function<T, R> function) {
         this.function = function;
@@ -74,6 +74,9 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
      * the inputs are provided in their order, with surplus parameters being discarded.
      */
     public R call(T... inputs) {
+        if (biFunction != null) {
+            return biFunction.apply((T1)inputs[0], (T2)inputs[1]);
+        }
         if (biConsumer != null) {
             biConsumer.accept((T1)inputs[0], (T2)inputs[1]);
             return null;
@@ -132,7 +135,7 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     public <VN extends R> VN get(T key) {
         VN ret = (VN) call(key);
         if (ret == null) {
-            return (VN) defaultValue;
+            return (VN) defaultFunction.apply(key);
         }
         return ret;
     }
@@ -141,7 +144,7 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
      * Like {@link ReadonlyIndexedI#get(Object)}, but invokes {@link #call(Object)} with the <code>key</code> provided.
      */
     @Override
-    public <VN extends R> VN getOrDefault(T key, R defaultValue) {
+    public <VN extends R> VN getOrDefault(T key, VN defaultValue) {
         VN ret = (VN) call(key);
         if (ret == null) {
             return (VN) defaultValue;
@@ -159,7 +162,7 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
 
     @Override
     public F<T, T1, T2, R> WithDefault(Function<T, R> defaultValue) {
-        this.defaultValue = defaultValue;
+        this.defaultFunction = defaultValue;
         return this;
     }
     
@@ -167,6 +170,13 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
      * Creates a {@link F} which wraps the function provided.
      */
     public static <T, R> F<T, T, T, R> f(Function<T, R> function) {
+        return new F(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static <T, K extends T, V extends T, R> F<T, K, V, R> f(BiFunction<K, V, R> function) {
         return new F(function);
     }
     

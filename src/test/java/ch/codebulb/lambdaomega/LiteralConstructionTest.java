@@ -33,6 +33,9 @@ public class LiteralConstructionTest {
         
         assertEquals(EXPECTED_NESTED_LIST, l(l(0, 1, 2).l, l(0, 1, 2).l).l);
         assertEquals(EXPECTED_NESTED_LIST, L(l(0, 1, 2), l(0, 1, 2)).l);
+        
+        assertEquals(EXPECTED_LIST, l(3, it -> it).l);
+        assertEquals(EXPECTED_LIST, list(3, it -> it));
     }
     
     @Test

@@ -10,11 +10,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import ch.codebulb.lambdaomega.abstractions.SequentialIFunctions;
+import java.util.List;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test cases for the {@link M} implementation for {@link SequentialIFunctions}.
@@ -130,6 +131,14 @@ public class MFunctionsSequentialTest {
         
         assertEquals(-1, m("a", 2).i("b", 1).i("c", 0).i("d", -1).min(E::getV).v);
         assertEquals(2, m("a", 2).i("b", 1).i("c", 0).i("d", -1).max(E::getV).v);
+        
+        M<String, Integer> shuffleMap = m("a", 0).i("b", 1).i("c", 2);
+        List<E<String, Integer>> shuffledList = shuffleMap.shuffle();
+        assertEquals(m("a", 0).i("b", 1).i("c", 2).m, shuffleMap.m);
+        assertEquals(3, shuffledList.size());
+        assertTrue(shuffledList.contains(e("a", 0)));
+        assertTrue(shuffledList.contains(e("b", 1)));
+        assertTrue(shuffledList.contains(e("c", 2)));
     }
     
     @Test

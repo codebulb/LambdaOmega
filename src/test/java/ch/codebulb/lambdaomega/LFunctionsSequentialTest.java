@@ -148,6 +148,14 @@ public class LFunctionsSequentialTest {
         
         assertEquals(-1, l(0, -1, 1, 2).min(it -> it));
         assertEquals(2, l(0, -1, 1, 2).max(it -> it));
+        
+        L<Integer> shuffleList = l(0, 1, 2);
+        List<Integer> shuffledList = shuffleList.shuffle();
+        assertEquals(list(0, 1, 2), shuffleList.l);
+        assertEquals(3, shuffledList.size());
+        assertTrue(shuffledList.contains(0));
+        assertTrue(shuffledList.contains(1));
+        assertTrue(shuffledList.contains(2));
     }
     
     @Test

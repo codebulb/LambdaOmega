@@ -154,6 +154,7 @@ public class MBaseIndexedTest {
         M<String, Number> putMap = m(String.class, Number.class).i("a", 3).i("b", 1).i("c", 2);
         assertEquals(EXPECTED_MAP, putMap.put("a", 0), putMap.m);
         assertEquals(EXPECTED_MAP, m("a", 3).i("b", 1).i("c", 2).Put("a", 0).m);
+        assertEquals(EXPECTED_MAP, m("a", 3).i("b", 1).i("c", 2).p("a", 0).m);
         
         putMap = m(String.class, Number.class).i("a", null).i("b", 1).i("c", 2);
         assertEquals(null, putMap.putIfAbsent("a", 0));
@@ -241,6 +242,10 @@ public class MBaseIndexedTest {
         assertEquals(list(0, 2), m("a", 0).i("b", 1).i("c", 2).get("a", "c"));
         assertEquals(list(0, 2), m("a", 0).i("b", 1).i("c", 2).Get("a", "c").l);
         assertEquals(list(0, 2), m("a", 0).i("b", 1).i("c", 2).g("a", "c").l);
+        
+        assertEquals(list(0, 2, 1), m("a", 0).i("b", 1).i("c", 2).getAll(list("a", "c"), list("b")));
+        assertEquals(list(0, 2, 1), m("a", 0).i("b", 1).i("c", 2).GetAll(list("a", "c"), list("b")).l);
+        assertEquals(list(0, 2, 1), m("a", 0).i("b", 1).i("c", 2).G(list("a", "c"), list("b")).l);
         
         // get all
         assertEquals(EXPECTED_LIST, m("a", 0).i("b", 1).i("c", 2).getValues());

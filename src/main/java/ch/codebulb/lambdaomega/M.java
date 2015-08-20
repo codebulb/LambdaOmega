@@ -130,7 +130,7 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
             return (VN) m.get(key);
         }
         else {
-            V ret = defaultValue.apply(key);
+            V ret = defaultFunction.apply(key);
             put(key, ret);
             return (VN) ret;
         }

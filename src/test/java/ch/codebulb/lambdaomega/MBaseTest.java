@@ -37,9 +37,38 @@ public class MBaseTest {
         assertEquals(list("e!"), mapWithDefault.get("e"));
         
         mapWithDefault.get("a").add("y");
+        // keep previously created element
         assertEquals(list("a?", "y"), mapWithDefault.get("a"));
         mapWithDefault.get("e").add("z");
         // original entry has been changed
         assertEquals(list("e!", "z"), mapWithDefault.get("e"));
+        
+        // usage without explicit map
+        mapWithDefault = m(it -> list(it + '!'));
+        assertEquals(list("b!"), mapWithDefault.get("b"));
+        
+        mapWithDefault.get("a").add("y");
+        // keep previously created element
+        assertEquals(list("a!", "y"), mapWithDefault.get("a"));
+        mapWithDefault.get("e").add("z");
+        // original entry has been changed
+        assertEquals(list("e!", "z"), mapWithDefault.get("e"));
+    }
+    
+    @Test
+    public void testE() {
+        assertTrue(e("a", 1).equals(e("a", 1)));
+        assertFalse(e("a", 1).equals(e("a", 2)));
+        assertFalse(e("a", 1).equals(e("b", 1)));
+        
+        assertEquals("e(a, 1)", e("a", 1).toString());
+        
+        assertEquals("a", e("a", 1).k);
+        assertEquals("a", e("a", 1).getK());
+        assertEquals(1, e("a", 1).v);
+        assertEquals(1, e("a", 1).getV());
+        
+        assertEquals("a", e("a", 1).toEntry().getKey());
+        assertEquals(1, e("a", 1).toEntry().getValue());
     }
 }

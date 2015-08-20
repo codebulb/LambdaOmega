@@ -51,19 +51,28 @@ public class PromiseTest {
     }
     
     @Test
+    public void testObject() {
+        CompletableFuture completableFuture = new CompletableFuture();
+        Promise promise = Promise.wrap(completableFuture);
+        assertEquals("Promise(" + completableFuture.toString() + ")", promise.toString());
+    }
+    
+    @Test
     public void testCompleteAsync() throws InterruptedException, ExecutionException {
         String expected = CompletableFuture.supplyAsync(() -> OUTPUT).get();
         String actual = Promise.completeAsync(() -> OUTPUT).get();
+        String actualWithExecutor = Promise.completeAsync(() -> OUTPUT, DEFAULT_EXECUTOR).get();
         
-        TestUtil.assertEquals(OUTPUT, expected, actual);
+        TestUtil.assertEquals(OUTPUT, expected, actual, actualWithExecutor);
     }
     
     @Test
     public void testCompleteAsyncRunnable() throws InterruptedException, ExecutionException {
         CompletableFuture.runAsync(() -> expected.a(OUTPUT));
         Promise.completeAsync(() -> {actual.a(OUTPUT);}).get();
+        Promise.completeAsync(() -> {actual1.a(OUTPUT);}, DEFAULT_EXECUTOR).get();
         
-        assertEquals(OUTPUT, expected.get(0), actual.get(0));
+        assertEquals(OUTPUT, expected.get(0), actual.get(0), actual1.get(0));
     }
     
     
@@ -345,9 +354,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.and(actualPromise1, (a, b) -> OUTPUT_MODIFIED).completed(it -> {return actual.a(it);});
-        executeAsync(actualPromise.and(actualPromiseAsync, (a, b) -> OUTPUT_MODIFIED).completed(it -> {return actual.a(it);}),
-        actualPromiseAsyncExec.and(actualPromise1, (a, b) -> OUTPUT_MODIFIED).completed(it -> {return actual.a(it);}));
+        actualPromise.and(actualPromise1, (a, b) -> OUTPUT_MODIFIED).completed(it -> {return actual1.a(it);});
+        executeAsync(actualPromise.and(actualPromiseAsync, (a, b) -> OUTPUT_MODIFIED, true).completed(it -> {return actual2.a(it);}),
+        actualPromiseAsyncExec.and(actualPromise1, (a, b) -> OUTPUT_MODIFIED, true, DEFAULT_EXECUTOR).completed(it -> {return actual3.a(it);}));
         actualPromise1.complete(ANY_OUTPUT);
         actualPromise.complete(ANY_OUTPUT);
         actualPromiseAsync.complete(ANY_OUTPUT);
@@ -356,7 +365,7 @@ public class PromiseTest {
         actualPromise1.join();
         
         Assert.assertEquals(OUTPUTS_MODIFIED.l, expected.l);
-        Assert.assertEquals(OUTPUTS_MODIFIED.l, actual.l);
+        Assert.assertEquals(OUTPUTS_MODIFIED.l, l(actual1, actual2, actual3).flatten());
     }
     
     @Test
@@ -369,9 +378,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.and(actualPromise1, (a, b) -> {actual.a(a);});
-        executeAsync(actualPromise.and(actualPromiseAsync, (a, b) -> {actual.a(a);}),
-        actualPromiseAsyncExec.and(actualPromise1, (a, b) -> {actual.a(a);}));
+        actualPromise.and(actualPromise1, (a, b) -> {actual1.a(a);});
+        executeAsync(actualPromise.and(actualPromiseAsync, (a, b) -> {actual2.a(a);}, true),
+        actualPromiseAsyncExec.and(actualPromise1, (a, b) -> {actual3.a(a);}, true, DEFAULT_EXECUTOR));
         actualPromise1.complete(ANY_OUTPUT);
         actualPromise.complete(OUTPUT);
         actualPromiseAsync.complete(OUTPUT);
@@ -380,7 +389,7 @@ public class PromiseTest {
         actualPromise1.join();
         
         Assert.assertEquals(OUTPUTS.l, expected.l);
-        Assert.assertEquals(OUTPUTS.l, actual.l);
+        Assert.assertEquals(OUTPUTS.l, l(actual1, actual2, actual3).flatten());
     }
     
     @Test
@@ -393,9 +402,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.and(actualPromise1, () -> {actual.a(OUTPUT);});
-        executeAsync(actualPromise.and(actualPromiseAsync, () -> {actual.a(OUTPUT);}),
-        actualPromiseAsyncExec.and(actualPromise1, () -> {actual.a(OUTPUT);}));
+        actualPromise.and(actualPromise1, () -> {actual1.a(OUTPUT);});
+        executeAsync(actualPromise.and(actualPromiseAsync, () -> {actual2.a(OUTPUT);}, true),
+        actualPromiseAsyncExec.and(actualPromise1, () -> {actual3.a(OUTPUT);}, true, DEFAULT_EXECUTOR));
         actualPromise1.complete(ANY_OUTPUT);
         actualPromise.complete(ANY_OUTPUT);
         actualPromiseAsync.complete(ANY_OUTPUT);
@@ -404,7 +413,7 @@ public class PromiseTest {
         actualPromise1.join();
         
         Assert.assertEquals(OUTPUTS.l, expected.l);
-        Assert.assertEquals(OUTPUTS.l, actual.l);
+        Assert.assertEquals(OUTPUTS.l, l(actual1, actual2, actual3).flatten());
     }
     
     @Test
@@ -440,9 +449,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.or(actualPromise1, (it) -> it).completed(it -> {return actual.a(it);});
-        executeAsync(actualPromise.or(actualPromiseAsync, (it) -> it).completed(it -> {return actual.a(it);}),
-        actualPromiseAsyncExec.or(actualPromise1, (it) -> it).completed(it -> {return actual.a(it);}));
+        actualPromise.or(actualPromise1, (it) -> it).completed(it -> {return actual1.a(it);});
+        executeAsync(actualPromise.or(actualPromiseAsync, (it) -> it, true).completed(it -> {return actual2.a(it);}),
+        actualPromiseAsyncExec.or(actualPromise1, (it) -> it, true, DEFAULT_EXECUTOR).completed(it -> {return actual3.a(it);}));
         actualPromise1.complete(OUTPUT);
         actualPromise.complete(OUTPUT);
         actualPromiseAsync.complete(OUTPUT);
@@ -451,7 +460,7 @@ public class PromiseTest {
         actualPromise1.join();
         
         Assert.assertEquals(OUTPUTS.l, expected.l);
-        Assert.assertEquals(OUTPUTS.l, actual.l);
+        Assert.assertEquals(OUTPUTS.l, l(actual1, actual2, actual3).flatten());
     }
     
     @Test
@@ -464,9 +473,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.or(actualPromise1, (it) -> {actual.a(it);});
-        executeAsync(actualPromise.or(actualPromiseAsync, (it) -> {actual.a(it);}),
-        actualPromiseAsyncExec.or(actualPromise1, (it) -> {actual.a(it);}));
+        actualPromise.or(actualPromise1, (it) -> {actual1.a(it);});
+        executeAsync(actualPromise.or(actualPromiseAsync, (it) -> {actual2.a(it);}, true),
+        actualPromiseAsyncExec.or(actualPromise1, (it) -> {actual3.a(it);}, true, DEFAULT_EXECUTOR));
         actualPromise1.complete(OUTPUT);
         actualPromise.complete(OUTPUT);
         actualPromiseAsync.complete(OUTPUT);
@@ -475,7 +484,7 @@ public class PromiseTest {
         actualPromise1.join();
         
         Assert.assertEquals(OUTPUTS.l, expected.l);
-        Assert.assertEquals(OUTPUTS.l, actual.l);
+        Assert.assertEquals(OUTPUTS.l, l(actual1, actual2, actual3).flatten());
     }
     
     @Test
@@ -488,9 +497,9 @@ public class PromiseTest {
         expectedPromise1.join();
         
         Promise<String> actualPromise1 = new Promise<>();
-        actualPromise.or(actualPromise1, () -> {actual.a(OUTPUT);});
-        executeAsync(actualPromise.or(actualPromiseAsync, () -> {actual.a(OUTPUT);}),
-        actualPromiseAsyncExec.or(actualPromise1, () -> {actual.a(OUTPUT);}));
+        actualPromise.or(actualPromise1, () -> {actual1.a(OUTPUT);});
+        executeAsync(actualPromise.or(actualPromiseAsync, () -> {actual2.a(OUTPUT);}, true),
+        actualPromiseAsyncExec.or(actualPromise1, () -> {actual3.a(OUTPUT);}, true, DEFAULT_EXECUTOR));
         actualPromise1.complete(ANY_OUTPUT);
         actualPromise.complete(ANY_OUTPUT);
         actualPromiseAsync.complete(ANY_OUTPUT);
@@ -499,6 +508,6 @@ public class PromiseTest {
         actualPromise1.join();
         
         Assert.assertEquals(OUTPUTS.l, expected.l);
-        Assert.assertEquals(OUTPUTS.l, actual.l);
+        Assert.assertEquals(OUTPUTS.l, l(actual1, actual2, actual3).flatten());
     }
 }

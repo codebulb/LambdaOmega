@@ -85,7 +85,7 @@ public class Promise<T> extends OmegaObject {
      * @see #completed(Function, boolean, Executor)
      */
     public <U> Promise<U> completed(Function<? super T, ? extends U> fn, boolean async) {
-        return completed(fn, false, null);
+        return completed(fn, async, null);
     }
     
     /**
@@ -109,7 +109,7 @@ public class Promise<T> extends OmegaObject {
      * @see #completed(Consumer, boolean, Executor)
      */
     public Promise<Void> completed(Consumer<? super T> action, boolean async) {
-        return completed(action, false, null);
+        return completed(action, async, null);
     }
     
     /**
@@ -133,7 +133,7 @@ public class Promise<T> extends OmegaObject {
      * @see #completed(Runnable, boolean, Executor)
      */
     public Promise<Void> completed(Runnable action, boolean async) {
-        return completed(action, false, null);
+        return completed(action, async, null);
     }
     
     /**
@@ -164,7 +164,7 @@ public class Promise<T> extends OmegaObject {
      * @see #completed(BiFunction, boolean, Executor)
      */
     public <U> Promise<U> completed(BiFunction<? super T, Throwable, ? extends U> fn, boolean async) {
-        return completed(fn, false, null);
+        return completed(fn, async, null);
     }
     
     /**
@@ -188,7 +188,7 @@ public class Promise<T> extends OmegaObject {
      * @see #completed(BiConsumer, boolean, Executor)
      */
     public Promise<T> completed(BiConsumer<? super T, ? super Throwable> action, boolean async) {
-        return completed(action, false, null);
+        return completed(action, async, null);
     }
     
     /**
@@ -222,7 +222,7 @@ public class Promise<T> extends OmegaObject {
      * @see #then(Function, boolean, Executor)
      */
     public <U> Promise<U> then(Function<? super T, ? extends Promise<U>> fn, boolean async) {
-        return then(fn, false, null);
+        return then(fn, async, null);
     }
     
     /**
@@ -259,7 +259,7 @@ public class Promise<T> extends OmegaObject {
      * @see #and(Promise, BiFunction, boolean, Executor)
      */
     public <U, V> Promise<V> and(Promise<? extends U> other, BiFunction<? super T, ? super U, ? extends V> fn, boolean async) {
-        return and(other, fn, false, null);
+        return and(other, fn, async, null);
     }
     
     /**
@@ -283,7 +283,7 @@ public class Promise<T> extends OmegaObject {
      * @see #and(Promise, BiConsumer, boolean, Executor)
      */
     public <U> Promise<Void> and(Promise<? extends U> other, BiConsumer<? super T, ? super U> action, boolean async) {
-        return and(other, action, false, null);
+        return and(other, action, async, null);
     }
     
     /**
@@ -307,7 +307,7 @@ public class Promise<T> extends OmegaObject {
      * @see #and(Promise, Runnable, boolean, Executor)
      */
     public Promise<Void> and(Promise<?> other, Runnable action, boolean async) {
-        return and(other, action, false, null);
+        return and(other, action, async, null);
     }
     
     /**
@@ -341,7 +341,7 @@ public class Promise<T> extends OmegaObject {
      * @see #or(Promise, Function, boolean, Executor)
      */
     public <U> Promise<U> or(Promise<? extends T> other, Function<? super T, U> fn, boolean async) {
-        return or(other, fn, false, null);
+        return or(other, fn, async, null);
     }
     
     /**
@@ -365,7 +365,7 @@ public class Promise<T> extends OmegaObject {
      * @see #or(Promise, Consumer, boolean, Executor)
      */
     public Promise<Void> or(Promise<? extends T> other, Consumer<? super T> action, boolean async) {
-        return or(other, action, false, null);
+        return or(other, action, async, null);
     }
     
     /**
@@ -389,7 +389,7 @@ public class Promise<T> extends OmegaObject {
      * @see #or(Promise, Runnable, boolean, Executor)
      */
     public Promise<Void> or(Promise<?> other, Runnable action, boolean async) {
-        return or(other, action, false, null);
+        return or(other, action, async, null);
     }
     
     /**
@@ -517,7 +517,7 @@ public class Promise<T> extends OmegaObject {
     
     @Override
     public String toString() {
-        return wrapped.toString();
+        return "Promise(" + wrapped.toString() + ")";
     }
     
     /**

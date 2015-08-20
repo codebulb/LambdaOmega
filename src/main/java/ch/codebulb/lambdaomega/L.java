@@ -23,7 +23,6 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
@@ -119,8 +118,8 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
     /**
      * Like {@link #l(int, Function)}, but turning the result into a {@link L}.
      */
-    public static <T> List<T> list(int times, Supplier<T> generator) {
-        return L(Stream.generate(generator).limit(times)).l;
+    public static <T> List<T> list(int times, Function<Integer, T> generator) {
+        return l(times, generator).l;
     }
 
     @Override
@@ -180,12 +179,12 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
             return l.get(index);
         }
         else {
-            return defaultValue.apply(index);
+            return defaultFunction.apply(index);
         }
     }
     
     @Override
-    public <VN extends T> VN getOrDefault(Integer key, T defaultValue) {
+    public <VN extends T> VN getOrDefault(Integer key, VN defaultValue) {
         if (containsAnyKey(key)) {
             return (VN) l.get(key);
         }

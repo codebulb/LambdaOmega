@@ -162,7 +162,7 @@ public interface IndexedI<K, V> extends ReadonlyIndexedI<K, V> {
     }
 
     @Override
-    public default <VN extends V> VN getOrDefault(K key, V defaultValue) {
+    public default <VN extends V> VN getOrDefault(K key, VN defaultValue) {
         return (VN) toMap().getOrDefault(key, defaultValue);
     }
 }

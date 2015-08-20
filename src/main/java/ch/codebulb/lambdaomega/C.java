@@ -28,7 +28,7 @@ import java.util.stream.StreamSupport;
 // TODO Complete implementation with more converters
 public abstract class C<T, K, V> extends OmegaObject implements StreamableI, ReadonlyIndexedI<K, V> {
     private boolean parallel;
-    protected Function<K, V> defaultValue;
+    protected Function<K, V> defaultFunction;
     
     public abstract Collection<T> toCollection();
     
@@ -76,7 +76,7 @@ public abstract class C<T, K, V> extends OmegaObject implements StreamableI, Rea
     
     @Override
     public C<T, K, V> WithDefault(Function<K, V> defaultValue) {
-        this.defaultValue = defaultValue;
+        this.defaultFunction = defaultValue;
         return this;
     }
     

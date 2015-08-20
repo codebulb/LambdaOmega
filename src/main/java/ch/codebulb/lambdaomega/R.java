@@ -120,6 +120,6 @@ public class R extends OmegaObject {
 
     @Override
     public String toString() {
-        return "[" + startInclusive + "..<" + endExclusive + "]";
+        return "[" + startInclusive + "..<" + (endExclusive + 1) + "]";
     }
 }

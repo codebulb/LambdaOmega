@@ -47,6 +47,7 @@ public class LBaseTest {
         assertEquals(list(10), listWithDefault.get(5));
         
         listWithDefault.get(0).add(9);
+        // keep previously created element
         assertEquals(list(5, 9), listWithDefault.get(0));
         listWithDefault.get(5).add(9);
         // return a newly created element

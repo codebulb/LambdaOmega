@@ -20,7 +20,7 @@ import java.util.function.Function;
 public class V2<X, Y> extends OmegaObject implements ReadonlyIndexedI<Integer, Object> {
     private X x;
     private Y y;
-    private Function<Integer, Object> defaultValue;
+    private Function<Integer, Object> defaultFunction;
 
     V2(X x, Y y) {
         this.x = x;
@@ -71,25 +71,48 @@ public class V2<X, Y> extends OmegaObject implements ReadonlyIndexedI<Integer, O
     
     @Override
     public <T> T get(Integer key) {
-        T ret = (T)(key == 0 ? get0() : get1());
-        if (defaultValue != null && ret == null) {
-            return (T) defaultValue.apply(key);
+        T ret = null;
+        if (key == 0) {
+            ret = (T) get0();
         }
-        return ret;
+        else if (key == 1) {
+            ret = (T) get1();
+        }
+        
+        if (ret == null) {
+            if (defaultFunction != null) {
+                return (T) defaultFunction.apply(key);
+            }
+            else {
+                throw new IllegalArgumentException("Illegal vector access key : " + key);
+            }
+        }
+        else {
+            return ret;
+        }
     }    
     
     @Override
-    public <T> T getOrDefault(Integer key, Object defaultValue) {
-        T ret = (T)(key == 0 ? get0() : get1());
+    public <T> T getOrDefault(Integer key, T defaultValue) {
+        T ret = null;
+        if (key == 0) {
+            ret = (T) get0();
+        }
+        else if (key == 1) {
+            ret = (T) get1();
+        }
+        
         if (ret == null) {
             return (T) defaultValue;
         }
-        return ret;
+        else {
+            return ret;
+        }
     }
 
     @Override
     public V2<X, Y> WithDefault(Function<Integer, Object> defaultValue) {
-        this.defaultValue = defaultValue;
+        this.defaultFunction = defaultValue;
         return this;
     }
 
