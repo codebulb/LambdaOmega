@@ -2,6 +2,7 @@ package ch.codebulb.lambdaomega;
 
 import static ch.codebulb.lambdaomega.L.l;
 import static ch.codebulb.lambdaomega.V2.v;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -22,6 +23,10 @@ public class U {
      */
     public static <T> Choice<T> Choose(boolean predicate, Supplier<T> function) {
         return new Choice<>(predicate, function);
+    }
+    
+    public static <T> boolean in(Predicate<T> predicate, T... ts) {
+        return C.toStream(ts).anyMatch(predicate);
     }
     
     /**
