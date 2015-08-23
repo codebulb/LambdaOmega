@@ -260,6 +260,7 @@ public class LBaseIndexedTest {
     @Test
     public void testGet() {
         assertEquals("a", l("a", "b", "c").get(0));
+        assertEquals("a", l("a", "b", "c").g(0));
         assertEquals(list("a", "c"), l("a", "b", "c").Get(0, 2).l);
         assertEquals(list("a", "c"), l("a", "b", "c").get(0, 2));
         assertEquals(list("a", "c"), l("a", "b", "c").g(0, 2).l);

@@ -59,6 +59,13 @@ public interface I<K, V> {
     /**
      * @see #get(Object)
      */
+    public default V g(K key) {
+        return get(key);
+    }
+    
+    /**
+     * @see #get(Object)
+     */
     public default L<V> Get(K... keys) {
         return L(get(keys));
     }

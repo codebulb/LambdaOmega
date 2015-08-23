@@ -239,6 +239,7 @@ public class MBaseIndexedTest {
     @Test
     public void testGet() {
         assertEquals(0, m("a", 0).i("b", 1).i("c", 2).get("a"));
+        assertEquals(0, m("a", 0).i("b", 1).i("c", 2).g("a"));
         assertEquals(list(0, 2), m("a", 0).i("b", 1).i("c", 2).get("a", "c"));
         assertEquals(list(0, 2), m("a", 0).i("b", 1).i("c", 2).Get("a", "c").l);
         assertEquals(list(0, 2), m("a", 0).i("b", 1).i("c", 2).g("a", "c").l);
