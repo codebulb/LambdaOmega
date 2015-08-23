@@ -13,10 +13,25 @@ import org.junit.Test;
 
 public class FTest {
     @Test
-    public void testBasics() {
+    public void testCall() {
         assertEquals(1, f((Integer it) -> it + 1).call(0));
         assertEquals(3, f((Integer x, Integer y) -> x + y).call(1, 2));
         
+        L<Integer> consumerList1 = l();
+        f((Integer it) -> {consumerList1.a(it);}).call(1);
+        assertEquals(l(1), consumerList1);
+        L<Integer> consumerList2 = l();
+        f((Integer x, Integer y) -> {consumerList2.a(x).a(y);}).call(1, 2);
+        assertEquals(l(1, 2), consumerList2);
+        
+        assertTrue(f((Integer it) -> it > 0).call(2));
+        assertTrue(f((Integer x, Integer y) -> x > 0 && y < 0).call(2, -1));
+        
+        assertEquals(1, f(() -> 1).call(2));
+    }
+    
+    @Test
+    public void testGet() {
         assertEquals(1, f((Integer it) -> it + 1).get(0));
         assertEquals(list(1, 2, 3), f((Integer it) -> it + 1).get(0, 1, 2));
         assertEquals(l(1, 2, 3), f((Integer it) -> it + 1).Get(0, 1, 2));

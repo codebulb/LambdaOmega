@@ -235,14 +235,49 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
      * Creates a {@link F} which wraps the function provided.
      */
     public static <T, R> F<T, T, T, R> f(Function<T, R> function) {
-        return new F(function);
+        return new F<>(function);
     }
     
     /**
      * @see #f(Function)
      */
+    public static <T> F<T, T, T, Void> f(Consumer<T> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static <T> F<T, T, T, Boolean> f(Predicate<T> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static <T, R> F<T, T, T, R> f(Supplier<R> function) {
+        return new F<>(function);
+    }
+       
+    /**
+     * @see #f(Function)
+     */
     public static <T, K extends T, V extends T, R> F<T, K, V, R> f(BiFunction<K, V, R> function) {
-        return new F(function);
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static <T, K extends T, V extends T> F<T, K, V, Void> f(BiConsumer<K, V> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static <T, K extends T, V extends T> F<T, K, V, Boolean> f(BiPredicate<K, V> function) {
+        return new F<>(function);
     }
     
     /**
