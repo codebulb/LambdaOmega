@@ -15,6 +15,17 @@ LambdaOmega consists of only a few classes. For brevity reasons, most of their n
 *	`U` (“Utils”) provides additional miscellaneous helper methods.
 *	`Promise` is a wrapper and a drop-in replacement for CompletableFuture, providing several simplifications and fixes for the API. It can be used independently of all the other classes. It’s discussed in a separate section.
 
+## Why you should use it
+*	Although Java’s Collections / lambdas are everywhere, you feel like their API is really cumbersome.
+*	You feel even more so if you know and love Groovy or JavaScript / lodash.
+*	It perfectly fits unit tests where fluid, maintainable code is key.
+
+Other benefits:
+*	Small footprint (JAR < 85KB), no other dependencies.
+*	Thoroughly tested (coverage > 80%).
+*	Human-readable documentation (here and in the API docs).
+*	Free & Open source ([New BSD license](https://github.com/codebulb/LambdaOmega/blob/master/LICENSE)).
+
 ## How to use it
 LambdaOmega is not released yet; however, if you feel adventurous, can use [JitPack](https://jitpack.io/) to add its SNAPSHOT dependency to your Maven project:
 ```
@@ -92,7 +103,7 @@ We’ve already met the `add` / `Add` / `a` method on L. There’s also `addAll`
 ```
 List<Integer> zeroToSix = l(0, 1, 2).A(list(3, 4)).addAll(l(5, 6));
 ```
-For M, there’s an add method variant named `insert` / `Insert` / `I` / `insertAll` / `InsertAll` / `I` which will invoke `put()`, but only after a check preventing you from inserting the same key twice; otherwise, a `MapEntryKeyAlreadyPresentException` is thrown and the map is not modified. This method comes in handy e.g. in unit tests when you explicitly build a map and you want to make sure that you don’t accidentally insert the same key twice. Note that this check costs significantly more performance than just performing put().
+For M, there’s an add method variant named `insert` / `Insert` / `i` / `insertAll` / `InsertAll` / `I` which will invoke `put()`, but only after a check preventing you from inserting the same key twice; otherwise, a `MapEntryKeyAlreadyPresentException` is thrown and the map is not modified. This method comes in handy e.g. in unit tests when you explicitly build a map and you want to make sure that you don’t accidentally insert the same key twice. Note that this check costs significantly more performance than just performing put().
 ```
 m("a", 0).i("b", 1).I(m("c", 2).i("d", 3), m("c", 9)); // exception because of "c"!
 ```
@@ -134,9 +145,9 @@ and M methods such as `insert()` on a L:
 ```
 L<String> abcd = l("a", "b").I(m(2, "c").i(3, "d"));
 ```
-Finally, indexed access using get() is actually provided by the `ReadonlyIndexedI` interface which is implemented by L, M, and F, thus you can use “one interface to rule them all”:
+Finally, indexed access using get() is actually provided by the `I` interface which is implemented by L, M, and F, thus you can use “one interface to rule them all”:
 ```
-ReadonlyIndexedI<Integer, String> indexed = m(0, "a").i(1, "b");
+I<Integer, String> indexed = m(0, "a").i(1, "b");
 String b = indexed.g(1);
 indexed = l("a", "b");
 b = indexed.g(1);
@@ -180,13 +191,27 @@ There are also additional functional operations such as `flatten()`, `flattenDee
 ```
 List<Integer> list123456 = l(0, 1, l(2, 3, l(4)), list(5, 6)).<Integer> flattenDeep();
 ```
-There’s also a `WithDefault()` method which allows you for any ReadonlyIndexedI to register a function the return value of which is returned if a get() access would return null or get out of bounds (as inspired by Groovy). You can use this e.g. to easily create a Map of Lists:
+There’s also a `WithDefault()` method which allows you for any `I` to register a function the return value of which is returned if a get() access would return null or get out of bounds (as inspired by Groovy). You can use this e.g. to easily create a Map of Lists:
 ```
 M<String, L> withDefault = m(L.class).WithDefault(it -> l());
 withDefault.g("a").a(1);
 println(withDefault); // prints M{a=L[1]}
 ```
 Take a look at the [API docs](http://codebulb.github.io/pages/LambdaOmega/doc/) to see all available functional operations.
+
+## Functions
+The `F` class serves as a simple wrapper around any kind of `FunctionalInterface`, providing a unified API to any kind of function:
+```
+int two = f((Integer it) -> it + 1).call(1); // Function
+int three = f((Integer x, Integer y) -> x + y).call(1, 2); // BiFunction
+boolean yes = f((Integer it) -> it > 0).call(1); // Predicate
+```
+It also features some useful transformation methods for Java’s FunctionalInterface implementations. For instance, it may be useful to combine a 2-ary <K, V> function into a 1-ary E<K, V> function or vice versa to write more concise code:
+```
+F.function((Integer k, Integer v) -> k - v).apply(e(3, 2))
+F.biFunction((E<Integer, Integer> it) -> it.k - it.v).apply(3, 2)
+```
+…expect more FunctionalInterface transformations in future LambdaOmega releases!
 
 ## Ranges
 The `R` class represents an int range. It’s basically syntactic sugar to create ranges using the Java 8 stream API.
