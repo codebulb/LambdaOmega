@@ -2,10 +2,13 @@ package ch.codebulb.lambdaomega;
 
 import static ch.codebulb.lambdaomega.F.f;
 import static ch.codebulb.lambdaomega.L.*;
+import ch.codebulb.lambdaomega.M.E;
+import static ch.codebulb.lambdaomega.M.e;
 import static ch.codebulb.lambdaomega.TestUtil.assertEquals;
 import ch.codebulb.lambdaomega.abstractions.I;
 import java.util.List;
 import java.util.stream.Collectors;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class FTest {
@@ -31,7 +34,23 @@ public class FTest {
     public void testCompare() {
         assertEquals(list(-1, 0, 1, 2), list(2, -1, 1, 0).stream().sorted(F.compare()).collect(Collectors.toList()));
         
-        // other comparison tests are implicitly made in L /m tests
+        // other comparison tests are implicitly made in L / M tests
+    }
+    
+    @Test
+    public void testConvert() {
+        assertEquals(1, F.function((Integer k, Integer v) -> k - v).apply(e(3, 2)));
+        assertEquals(1, F.biFunction((E<Integer, Integer> it) -> it.k - it.v).apply(3, 2));
+        
+        L<Integer> consumerList1 = l();
+        F.consumer((Integer k, Integer v) -> consumerList1.a(k).a(v)).accept(e(1, 2));
+        assertEquals(l(1, 2), consumerList1);
+        L<Integer> consumerList2 = l();
+        F.biConsumer((E<Integer, Integer> it) -> consumerList2.a(it.k).a(it.v)).accept(1, 2);
+        assertEquals(l(1, 2), consumerList2);
+        
+        assertTrue(F.predicate((Integer k, Integer v) -> k > 0 && v < 0).test(e(2, -1)));
+        assertTrue(F.biPredicate((E<Integer, Integer> it) -> it.k > 0 && it.v < 0).test(2, -1));
     }
     
     @Test

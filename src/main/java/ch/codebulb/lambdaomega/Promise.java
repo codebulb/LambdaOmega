@@ -18,6 +18,302 @@ import java.util.function.Supplier;
 
 /**
  * A drop-in-replacement for {@link CompletableFuture} with a simplified, more concise API. It wraps around a {@link CompletableFuture}.
+ * As desribed in <a href="http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html#drop-in-replacement">
+ * the accompanying blog post</a>:<p/>
+ * 
+ * This will turn the bloated, inconcise Java CompletableFuture API:<br>
+<table class="completablefuture-api-overview" border="1">
+ <tbody>
+<tr>
+   <th>&nbsp;
+   </th>
+   <th>intermediary
+   </th>
+   <th>terminal
+   </th>
+   <th>terminal (Runnable)
+   </th>
+   <th>A
+   </th>
+   <th>E
+   </th>
+  </tr>
+<tr>
+   <td>Construct from task
+   </td>
+   <td>static supplyAsync
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>static runAsync
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>X
+   </td>
+  </tr>
+<tr>
+   <td><code>complete</code> listener
+   </td>
+   <td>thenApply
+   </td>
+   <td>thenAccept
+   </td>
+   <td>thenRun
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+  </tr>
+<tr>
+   <td><code>completeExceptionally</code> listener
+   </td>
+   <td>exceptionally
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+  </tr>
+<tr>
+   <td>Combined <code>complete</code> and <code>completeExceptionally</code> listener
+   </td>
+   <td>handle
+   </td>
+   <td>whenComplete
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+  </tr>
+<tr>
+   <td>Dynamic callback chaining
+   </td>
+   <td>thenCompose
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+  </tr>
+<tr>
+   <td>AND all combining
+   </td>
+   <td>static allOf
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+  </tr>
+<tr>
+   <td>AND both combining
+   </td>
+   <td>thenCombine
+   </td>
+   <td>thenAcceptBoth
+   </td>
+   <td>runAfterBoth
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+  </tr>
+<tr>
+   <td>OR any combining
+   </td>
+   <td>static anyOf
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+  </tr>
+<tr>
+   <td>OR either combining
+   </td>
+   <td>applyToEither
+   </td>
+   <td>acceptEither
+   </td>
+   <td>runAfterEither
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+  </tr>
+</tbody>
+</table>
+<br>
+into the much cleaner Promise API:<br>
+<table class="completablefuture-api-overview" border="1">
+ <tbody>
+<tr>
+   <th>&nbsp;
+   </th>
+   <th>intermediary
+   </th>
+   <th>terminal
+   </th>
+   <th>terminal (Runnable)
+   </th>
+   <th>A*
+   </th>
+   <th>E
+   </th>
+  </tr>
+<tr>
+   <td>Construct from task
+   </td>
+   <td>static completeAsync
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>static completeAsync
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>X
+   </td>
+  </tr>
+<tr>
+   <td><code>complete</code> listener
+   </td>
+   <td>completed
+   </td>
+   <td>completed
+   </td>
+   <td>completed
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+  </tr>
+<tr>
+   <td><code>completeExceptionally</code> listener
+   </td>
+   <td>completedExceptionally
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+  </tr>
+<tr>
+   <td>Combined <code>complete</code> and <code>completeExceptionally</code> listener
+   </td>
+   <td>completed
+   </td>
+   <td>completed
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+  </tr>
+<tr>
+   <td>Dynamic callback chaining
+   </td>
+   <td>then
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+  </tr>
+<tr>
+   <td>AND all combining
+   </td>
+   <td>static allOf**
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+  </tr>
+<tr>
+   <td>AND both combining
+   </td>
+   <td>and
+   </td>
+   <td>and
+   </td>
+   <td>and
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+  </tr>
+<tr>
+   <td>OR any combining
+   </td>
+   <td>static anyOf**
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+   <td>&nbsp;
+   </td>
+  </tr>
+<tr>
+   <td>OR either combining
+   </td>
+   <td>or
+   </td>
+   <td>or
+   </td>
+   <td>or
+   </td>
+   <td>X
+   </td>
+   <td>X
+   </td>
+  </tr>
+</tbody>
+</table>
+<br>* Synchronous / asynchronous is controlled by a boolean flag rather than by the method name.
+<br>** The flawed implementations of {@link #allOf(Promise...)} / {@link #anyOf(Promise...)} have been fixed.
  */
 public class Promise<T> extends OmegaObject {
     public final CompletableFuture<T> wrapped;
@@ -233,7 +529,12 @@ public class Promise<T> extends OmegaObject {
     }
     
     /**
-     * @see CompletableFuture#allOf(CompletableFuture...)
+     * Like {@link CompletableFuture#allOf(CompletableFuture...)}, but includes a bugfix for the problem described 
+     * <a href="http://www.codebulb.ch/2015/07/completablefuture-clean-callbacks-with-java-8s-promises-part-4.html#advanced">here</a>:
+     * "Unfortunately, the resulting combined promise is of type <code>&lt;{@link Void}&gt;</code>, leading to the ridiculous need to create a 
+     * listener which takes a single parameter of type {@link Void}. Typically, we would much rather like to have a resulting 
+     * promise working with the collected results of the combined promises, i.e. of Type <code>&lt;List&lt;�&gt;&gt;</code>."
+     * This problem is fixed in this implementation.
      */
     public static <T> Promise<List<T>> allOf(Promise<T>... cfs) {
         Promise<Void> allDoneFuture = new Promise<>(
@@ -318,7 +619,12 @@ public class Promise<T> extends OmegaObject {
     }
     
     /**
-     * @see CompletableFuture#anyOf(CompletableFuture...)
+     * Like {@link CompletableFuture#anyOf(CompletableFuture...)}, but includes a bugfix for the problem described 
+     * <a href="http://www.codebulb.ch/2015/07/completablefuture-clean-callbacks-with-java-8s-promises-part-4.html#advanced">here</a>:
+     * "Unfortunately, the resulting combined promise is of type <code>&lt;?&gt;</code>, thus of type {@link Object}. 
+     * However, I think that typically, the result type of the combined promises would match and then it would be sensible 
+     * for the combined promise to be of that very type."
+     * This problem is fixed in this implementation.
      */
     public static <T> Promise<T> anyOf(Promise<T>... cfs) {
         return (Promise<T>) new Promise<>(

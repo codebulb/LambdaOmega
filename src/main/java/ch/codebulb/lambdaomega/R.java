@@ -47,7 +47,7 @@ public class R extends OmegaObject {
     public static class Rinit {
         private final int startInclusive;
 
-        public Rinit(int startInclusive) {
+        private Rinit(int startInclusive) {
             this.startInclusive = startInclusive;
         }
         

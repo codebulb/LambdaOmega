@@ -1,6 +1,6 @@
 package ch.codebulb.lambdaomega;
 
-import ch.codebulb.lambdaomega.M.E;
+import ch.codebulb.lambdaomega.M.*;
 import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import ch.codebulb.lambdaomega.abstractions.ReadonlyIndexedI;
 import java.util.Comparator;
@@ -11,6 +11,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
 
@@ -32,15 +33,32 @@ import java.util.function.ToDoubleFunction;
 // TODO Complete implementation, supporting all available functional interfaces
 public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements ReadonlyIndexedI<T, R> {
     private Function<T, R> function;
+    private Consumer<T> consumer;
+    private Predicate<T> predicate;
+    private Supplier<R> supplier;
+    
     private BiFunction<T1, T2, R> biFunction;
     private BiConsumer<T1, T2> biConsumer;
     private BiPredicate<T1, T2> biPredicate;
+    
     private ToDoubleBiFunction<T1, T2> toDoubleBiFunction;
     
     private Function<T, R> defaultFunction;
 
     F(Function<T, R> function) {
         this.function = function;
+    }
+
+    F(Consumer<T> consumer) {
+        this.consumer = consumer;
+    }
+
+    F(Predicate<T> predicate) {
+        this.predicate = predicate;
+    }
+
+    F(Supplier<R> supplier) {
+        this.supplier = supplier;
     }
     
     F(BiFunction<T1, T2, R> biFunction) {
@@ -66,6 +84,16 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         if (function != null) {
             return function.apply(input);
         }
+        if (consumer != null) {
+            consumer.accept(input);
+            return null;
+        }
+        if (predicate != null) {
+            return (R) (Boolean)predicate.test(input);
+        }
+        if (supplier != null) {
+            return supplier.get();
+        }
         throw new IllegalStateException("No appropriate original function is set.");
     }
     
@@ -81,13 +109,17 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
             biConsumer.accept((T1)inputs[0], (T2)inputs[1]);
             return null;
         }
+        
+        if (biPredicate != null) {
+            return (R)(Boolean)biPredicate.test((T1)inputs[0], (T2)inputs[1]);
+        }
         throw new IllegalStateException("No appropriate original function is set.");
     }
     
     /**
      * Turns a wrapped {@link BiFunction} <i>f1: (K, V) &rarr; R</i> into a {@link Function} <i>f2: ({@link E}&lt;K, V&gt;) &rarr; R</i>.
      */
-    public Function<M.E<T1, T2>, R> function() {
+    public Function<M.E<T1, T2>, R> eFunction() {
         if (biFunction != null) {
             return (M.E<T1, T2> e) -> 
                 biFunction.apply(e.k, e.v);
@@ -98,7 +130,7 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     /**
      * Turns a wrapped {@link BiConsumer} <i>f1: (K, V) &rarr; <code>void</code></i> into a {@link Consumer} <i>f2: ({@link E}&lt;K, V&gt;) &rarr; <code>void</code></i>.
      */
-    public Consumer<M.E<T1, T2>> consumer() {
+    public Consumer<M.E<T1, T2>> eConsumer() {
         if (biConsumer != null) {
             return (M.E<T1, T2> e) -> 
                 biConsumer.accept(e.k, e.v);
@@ -109,7 +141,7 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     /**
      * Turns a wrapped {@link BiPredicate} <i>f1: (K, V) &rarr; <code>boolean</code></i> into a {@link Predicate} <i>f2: ({@link E}&lt;K, V&gt;) &rarr; <code>boolean</code></i>.
      */
-    public Predicate<M.E<T1, T2>> predicate() {
+    public Predicate<M.E<T1, T2>> ePredicate() {
         if (biPredicate != null) {
             return (M.E<T1, T2> e) -> 
                 biPredicate.test(e.k, e.v);
@@ -120,10 +152,43 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     /**
      * Turns a wrapped {@link ToDoubleBiFunction} <i>f1: (K, V) &rarr; <code>double</code></i> into a {@link ToDoubleFunction} <i>f2: ({@link E}&lt;K, V&gt;) &rarr; <code>double</code></i>.
      */
-    public ToDoubleFunction<M.E<T1, T2>> toDoubleFunction() {
+    public ToDoubleFunction<M.E<T1, T2>> eToDoubleFunction() {
         if (toDoubleBiFunction != null) {
             return (M.E<T1, T2> e) -> 
                 toDoubleBiFunction.applyAsDouble(e.k, e.v);
+        }
+        throw new IllegalStateException("No appropriate original function is set.");
+    }
+    
+    /**
+     * Turns a wrapped {@link Function} <i>f1: ({@link E}&lt;K, V&gt;) &rarr; R</i> into a {@link BiFunction} <i>f2: (K, V) &rarr; R</i>.
+     */
+    public BiFunction<T1, T2, R> eBiFunction() {
+        if (function != null) {
+            return (T1 t, T2 u) -> 
+                function.apply((T) M.e(t, u));
+        }
+        throw new IllegalStateException("No appropriate original function is set.");
+    }
+    
+    /**
+     * Turns a wrapped {@link Consumer} <i>f1: ({@link E}&lt;K, V&gt;) &rarr; <code>void</code></i> into a {@link BiConsumer} <i>f2: (K, V) &rarr; <code>void</code></i>.
+     */
+    public BiConsumer<T1, T2> eBiConsumer() {
+        if (consumer != null) {
+            return (T1 t, T2 u) -> 
+                consumer.accept((T) M.e(t, u));
+        }
+        throw new IllegalStateException("No appropriate original function is set.");
+    }
+    
+    /**
+     * Turns a wrapped {@link Predicate} <i>f1: ({@link E}&lt;K, V&gt;) &rarr; <code>boolean</code></i> into a {@link BiPredicate} <i>f2: (K, V) &rarr; <code>boolean</code></i>.
+     */
+    public BiPredicate<T1, T2> eBiPredicate() {
+        if (predicate != null) {
+            return (T1 t, T2 u) -> 
+                predicate.test((T) M.e(t, u));
         }
         throw new IllegalStateException("No appropriate original function is set.");
     }
@@ -181,31 +246,52 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     }
     
     /**
-     * @see #function()
+     * @see #eFunction()
      */
     public static <K, V, R> Function<M.E<K, V>, R> function(BiFunction<K, V, R> function) {
-      return new F(function).function();
+      return new F(function).eFunction();
     }
     
     /**
-     * @see #consumer()
+     * @see #eConsumer()
      */
     public static <K, V> Consumer<M.E<K, V>> consumer(BiConsumer<K, V> function) {
-        return new F(function).consumer();
+        return new F(function).eConsumer();
     }
     
     /**
-     * @see #predicate()
+     * @see #ePredicate()
      */
     public static <K, V> Predicate<M.E<K, V>> predicate(BiPredicate<K, V> function) {
-        return new F(function).predicate();
+        return new F(function).ePredicate();
     }
     
     /**
-     * @see #toDoubleFunction()
+     * @see #eToDoubleFunction()
      */
     public static <K, V> ToDoubleFunction<M.E<? extends K, ? extends V>> toDoubleFunction(ToDoubleBiFunction<? extends K, ? extends V> function) {
-        return new F(function).toDoubleFunction();
+        return new F(function).eToDoubleFunction();
+    }
+    
+    /**
+     * @see #eBiFunction()
+     */
+    public static <K, V, R> BiFunction<K, V, R> biFunction(Function<E<K, V>, R> function) {
+        return new F(function).eBiFunction();
+    }
+    
+    /**
+     * @see #eBiConsumer()
+     */
+    public static <K, V> BiConsumer<K, V> biConsumer(Consumer<E<K, V>> function) {
+        return new F(function).eBiConsumer();
+    }
+    
+    /**
+     * @see #eBiPredicate()
+     */
+    public static <K, V> BiPredicate<K, V> biPredicate(Predicate<E<K, V>> function) {
+        return new F(function).eBiPredicate();
     }
     
     /**

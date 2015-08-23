@@ -25,8 +25,11 @@ public class U {
         return new Choice<>(predicate, function);
     }
     
-    public static <T> boolean in(Predicate<T> predicate, T... ts) {
-        return C.toStream(ts).anyMatch(predicate);
+    /**
+     * Returns <code>true</code> if the <code>predicate</code> provided is <code>true</code> for at least one of the <code>candidates</code>.
+     */
+    public static <T> boolean any(Predicate<T> predicate, T... candidates) {
+        return C.toStream(candidates).anyMatch(predicate);
     }
     
     /**

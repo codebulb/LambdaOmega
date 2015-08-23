@@ -2,7 +2,7 @@
 package ch.codebulb.lambdaomega;
 
 import ch.codebulb.lambdaomega.M.E;
-import static ch.codebulb.lambdaomega.U.in;
+import static ch.codebulb.lambdaomega.U.any;
 import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import ch.codebulb.lambdaomega.abstractions.ReadonlyIndexedI;
 import ch.codebulb.lambdaomega.abstractions.StreamableI;
@@ -57,6 +57,8 @@ public abstract class C<T, K, V> extends OmegaObject implements StreamableI, Rea
     protected Function<K, V> defaultFunction;
     
     public abstract Collection<T> toCollection();
+    
+    C() {}
     
     /**
      * Depending on {@link #isParallel()}, returns a parallel or a sequential {@link Stream}.
@@ -114,7 +116,7 @@ public abstract class C<T, K, V> extends OmegaObject implements StreamableI, Rea
         // We have to copy the stream just in case we want to use its size (cannot open a stream twice)
         List<T> collectedStream = stream.collect(Collectors.toList());
         
-        if (in(it -> format.isAssignableFrom(it),
+        if (any(it -> format.isAssignableFrom(it),
                 ArrayBlockingQueue.class,
                 ArrayDeque.class,
                 ArrayList.class,
@@ -196,7 +198,7 @@ public abstract class C<T, K, V> extends OmegaObject implements StreamableI, Rea
         }));
         }
         
-        if (in(it -> format.isAssignableFrom(it), 
+        if (any(it -> format.isAssignableFrom(it), 
                 ConcurrentHashMap.class,
                 ConcurrentSkipListMap.class)) {
             return (C)collectedStream.stream().collect(Collectors.toConcurrentMap(it -> ((E)it).k, it -> ((E)it).v, (x, y) -> x, () -> {
@@ -211,7 +213,7 @@ public abstract class C<T, K, V> extends OmegaObject implements StreamableI, Rea
         }));
         }
         
-        if (in(it -> format.isAssignableFrom(it), 
+        if (any(it -> format.isAssignableFrom(it), 
                 HashMap.class,
                 Hashtable.class,
                 IdentityHashMap.class,
