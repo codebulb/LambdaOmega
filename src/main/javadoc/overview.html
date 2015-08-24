@@ -1,0 +1,321 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+</head>
+<body>
+<p>A simple wrapper API to make usage of Java collections, lambdas and CompletableFuture more simple, concise and enjoyable.</p>
+
+<p><i>From <a href="https://github.com/codebulb/LambdaOmega">the project's GitHub repository's documentation:</a></i></p>
+
+<h2><a id="user-content-whats-in-the-box" class="anchor" href="#whats-in-the-box" aria-hidden="true"><span class="octicon octicon-link"></span></a>What’s in the box?</h2>
+
+<p>LambdaOmega consists of only a few classes. For brevity reasons, most of their names consist of a single letter.</p>
+
+<ul>
+<li>  <code>L</code> (“List”) is a wrapper for List.</li>
+<li>  <code>M</code> (“Map”) is a wrapper for Map.</li>
+<li>  <code>S</code> (“Set”) is a wrapper for Set.</li>
+<li>  <code>R</code> (“Range”) is a wrapper for an IntStream range.</li>
+<li>  <code>V2</code> (“Vector 2D”) represents a 2D vector (= a 2-ary tuple). It can be converted into a Map.Entry.</li>
+<li>  <code>F</code> (“Function”) is a wrapper for functional interfaces (lambda expressions) which also provides helper methods to convert functions.</li>
+<li>  <code>C</code> (“Collection”) is the base class for L and M and provides additional helper methods to convert collections.</li>
+<li>  <code>U</code> (“Utils”) provides additional miscellaneous helper methods.</li>
+<li>  <code>Promise</code> is a wrapper and a drop-in replacement for CompletableFuture, providing several simplifications and fixes for the API. It can be used independently of all the other classes. It’s discussed in a separate section.</li>
+</ul>
+
+<h2><a id="user-content-why-you-should-use-it" class="anchor" href="#why-you-should-use-it" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why you should use it</h2>
+
+<ul>
+<li>  Although Java’s Collections / lambdas are everywhere, you feel like their API is really cumbersome.</li>
+<li>  You feel even more so if you know and love Groovy or JavaScript / lodash.</li>
+<li>  It perfectly fits unit tests where fluid, maintainable code is key.</li>
+</ul>
+
+<p>Other benefits:</p>
+
+<ul>
+<li>  Small footprint (JAR &lt; 85KB), no other dependencies.</li>
+<li>  Thoroughly tested (coverage &gt; 80%).</li>
+<li>  Human-readable documentation (here and in the API docs).</li>
+<li>  Free &amp; Open source (<a href="https://github.com/codebulb/LambdaOmega/blob/master/LICENSE">New BSD license</a>).</li>
+</ul>
+
+<h2><a id="user-content-how-to-use-it" class="anchor" href="#how-to-use-it" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use it</h2>
+
+<p>Use <a href="https://jitpack.io/">JitPack</a> to add its dependency to your Maven project:</p>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;com.github.codebulb&lt;/groupId&gt;
+    &lt;artifactId&gt;LambdaOmega&lt;/artifactId&gt;
+    &lt;version&gt;0.1_RC-1&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>Replace the version by the branch of your choice or the current commit hash to get the newest SNAPSHOT. Visit <a href="https://jitpack.io/docs/">JitPack's docs</a> for more information.</p>
+
+<h2><a id="user-content-getting-started-with-collections" class="anchor" href="#getting-started-with-collections" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting started with Collections</h2>
+
+<p>The heart of LambdaOmega are the wrapper classes <code>L</code> and <code>M</code> which wrap around vanilla Java Collection <code>List</code> or <code>Map</code>, respectively (decorator pattern) to provide a more concise and more enjoyable API to the underlying collection.
+You can wrap an L around everything which can be turned into a List: a List, a <code>Stream</code>, varargs:</p>
+
+<pre><code>import static ch.codebulb.lambdaomega.L.*;
+
+L&lt;Integer&gt; myL = l(0, 1, 2);
+</code></pre>
+
+<p>The wrapper function invokes the L constructor and returns the L. You can’t invoke that constructor explicitly, always use the convenience wrapper function instead.</p>
+
+<p>It’s best practice to statically import the <code>l()</code> method so you can write just <code>l()</code> instead of <code>L.l()</code>.</p>
+
+<p>In the most simple case, you just want to return the underlying List:</p>
+
+<pre><code>List&lt;Integer&gt; mylist = l(0, 1, 2).l;
+</code></pre>
+
+<p>There’s a shorthand method for this simple case:</p>
+
+<pre><code>List&lt;Integer&gt; list = list(0, 1, 2);
+</code></pre>
+
+<p>Note that <code>l(Collection)</code> returns a one-element L with the collection provided being the one element. To create an L containing all the elements of the collection, use</p>
+
+<pre><code>L&lt;Integer&gt; flatList = L(list(0, 1, 2));
+</code></pre>
+
+<p>Some wrapper methods return another wrapper (e.g. of type L) or <code>this</code>; these are “intermediate” functions. You can chain another function call after them (builder pattern). Other wrapper methods return the underlying Java collection (e.g. of type List) or any other type; these are “terminal” functions. The wrapper API adheres to a simple method naming schema:</p>
+
+<ul>
+<li>methods with names starting with an <code>UpperCase</code> letter are <strong>intermediate</strong> functions</li>
+<li>methods with names consisting of a <code>single letter</code> are <strong>intermediate</strong> functions as well. These are typically shorthand aliases for another intermediate function.</li>
+<li>methods with names starting with a <code>lowerCase</code> letter are <strong>terminal</strong> functions</li>
+</ul>
+
+<p>There are no exceptions to these rules. (Although they don’t apply to the special <code>Promise</code> class.)</p>
+
+<p>With these rules in mind, we can start working with a L, e.g. add a new element:</p>
+
+<pre><code>List&lt;Integer&gt; outcome = l(0, 1, 2).add(3);
+</code></pre>
+
+<p>This is a terminal function. Using the equivalent intermediate function, we can chain method calls:</p>
+
+<pre><code>L&lt;Integer&gt; modifiedList = l(0, 1, 2).Add(3).Add(4, 5);
+</code></pre>
+
+<p>There’s a shorthand for the <code>Add()</code> method:</p>
+
+<pre><code>L&lt;Integer&gt; modifiedList2 = l(0, 1, 2).a(3).a(4, 5);
+</code></pre>
+
+<p>When constructing a Map, you make intense use of method chaining:</p>
+
+<pre><code>Map&lt;String, Integer&gt; map = m("a", 0).Insert("b", 1).i("c", 2).m;
+</code></pre>
+
+<p>(we cover Map' <code>insert()</code> method in a bit.)</p>
+
+<p>There’s a two-arg constructor for empty Maps of an explicit key / value type. If the “key” class is omitted, it’s assumed to be String:</p>
+
+<pre><code>M&lt;String, Integer&gt; emptyM = m(Integer.class);
+</code></pre>
+
+<h2><a id="user-content-collection-methods" class="anchor" href="#collection-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Collection methods</h2>
+
+<p>None of the LambdaOmega collections implements Java’s Collection or Map interface, for two reasons:</p>
+
+<ul>
+<li>We don’t want to inherit this bloated, flawed API.</li>
+<li>It encourages us to use LambdaOmega collections locally only and unwrap them into Java collections for external method calls.</li>
+</ul>
+
+<p>However, L and M implement a set of methods closely inspired by Collection and Map; most methods are actually the same, others are augmented to e.g. accept varargs or to provide a more reasonable return type.</p>
+
+<p>Some of these methods exist both as intermediate and terminal function. For the most common methods, a shorthand one-letter variant exists.</p>
+
+<p>We’ve already met the <code>add</code> / <code>Add</code> / <code>a</code> method on L. There’s also <code>addAll</code> / <code>AddAll</code> / <code>A</code>; all of these also works with varargs:</p>
+
+<pre><code>List&lt;Integer&gt; zeroToSix = l(0, 1, 2).A(list(3, 4)).addAll(l(5, 6));
+</code></pre>
+
+<p>For M, there’s an add method variant named <code>insert</code> / <code>Insert</code> / <code>i</code> / <code>insertAll</code> / <code>InsertAll</code> / <code>I</code> which will invoke <code>put()</code>, but only after a check preventing you from inserting the same key twice; otherwise, an <code>IndexAlreadyPresentException</code> is thrown and the map is not modified. This method comes in handy e.g. in unit tests when you explicitly build a map and you want to make sure that you don’t accidentally insert the same key twice. Note that this check costs significantly more performance than just performing put().</p>
+
+<pre><code>m("a", 0).i("b", 1).I(m("c", 2).i("d", 3), m("c", 9)); // exception because of "c"!
+</code></pre>
+
+<p>For L or M, you can set a single element with <code>set</code> / <code>Set</code> / <code>s</code> / <code>put</code> / <code>Put</code> / <code>p</code> or set all elements included in a Map data structure with <code>setAll</code> / <code>SetAll</code> / <code>S</code> / <code>putAll</code> / <code>PutAll</code> / <code>P</code>.</p>
+
+<pre><code>m("a", 0).p("b", 1).p("c", 2).P(m("d", 3).i("e", 4));
+</code></pre>
+
+<p>For L or M, you can get a single element or multiple elements with <code>get</code> / <code>Get</code> / <code>g</code>:</p>
+
+<pre><code>String a = l("a", "b", "c").g(0);
+L&lt;String&gt; aAndC = l("a", "b", "c").g(0, 2);
+</code></pre>
+
+<p>For L, you can remove a single element or a collection with <code>remove</code> / <code>Remove</code> / <code>r</code> / <code>removeAll</code> / <code>RemoveAll</code> / <code>R</code>:</p>
+
+<pre><code>L&lt;String&gt; aAndB = l("a", "b", "c", "d", "e").r("c").R(list("d", "e"));
+</code></pre>
+
+<p>For M, you can remove a single element or a collection with <code>deleteKey</code> / <code>DeleteKey</code> / <code>d</code> / <code>deleteAllKeys</code> / <code>DeleteAllKeys</code> / <code>D</code> or <code>deleteValue</code> / <code>DeleteValue</code> / <code>deleteAllValues</code> / <code>DeleteAllValues</code> (it’s called “delete” instead of “remove” to avoid naming clashes for the one-letter abbreviation):</p>
+
+<pre><code>M&lt;String, Integer&gt; bAndC = m("a", 0).i("b", 1).i("c", 2).d("a");
+</code></pre>
+
+<p>Also, you can convert an L / M into almost any collection with a corresponding <code>to…(…)</code> method:</p>
+
+<pre><code>Set&lt;Integer&gt; set = l(0, 1, 2).toSet();
+</code></pre>
+
+<p>These conversion methods internally use the <code>C.to…(…)</code> static helper methods. You can call them directly to convert collection without the need to create intermediate L / M instances.</p>
+
+<p>There are a lot of additional methods for L and M. For more information, visit the API docs.</p>
+
+<h2><a id="user-content-a-list-is-a-map-and-a-map-is-a-list" class="anchor" href="#a-list-is-a-map-and-a-map-is-a-list" aria-hidden="true"><span class="octicon octicon-link"></span></a>A List is a Map and a Map is a List</h2>
+
+<p>Now comes the fun part. Because the LambdaOmega API lives independently of vanilla Java Collection / Map API, it features its own API which is more simple, consistent and powerful at the same time, whilst keeping it as close to the original Java APIs as possible.</p>
+
+<p>Most importantly, a List is also a Map from int to T, and a Map is also a List of entries. More precisely, both L and M implement the <code>SequencedI</code> (Collection-like access) interface as well as the <code>IndexedI</code> (Map-like access) interface.
+Thus, you can call L methods such as <code>indexOf()</code> on a M:</p>
+
+<pre><code>String c = m("a", 0).i("b", 1).i("c", 2).indexOf(2);
+</code></pre>
+
+<p>and M methods such as <code>insert()</code> on a L:</p>
+
+<pre><code>L&lt;String&gt; abcd = l("a", "b").I(m(2, "c").i(3, "d"));
+</code></pre>
+
+<p>Finally, indexed access using get() is actually provided by the <code>I</code> interface which is implemented by L, M, and F, thus you can use “one interface to rule them all”:</p>
+
+<pre><code>I&lt;Integer, String&gt; indexed = m(0, "a").i(1, "b");
+String b = indexed.g(1);
+indexed = l("a", "b");
+b = indexed.g(1);
+indexed = f((Integer it) -&gt; it == 0 ? "a" : "b");
+b = indexed.g(1);
+</code></pre>
+
+<h2><a id="user-content-collection-methods-with-lambdas" class="anchor" href="#collection-methods-with-lambdas" aria-hidden="true"><span class="octicon octicon-link"></span></a>Collection methods with Lambdas</h2>
+
+<p>One of the main reasons to use LambdaOmega are the simplifications to use collections with lambda expressions in functional programming. When compared with vanilla Java lambda use, the API is much more simple and concise. Many of these modifications are inspired by the equivalent Groovy semantics.</p>
+
+<p>Most importantly, functions are invoked on the collection object itself, without the need to create an intermediate stream.</p>
+
+<p>To execute a forEach loop:</p>
+
+<pre><code>l("a", "b", "c").forEach(it -&gt; println(it));
+</code></pre>
+
+<p>(<code>U.println()</code> is a shorthand for <code>System.out.println()</code>.)</p>
+
+<p>Keep in mind that a L is also a Map, thus there’s a variant of the forEach loop which takes both a key and value argument whereby in a L, the key is the index (this method is thus equivalent to a Groovy <code>forEachWithIndex()</code> loop).</p>
+
+<pre><code>l("a", "b", "c").forEach((index, it) -&gt; println(index + ": " + it));
+</code></pre>
+
+<p>Again note how intermediary functions are marked by a name starting with an UpperCase letter. Here we invoke two consecutive  map operations:</p>
+
+<pre><code>List&lt;Integer&gt; list246 = l(0, 1, 2).Map(it -&gt; it + 1).map(it -&gt; it * 2);
+</code></pre>
+
+<p>Some functions incorporate syntax changes (when compared to their vanilla Java couterpart) to facilitate their usage. With mapEntries(), you can map list elements to a Map. Note that the lambda returns a <code>M.E</code> Map Entry which is much simpler than having two separate return values as in the corresponding vanilla Java method.</p>
+
+<pre><code>Map&lt;String, Integer&gt; stringsToSize = l("a", "ab", "abc").mapEntries(it -&gt; e(it, it.length()));
+</code></pre>
+
+<p>(<code>e()</code> is a shorthand to create a M.E with key, value.)</p>
+
+<p><code>find()</code> returns null or a result instead of an <code>Option</code>:</p>
+
+<pre><code>Integer negative = l(1, 2, -1, 3).find(it -&gt; it &lt; 0);
+</code></pre>
+
+<p>There are sort operations which work with consecutive sort key mappers:</p>
+
+<pre><code>l("John Smith", "Bob Miller", "Tim Miller", "Anna Smith").sortAscBy(it -&gt; it.split(" ")[1], it -&gt; it.split(" ")[0]);
+</code></pre>
+
+<p>There are also additional functional operations such as <code>flatten()</code>, <code>flattenDeep()</code>, <code>join()</code>, <code>partition()</code>, and more.</p>
+
+<pre><code>List&lt;Integer&gt; list123456 = l(0, 1, l(2, 3, l(4)), list(5, 6)).&lt;Integer&gt; flattenDeep();
+</code></pre>
+
+<p>There’s also a <code>WithDefault()</code> method which allows you for any <code>I</code> to register a function the return value of which is returned if a get() access would return null or get out of bounds (as inspired by Groovy). You can use this e.g. to easily create a Map of Lists:</p>
+
+<pre><code>M&lt;String, L&gt; withDefault = m(L.class).WithDefault(it -&gt; l());
+withDefault.g("a").a(1);
+println(withDefault); // prints M{a=L[1]}
+</code></pre>
+
+<p>Take a look at the API docs to see all available functional operations.</p>
+
+<h2><a id="user-content-functions" class="anchor" href="#functions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Functions</h2>
+
+<p>The <code>F</code> class serves as a simple wrapper around any kind of <code>FunctionalInterface</code>, providing a unified API to any kind of function:</p>
+
+<pre><code>int two = f((Integer it) -&gt; it + 1).call(1); // Function
+int three = f((Integer x, Integer y) -&gt; x + y).call(1, 2); // BiFunction
+boolean yes = f((Integer it) -&gt; it &gt; 0).call(1); // Predicate
+</code></pre>
+
+<p>It also features some useful transformation methods for Java’s FunctionalInterface implementations. For instance, it may be useful to combine a 2-ary  function into a 1-ary E function or vice versa to write more concise code:</p>
+
+<pre><code>F.function((Integer k, Integer v) -&gt; k - v).apply(e(3, 2))
+F.biFunction((E&lt;Integer, Integer&gt; it) -&gt; it.k - it.v).apply(3, 2)
+</code></pre>
+
+<p>…expect more FunctionalInterface transformations in future LambdaOmega releases!</p>
+
+<h2><a id="user-content-ranges" class="anchor" href="#ranges" aria-hidden="true"><span class="octicon octicon-link"></span></a>Ranges</h2>
+
+<p>The <code>R</code> class represents an int range. It’s basically syntactic sugar to create ranges using the Java 8 stream API.</p>
+
+<p>Create a range and convert it into a List like this:</p>
+
+<pre><code>List&lt;Integer&gt; list012 = r(0).to(3).list;
+</code></pre>
+
+<p>Support for range access has been added to L:</p>
+
+<pre><code>List&lt;String&gt; listBcd = l("a", "b", "c", "d", "e").get(r(1).to(3));
+</code></pre>
+
+<h2><a id="user-content-2d-vectors" class="anchor" href="#2d-vectors" aria-hidden="true"><span class="octicon octicon-link"></span></a>2D vectors</h2>
+
+<p>The V2 class represents a 2-dimensional vector = a 2-ary tuple:</p>
+
+<pre><code>V2&lt;String, Integer&gt; vector = v("a", 0);
+</code></pre>
+
+<p>By simply adding another value pair, the whole structure turns into a L:</p>
+
+<pre><code>V2.LV2&lt;String, Integer&gt; vector2 = v("a", 0).a("a", 1);
+</code></pre>
+
+<h2><a id="user-content-promises" class="anchor" href="#promises" aria-hidden="true"><span class="octicon octicon-link"></span></a>Promises</h2>
+
+<p>This library also features a drop-in-replacement for CompletableFuture, simplifying and fixing its partially flawed API. I went into some more details in the <a href="http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html#drop-in-replacement">accompanying blog post</a>.</p>
+
+<h2><a id="user-content-project-status-and-future-plans" class="anchor" href="#project-status-and-future-plans" aria-hidden="true"><span class="octicon octicon-link"></span></a>Project status and future plans</h2>
+
+<p>As of V. 0.1 RC1, RELEASE is imminent, and feedback is welcome.</p>
+
+<p>Please feel free to submit bug reports / feature requests or make your own contribution to the project.</p>
+
+<p>This is a private project I’ve started for my own pleasure and usage and to learn more about Java 8’s collection API, and I have no plans for (commercial) support. I decided to publish it open sourced so that everyone who is interested is free to use it at his own discretion.</p>
+
+<h2><a id="user-content-for-more-information" class="anchor" href="#for-more-information" aria-hidden="true"><span class="octicon octicon-link"></span></a>For more information</h2>
+
+<p>Please visit the <strong><a href="http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html">accompanying blog post</a></strong> to learn more about why I created this library or check out the API docs:</p>
+
+<ul>
+<li>  <strong><a href="http://codebulb.github.io/pages/LambdaOmega/doc/0.1_RC-1/">V. 0.1 RC-1 docs</a></strong></li>
+<li>  <strong><a href="http://codebulb.github.io/pages/LambdaOmega/doc/">Current SNAPSHOT docs</a></strong></li>
+</ul>
+
+<p>Visit <a href="https://github.com/codebulb/LambdaOmega">the project's GitHub repository</a> for basic usage information.</p>
+
+</body>
+</html>
