@@ -35,7 +35,7 @@ Use [JitPack](https://jitpack.io/) to add its dependency to your Maven project:
     <version>0.1_RC-1</version>
 </dependency>
 ```
-Replace the version by the branch of your choice or the current commit hash to get the newest SNAPSHOT. Visit [JitPack's docs(https://jitpack.io/docs/) for more information.
+Replace the version by the branch of your choice or the current commit hash to get the newest SNAPSHOT. Visit [JitPack's docs](https://jitpack.io/docs/) for more information.
 
 ## Getting started with Collections
 The heart of LambdaOmega are the wrapper classes `L` and `M` which wrap around vanilla Java Collection `List` or `Map`, respectively (decorator pattern) to provide a more concise and more enjoyable API to the underlying collection.
@@ -103,7 +103,7 @@ We’ve already met the `add` / `Add` / `a` method on L. There’s also `addAll`
 ```
 List<Integer> zeroToSix = l(0, 1, 2).A(list(3, 4)).addAll(l(5, 6));
 ```
-For M, there’s an add method variant named `insert` / `Insert` / `i` / `insertAll` / `InsertAll` / `I` which will invoke `put()`, but only after a check preventing you from inserting the same key twice; otherwise, a `MapEntryKeyAlreadyPresentException` is thrown and the map is not modified. This method comes in handy e.g. in unit tests when you explicitly build a map and you want to make sure that you don’t accidentally insert the same key twice. Note that this check costs significantly more performance than just performing put().
+For M, there’s an add method variant named `insert` / `Insert` / `i` / `insertAll` / `InsertAll` / `I` which will invoke `put()`, but only after a check preventing you from inserting the same key twice; otherwise, an `IndexAlreadyPresentException` is thrown and the map is not modified. This method comes in handy e.g. in unit tests when you explicitly build a map and you want to make sure that you don’t accidentally insert the same key twice. Note that this check costs significantly more performance than just performing put().
 ```
 m("a", 0).i("b", 1).I(m("c", 2).i("d", 3), m("c", 9)); // exception because of "c"!
 ```
