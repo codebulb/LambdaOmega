@@ -1,7 +1,7 @@
 # LambdaOmega
 A simple wrapper API to make usage of Java collections, lambdas and CompletableFuture more simple, concise and enjoyable.
 
-[![Build Status](https://travis-ci.org/codebulb/LambdaOmega.svg?branch=master)](https://travis-ci.org/codebulb/LambdaOmega) [![codecov.io](http://codecov.io/github/codebulb/LambdaOmega/coverage.svg?branch=master)](http://codecov.io/github/codebulb/LambdaOmega?branch=master)
+[![Build Status](https://travis-ci.org/codebulb/LambdaOmega.svg?branch=0.1_RC-2)](https://travis-ci.org/codebulb/LambdaOmega) [![codecov.io](http://codecov.io/github/codebulb/LambdaOmega/coverage.svg?branch=0.1_RC-2)](http://codecov.io/github/codebulb/LambdaOmega?branch=0.1_RC-2)
 
 ## What’s in the box?
 LambdaOmega consists of only a few classes. For brevity reasons, most of their names consist of a single letter.
@@ -32,10 +32,10 @@ Use [JitPack](https://jitpack.io/) to add its dependency to your Maven project:
 <dependency>
     <groupId>com.github.codebulb</groupId>
     <artifactId>LambdaOmega</artifactId>
-    <version>0.1_RC-1</version>
+    <version>0.1_RC-2</version>
 </dependency>
 ```
-Replace the version by the branch of your choice or the current commit hash to get the newest SNAPSHOT. Visit [JitPack's docs](https://jitpack.io/docs/) for more information.
+Replace the version by the tag / commit hash of your choice or `-SNAPHOT` to get the newest SNAPSHOT. Visit [JitPack's docs](https://jitpack.io/docs/) for more information.
 
 ## Getting started with Collections
 The heart of LambdaOmega are the wrapper classes `L` and `M` which wrap around vanilla Java Collection `List` or `Map`, respectively (decorator pattern) to provide a more concise and more enjoyable API to the underlying collection.
@@ -130,7 +130,7 @@ Set<Integer> set = l(0, 1, 2).toSet();
 ```
 These conversion methods internally use the `C.to…(…)` static helper methods. You can call them directly to convert collection without the need to create intermediate L / M instances.
 
-There are a lot of additional methods for L and M. For more information, visit the API docs ([V. 0.1 RC-1](http://codebulb.github.io/pages/LambdaOmega/doc/0.1_RC-1/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
+There are a lot of additional methods for L and M. For more information, visit the API docs ([V. 0.1 RC-2](http://codebulb.github.io/pages/LambdaOmega/doc/0.1_RC-2/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
 
 
 ## A List is a Map and a Map is a List
@@ -197,7 +197,7 @@ M<String, L> withDefault = m(L.class).WithDefault(it -> l());
 withDefault.g("a").a(1);
 println(withDefault); // prints M{a=L[1]}
 ```
-Take a look at the API docs to see all available functional operations ([V. 0.1 RC-1](http://codebulb.github.io/pages/LambdaOmega/doc/0.1_RC-1/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
+Take a look at the API docs to see all available functional operations ([V. 0.1 RC-2](http://codebulb.github.io/pages/LambdaOmega/doc/0.1_RC-2/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
 
 ## Functions
 The `F` class serves as a simple wrapper around any kind of `FunctionalInterface`, providing a unified API to any kind of function:
@@ -237,7 +237,7 @@ V2.LV2<String, Integer> vector2 = v("a", 0).a("a", 1);
 This library also features a drop-in-replacement for CompletableFuture, simplifying and fixing its partially flawed API. I went into some more details in the [accompanying blog post](http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html#drop-in-replacement).
 
 ## Project status and future plans
-As of V. 0.1 RC1, RELEASE is imminent, and feedback is welcome.
+As of V. 0.1 RC-2, RELEASE is imminent, and feedback is welcome.
 
 Please feel free to submit bug reports / feature requests or make your own contribution to the project.
 
@@ -245,5 +245,5 @@ This is a private project I’ve started for my own pleasure and usage and to le
 
 ## For more information
 Please visit the **[accompanying blog post](http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html)** to learn more about why I created this library or check out the API docs:
-*	**[V. 0.1 RC-1 docs](http://codebulb.github.io/pages/LambdaOmega/doc/0.1_RC-1/)**
+*	**[V. 0.1 RC-2 docs](http://codebulb.github.io/pages/LambdaOmega/doc/0.1_RC-2/)**
 *	**[Current SNAPSHOT docs](http://codebulb.github.io/pages/LambdaOmega/doc/)**
