@@ -51,6 +51,8 @@
                     <!-- as in http://stackoverflow.com/a/23543181/1399395 -->
                     <additionalparam>-Xdoclint:none</additionalparam>
                     <bottom><![CDATA[Copyright &#169; {inceptionYear}&#x2013;{currentYear}, <a href="http://www.codebulb.ch">codebulb.ch<a>. All rights reserved.]]></bottom>
+                    <!-- copy additional javadoc folder resources -->
+                    <docfilessubdirs>true</docfilessubdirs>
                 </configuration>
                 <!-- attach JavaDoc for JitPack distribution -->
                 <!-- as in https://github.com/jitpack/maven-simple/blob/master/pom.xml -->
