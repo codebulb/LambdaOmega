@@ -21,7 +21,7 @@ LambdaOmega consists of only a few classes. For brevity reasons, most of their n
 * It perfectly fits unit tests where fluid, maintainable code is key.
 
 Other benefits:
-* Small footprint (JAR < 85KB), no other dependencies.
+* Small footprint (JAR < 120KB), no other dependencies.
 * Thoroughly tested (coverage > 80%).
 * Human-readable documentation (here and in the API docs).
 * Free & Open source ([New BSD license](https://github.com/codebulb/LambdaOmega/blob/master/LICENSE)).

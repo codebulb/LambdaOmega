@@ -1,6 +1,8 @@
 package ch.codebulb.lambdaomega;
 
 import ch.codebulb.lambdaomega.M.*;
+import ch.codebulb.lambdaomega.abstractions.BiFunctionalI;
+import ch.codebulb.lambdaomega.abstractions.FunctionalI;
 import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import ch.codebulb.lambdaomega.abstractions.ReadonlyIndexedI;
 import java.util.Comparator;
@@ -8,12 +10,36 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoubleFunction;
+import java.util.function.DoublePredicate;
+import java.util.function.DoubleSupplier;
+import java.util.function.DoubleToIntFunction;
+import java.util.function.DoubleToLongFunction;
+import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import java.util.function.IntConsumer;
+import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
+import java.util.function.IntSupplier;
+import java.util.function.IntToDoubleFunction;
+import java.util.function.IntToLongFunction;
+import java.util.function.IntUnaryOperator;
+import java.util.function.LongConsumer;
+import java.util.function.LongFunction;
+import java.util.function.LongPredicate;
+import java.util.function.LongSupplier;
+import java.util.function.LongToDoubleFunction;
+import java.util.function.LongToIntFunction;
+import java.util.function.LongUnaryOperator;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
+import java.util.function.ToLongFunction;
 
 /**
  * The "F" stands for "function". Provides a common interface for all {@link FunctionalInterface} implementations for which it acts as a wrapper.<p>
@@ -33,48 +59,315 @@ import java.util.function.ToDoubleFunction;
 // TODO Complete implementation, supporting all available functional interfaces
 public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements ReadonlyIndexedI<T, R> {
     private Function<T, R> function;
-    private Consumer<T> consumer;
-    private Predicate<T> predicate;
-    private Supplier<R> supplier;
     
     private BiFunction<T1, T2, R> biFunction;
-    private BiConsumer<T1, T2> biConsumer;
-    private BiPredicate<T1, T2> biPredicate;
-    
-    private ToDoubleBiFunction<T1, T2> toDoubleBiFunction;
     
     private Function<T, R> defaultFunction;
+    
+    public final FunctionalI<T, R> f;
+    public final BiFunctionalI<T1, T2, R> f2;
 
     F(Function<T, R> function) {
         this.function = function;
+        this.f = (T t) -> function.apply(t);
+        this.f2 = null;
     }
 
     F(Consumer<T> consumer) {
-        this.consumer = consumer;
+        this(new Function<T, R>() {
+            @Override
+            public R apply(T t) {
+                consumer.accept(t);
+                return null;
+            }
+        });
     }
 
     F(Predicate<T> predicate) {
-        this.predicate = predicate;
+        this(new Function<T, R>() {
+            @Override
+            public R apply(T t) {
+                return (R) (Boolean)predicate.test(t);
+            }
+        });
     }
 
     F(Supplier<R> supplier) {
-        this.supplier = supplier;
+        this(new Function<T, R>() {
+            @Override
+            public R apply(T t) {
+                return supplier.get();
+            }
+        });
+    }
+    
+    F(IntUnaryOperator intUnaryOperator) {
+        this((Function<T, R>) new Function<Integer, Integer>() {
+            @Override
+            public Integer apply(Integer t) {
+                return intUnaryOperator.applyAsInt(t);
+            }
+        });
+    }
+    
+    F(LongUnaryOperator longUnaryOperator) {
+        this((Function<T, R>) new Function<Long, Long>() {
+            @Override
+            public Long apply(Long t) {
+                return longUnaryOperator.applyAsLong(t);
+            }
+        });
+    }
+    
+    F(DoubleUnaryOperator doubleUnaryOperator) {
+        this((Function<T, R>) new Function<Double, Double>() {
+            @Override
+            public Double apply(Double t) {
+                return doubleUnaryOperator.applyAsDouble(t);
+            }
+        });
+    }
+    
+    F(IntFunction<R> intFunction) {
+        this((Function<T, R>) new Function<Integer, R>() {
+            @Override
+            public R apply(Integer t) {
+                return intFunction.apply(t);
+            }
+        });
+    }
+    
+    F(LongFunction<R> longFunction) {
+        this((Function<T, R>) new Function<Long, R>() {
+            @Override
+            public R apply(Long t) {
+                return longFunction.apply(t);
+            }
+        });
+    }
+    
+    F(DoubleFunction<R> doubleFunction) {
+        this((Function<T, R>) new Function<Double, R>() {
+            @Override
+            public R apply(Double t) {
+                return doubleFunction.apply(t);
+            }
+        });
+    }
+    
+    F(ToIntFunction<T> toIntFunction) {
+        this((Function<T, R>) new Function<T, Integer>() {
+            @Override
+            public Integer apply(T t) {
+                return toIntFunction.applyAsInt(t);
+            }
+        });
+    }
+    
+    F(ToLongFunction<T> toLongFunction) {
+        this((Function<T, R>) new Function<T, Long>() {
+            @Override
+            public Long apply(T t) {
+                return toLongFunction.applyAsLong(t);
+            }
+        });
+    }
+    
+    F(ToDoubleFunction<T> toDoubleFunction) {
+        this((Function<T, R>) new Function<T, Double>() {
+            @Override
+            public Double apply(T t) {
+                return toDoubleFunction.applyAsDouble(t);
+            }
+        });
+    }
+    
+    F(IntToLongFunction intToLongFunction) {
+        this((Function<T, R>) new Function<Integer, Long>() {
+            @Override
+            public Long apply(Integer t) {
+                return intToLongFunction.applyAsLong(t);
+            }
+        });
+    }
+    
+    F(IntToDoubleFunction intToDoubleFunction) {
+        this((Function<T, R>) new Function<Integer, Double>() {
+            @Override
+            public Double apply(Integer t) {
+                return intToDoubleFunction.applyAsDouble(t);
+            }
+        });
+    }
+    
+    F(LongToIntFunction longToIntFunction) {
+        this((Function<T, R>) new Function<Long, Integer>() {
+            @Override
+            public Integer apply(Long t) {
+                return longToIntFunction.applyAsInt(t);
+            }
+        });
+    }
+    
+    F(LongToDoubleFunction longToDoubleFunction) {
+        this((Function<T, R>) new Function<Long, Double>() {
+            @Override
+            public Double apply(Long t) {
+                return longToDoubleFunction.applyAsDouble(t);
+            }
+        });
+    }
+    
+    F(DoubleToIntFunction doubleToIntFunction) {
+        this((Function<T, R>) new Function<Double, Integer>() {
+            @Override
+            public Integer apply(Double t) {
+                return doubleToIntFunction.applyAsInt(t);
+            }
+        });
+    }
+    
+    F(DoubleToLongFunction doubleToLongFunction) {
+        this((Function<T, R>) new Function<Double, Long>() {
+            @Override
+            public Long apply(Double t) {
+                return doubleToLongFunction.applyAsLong(t);
+            }
+        });
+    }
+    
+    F(IntPredicate intPredicate) {
+        this(new Function<T, R>() {
+            @Override
+            public R apply(T t) {
+                return (R) (Boolean)intPredicate.test((Integer)t);
+            }
+        });
+    }
+    
+    F(LongPredicate longPredicate) {
+        this((Predicate<T>) new Predicate<Long>() {
+            @Override
+            public boolean test(Long t) {
+                return longPredicate.test(t);
+            }
+        });
+    }
+    
+    F(DoublePredicate doublePredicate) {
+        this((Predicate<T>) new Predicate<Double>() {
+            @Override
+            public boolean test(Double t) {
+                return doublePredicate.test(t);
+            }
+        });
+    }
+    
+    F(IntConsumer intConsumer) {
+        this((Consumer<T>) new Consumer<Integer>() {
+            @Override
+            public void accept(Integer t) {
+                intConsumer.accept(t);
+            }
+        });
+    }
+    
+    F(LongConsumer longConsumer) {
+        this((Consumer<T>) new Consumer<Long>() {
+            @Override
+            public void accept(Long t) {
+                longConsumer.accept(t);
+            }
+        });
+    }
+    
+    F(DoubleConsumer doubleConsumer) {
+        this((Consumer<T>) new Consumer<Double>() {
+            @Override
+            public void accept(Double t) {
+                doubleConsumer.accept(t);
+            }
+        });
+    }
+    
+    F(IntSupplier intSupplier) {
+        this((Supplier<R>) new Supplier<Integer>() {
+            @Override
+            public Integer get() {
+                return intSupplier.getAsInt();
+            }
+        });
+    }
+    
+    F(LongSupplier longSupplier) {
+        this((Supplier<R>) new Supplier<Long>() {
+            @Override
+            public Long get() {
+                return longSupplier.getAsLong();
+            }
+        });
+    }
+    
+    F(DoubleSupplier doubleSupplier) {
+        this((Supplier<R>) new Supplier<Double>() {
+            @Override
+            public Double get() {
+                return doubleSupplier.getAsDouble();
+            }
+        });
+    }
+    
+    F(BooleanSupplier booleanSupplier) {
+        this((Supplier<R>) new Supplier<Boolean>() {
+            @Override
+            public Boolean get() {
+                return booleanSupplier.getAsBoolean();
+            }
+        });
     }
     
     F(BiFunction<T1, T2, R> biFunction) {
         this.biFunction = biFunction;
+        this.f = null;
+        this.f2 = (T1 t, T2 u) -> biFunction.apply(t, u);
     }
 
     F(BiConsumer<T1, T2> biConsumer) {
-        this.biConsumer = biConsumer;
+        this(new BiFunction<T1, T2, R>() {
+            @Override
+            public R apply(T1 t, T2 u) {
+                biConsumer.accept((T1)t, (T2)u);
+                return null;
+            }
+        });
     }
     
     F(BiPredicate<T1, T2> biPredicate) {
-        this.biPredicate = biPredicate;
+        this(new BiFunction<T1, T2, R>() {
+            @Override
+            public R apply(T1 t, T2 u) {
+                return (R)(Boolean)biPredicate.test((T1)t, (T2)u);
+            }
+        });
     }
     
     F(ToDoubleBiFunction<T1, T2> toDoubleBiFunction) {
-        this.toDoubleBiFunction = toDoubleBiFunction;
+        this(new BiFunction<T1, T2, R>() {
+            @Override
+            public R apply(T1 t, T2 u) {
+                return (R)(Double)toDoubleBiFunction.applyAsDouble(t, u);
+            }
+        });
+    }
+    
+    /**
+     * Invokes the wrapped function with <code>null</code>.
+     */
+    public R call() {
+        if (function != null) {
+            return function.apply(null);
+        }
+        throw new IllegalStateException("No appropriate original function is set.");
     }
     
     /**
@@ -83,16 +376,6 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     public R call(T input) {
         if (function != null) {
             return function.apply(input);
-        }
-        if (consumer != null) {
-            consumer.accept(input);
-            return null;
-        }
-        if (predicate != null) {
-            return (R) (Boolean)predicate.test(input);
-        }
-        if (supplier != null) {
-            return supplier.get();
         }
         throw new IllegalStateException("No appropriate original function is set.");
     }
@@ -105,15 +388,15 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         if (biFunction != null) {
             return biFunction.apply((T1)inputs[0], (T2)inputs[1]);
         }
-        if (biConsumer != null) {
-            biConsumer.accept((T1)inputs[0], (T2)inputs[1]);
-            return null;
-        }
-        
-        if (biPredicate != null) {
-            return (R)(Boolean)biPredicate.test((T1)inputs[0], (T2)inputs[1]);
-        }
         throw new IllegalStateException("No appropriate original function is set.");
+    }
+    
+    public FunctionalI<T, R> functional() {
+        return f;
+    }
+    
+    public BiFunctionalI<T1, T2, R> biFunctional() {
+        return f2;
     }
     
     /**
@@ -131,33 +414,24 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
      * Turns a wrapped {@link BiConsumer} <i>f1: (K, V) &rarr; <code>void</code></i> into a {@link Consumer} <i>f2: ({@link E}&lt;K, V&gt;) &rarr; <code>void</code></i>.
      */
     public Consumer<M.E<T1, T2>> eConsumer() {
-        if (biConsumer != null) {
-            return (M.E<T1, T2> e) -> 
-                biConsumer.accept(e.k, e.v);
-        }
-        throw new IllegalStateException("No appropriate original function is set.");
+        return (M.E<T1, T2> e) -> 
+                biFunction.apply(e.k, e.v);
     }
     
     /**
      * Turns a wrapped {@link BiPredicate} <i>f1: (K, V) &rarr; <code>boolean</code></i> into a {@link Predicate} <i>f2: ({@link E}&lt;K, V&gt;) &rarr; <code>boolean</code></i>.
      */
     public Predicate<M.E<T1, T2>> ePredicate() {
-        if (biPredicate != null) {
-            return (M.E<T1, T2> e) -> 
-                biPredicate.test(e.k, e.v);
-        }
-        throw new IllegalStateException("No appropriate original function is set.");
+        return (M.E<T1, T2> e) -> 
+                (Boolean)biFunction.apply(e.k, e.v);
     }
     
     /**
      * Turns a wrapped {@link ToDoubleBiFunction} <i>f1: (K, V) &rarr; <code>double</code></i> into a {@link ToDoubleFunction} <i>f2: ({@link E}&lt;K, V&gt;) &rarr; <code>double</code></i>.
      */
     public ToDoubleFunction<M.E<T1, T2>> eToDoubleFunction() {
-        if (toDoubleBiFunction != null) {
-            return (M.E<T1, T2> e) -> 
-                toDoubleBiFunction.applyAsDouble(e.k, e.v);
-        }
-        throw new IllegalStateException("No appropriate original function is set.");
+        return (M.E<T1, T2> e) -> 
+                (Double)biFunction.apply(e.k, e.v);
     }
     
     /**
@@ -175,22 +449,16 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
      * Turns a wrapped {@link Consumer} <i>f1: ({@link E}&lt;K, V&gt;) &rarr; <code>void</code></i> into a {@link BiConsumer} <i>f2: (K, V) &rarr; <code>void</code></i>.
      */
     public BiConsumer<T1, T2> eBiConsumer() {
-        if (consumer != null) {
-            return (T1 t, T2 u) -> 
-                consumer.accept((T) M.e(t, u));
-        }
-        throw new IllegalStateException("No appropriate original function is set.");
+        return (T1 t, T2 u) -> 
+                function.apply((T) M.e(t, u));
     }
     
     /**
      * Turns a wrapped {@link Predicate} <i>f1: ({@link E}&lt;K, V&gt;) &rarr; <code>boolean</code></i> into a {@link BiPredicate} <i>f2: (K, V) &rarr; <code>boolean</code></i>.
      */
     public BiPredicate<T1, T2> eBiPredicate() {
-        if (predicate != null) {
-            return (T1 t, T2 u) -> 
-                predicate.test((T) M.e(t, u));
-        }
-        throw new IllegalStateException("No appropriate original function is set.");
+        return (T1 t, T2 u) -> 
+                (Boolean)function.apply((T) M.e(t, u));
     }
 
     /**
@@ -239,10 +507,24 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     }
     
     /**
+     * Shorthand for {@link #f(Function)} followed by {@link #functional()}.
+     */
+    public static <T, R> FunctionalI<T, R> F(Function<T, R> function) {
+        return f(function).functional();
+    }
+    
+    /**
      * @see #f(Function)
      */
     public static <T> F<T, T, T, Void> f(Consumer<T> function) {
         return new F<>(function);
+    }
+    
+    /**
+     * @see #F(Function)
+     */
+    public static <T> FunctionalI<T, Void> F(Consumer<T> function) {
+        return f(function).functional();
     }
     
     /**
@@ -255,10 +537,248 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     /**
      * @see #f(Function)
      */
-    public static <T, R> F<T, T, T, R> f(Supplier<R> function) {
+    public static <R> F<Void, Void, Void, R> f(Supplier<R> function) {
         return new F<>(function);
     }
-       
+    
+    /**
+     * @see #F(Function)
+     */
+    public static <R> FunctionalI<Void, R> F(Supplier<R> function) {
+        return f(function).functional();
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Integer, Integer, Integer, Integer> f(IntUnaryOperator function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #F(Function)
+     */
+    public static FunctionalI<Integer, Integer> F(IntUnaryOperator function) {
+        return f(function).functional();
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Long, Long, Long, Long> f(LongUnaryOperator function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Double, Double, Double, Double> f(DoubleUnaryOperator function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static <R> F<Integer, Integer, Integer, R> f(IntFunction<R> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #F(Function)
+     */
+    public static <R> FunctionalI<Integer, R> F(IntFunction<R> function) {
+        return f(function).functional();
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static <R> F<Long, Long, Long, R> f(LongFunction<R> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #F(Function)
+     */
+    public static <R> FunctionalI<Long, R> F(LongFunction<R> function) {
+        return f(function).functional();
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static <R> F<Double, Double, Double, R> f(DoubleFunction<R> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #F(Function)
+     */
+    public static <R> FunctionalI<Double, R> F(DoubleFunction<R> function) {
+        return f(function).functional();
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static <T> F<T, T, T, Integer> f(ToIntFunction<T> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static <T> F<T, T, T, Long> f(ToLongFunction<T> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static <T> F<T, T, T, Double> f(ToDoubleFunction<T> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Integer, Integer, Integer, Long> f(IntToLongFunction function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Integer, Integer, Integer, Double> f(IntToDoubleFunction function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Long, Long, Long, Integer> f(LongToIntFunction function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Long, Long, Long, Double> f(LongToDoubleFunction function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Double, Double, Double, Integer> f(DoubleToIntFunction function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Double, Double, Double, Long> f(DoubleToLongFunction function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Integer, Integer, Integer, Boolean> f(IntPredicate function) {
+        return new F<>(function);
+    }
+        
+    /**
+     * @see #f(Function)
+     */
+    public static F<Long, Long, Long, Boolean> f(LongPredicate function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Double, Double, Double, Boolean> f(DoublePredicate function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Integer, Integer, Integer, Void> f(IntConsumer function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Long, Long, Long, Void> f(LongConsumer function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Double, Double, Double, Void> f(DoubleConsumer function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Void, Void, Void, Integer> f(IntSupplier function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #F(Function)
+     */
+    public static <R> FunctionalI<Void, Integer> F(IntSupplier function) {
+        return f(function).functional();
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Void, Void, Void, Long> f(LongSupplier function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #F(Function)
+     */
+    public static <R> FunctionalI<Void, Long> F(LongSupplier function) {
+        return f(function).functional();
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Void, Void, Void, Double> f(DoubleSupplier function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #F(Function)
+     */
+    public static <R> FunctionalI<Void, Double> F(DoubleSupplier function) {
+        return f(function).functional();
+    }
+    
+    /**
+     * @see #f(Function)
+     */
+    public static F<Void, Void, Void, Boolean> f(BooleanSupplier function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #F(Function)
+     */
+    public static <R> FunctionalI<Void, Boolean> F(BooleanSupplier function) {
+        return f(function).functional();
+    }
+    
     /**
      * @see #f(Function)
      */
@@ -269,14 +789,14 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     /**
      * @see #f(Function)
      */
-    public static <T, K extends T, V extends T> F<T, K, V, Void> f(BiConsumer<K, V> function) {
+    public static <T, K extends T, V extends T> F<T, K, V, Boolean> f(BiPredicate<K, V> function) {
         return new F<>(function);
     }
     
     /**
      * @see #f(Function)
      */
-    public static <T, K extends T, V extends T> F<T, K, V, Boolean> f(BiPredicate<K, V> function) {
+    public static <T, K extends T, V extends T> F<T, K, V, Void> f(BiConsumer<K, V> function) {
         return new F<>(function);
     }
     
