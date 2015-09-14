@@ -5,26 +5,26 @@ A simple wrapper API to make usage of Java collections, lambdas and CompletableF
 
 ## What’s in the box?
 LambdaOmega consists of only a few classes. For brevity reasons, most of their names consist of a single letter.
-*	`L` (“List”) is a wrapper for List.
-*	`M` (“Map”) is a wrapper for Map.
-*	`S` (“Set”) is a wrapper for Set.
-*	`R` (“Range”) is a wrapper for an IntStream range.
-*	`V2` (“Vector 2D”) represents a 2D vector (= a 2-ary tuple). It can be converted into a Map.Entry.
-*	`F` (“Function”) is a wrapper for functional interfaces (lambda expressions) which also provides helper methods to convert functions.
-*	`C` (“Collection”) is the base class for L and M and provides additional helper methods to convert collections.
-*	`U` (“Utils”) provides additional miscellaneous helper methods.
-*	`Promise` is a wrapper and a drop-in replacement for CompletableFuture, providing several simplifications and fixes for the API. It can be used independently of all the other classes. It’s discussed in a separate section.
+* `L` (“List”) is a wrapper for List.
+* `M` (“Map”) is a wrapper for Map.
+* `S` (“Set”) is a wrapper for Set.
+* `R` (“Range”) is a wrapper for an IntStream range.
+* `V2` (“Vector 2D”) represents a 2D vector (= a 2-ary tuple). It can be converted into a Map.Entry.
+* `F` (“Function”) is a wrapper for functional interfaces (lambda expressions) which also provides helper methods to convert functions.
+* `C` (“Collection”) is the base class for L and M and provides additional helper methods to convert collections.
+* `U` (“Utils”) provides additional miscellaneous helper methods.
+* `Promise` is a wrapper and a drop-in replacement for CompletableFuture, providing several simplifications and fixes for the API. It can be used independently of all the other classes. It’s discussed in a separate section.
 
 ## Why you should use it
-*	Although Java’s Collections / lambdas are everywhere, you feel like their API is really cumbersome.
-*	You feel even more so if you know and love Groovy or JavaScript / lodash.
-*	It perfectly fits unit tests where fluid, maintainable code is key.
+* Although Java’s Collections / lambdas are everywhere, you feel like their API is really cumbersome.
+* You feel even more so if you know and love Groovy or JavaScript / lodash.
+* It perfectly fits unit tests where fluid, maintainable code is key.
 
 Other benefits:
-*	Small footprint (JAR < 85KB), no other dependencies.
-*	Thoroughly tested (coverage > 80%).
-*	Human-readable documentation (here and in the API docs).
-*	Free & Open source ([New BSD license](https://github.com/codebulb/LambdaOmega/blob/master/LICENSE)).
+* Small footprint (JAR < 85KB), no other dependencies.
+* Thoroughly tested (coverage > 80%).
+* Human-readable documentation (here and in the API docs).
+* Free & Open source ([New BSD license](https://github.com/codebulb/LambdaOmega/blob/master/LICENSE)).
 
 ## How to use it
 Use [JitPack](https://jitpack.io/) to add its dependency to your Maven project:
@@ -236,6 +236,12 @@ V2.LV2<String, Integer> vector2 = v("a", 0).a("a", 1);
 ## Promises
 This library also features a drop-in-replacement for CompletableFuture, simplifying and fixing its partially flawed API. I went into some more details in the [accompanying blog post](http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html#drop-in-replacement).
 
+## Things to consider and Best practices
+* **Performance**: LambdaOmega doesn’t make use of reflection. It really just wraps Collection API method calls and should perform similarly to vanilla API calls.
+  * However, intermediate operations on LambdaOmega collections will always create a new Collection much unlike vanilla Java collections which just operate on a stream: `l(0, 1, 2).Map(it -> it + 1).map(it -> it * 2); // Creates a new Collection on #l(…), #Map(…) and #map(…)` This may decrease performance for big collections. Thus, even though LambdaOmega should perform OK in everyday situations, keep in mind that it is not and will never be built primarily for speed.
+* LambdaOmega is not built as a replacement for any of the Java core classes / interfaces. It’s hence best practice to use LambdaOmega collections and other abstractions locally only for the coder’s convenience and to not expose them in a public API to reduce dependency on this library.
+* However, LambdaOmega fits perfectly where you make intense use of Java’s collection API and keeping your code clean and concise is key. It’s thus especially useful for e.g. JUnit test code which typically involves lots of collection boilerplate code.
+
 ## Project status and future plans
 LambdaOmega is now RELEASED, feedback is welcome.
 
@@ -243,7 +249,12 @@ I will use the issue tracker to plan features for future releases. Feel free to 
 
 This is a private project I’ve started for my own pleasure and usage and to learn more about Java 8’s collection API, and I have no plans for (commercial) support. I decided to publish it open sourced so that everyone who is interested is free to use it at his own discretion.
 
+## Version history
+* V. 0.2:
+ * [F enhancements](https://github.com/codebulb/LambdaOmega/issues/1): Support for all `FunctionalInterface`s and more transformations in the `F` class.
+* V. 0.1: First release
+
 ## For more information
 Please visit the **[accompanying blog post](http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html)** to learn more about why I created this library or check out the API docs:
-*	**[V. 0.1 docs](http://codebulb.github.io/pages/LambdaOmega/doc/0.1/)**
-*	**[Current SNAPSHOT docs](http://codebulb.github.io/pages/LambdaOmega/doc/)**
+* **[V. 0.1 docs](http://codebulb.github.io/pages/LambdaOmega/doc/0.1/)**
+* **[Current SNAPSHOT docs](http://codebulb.github.io/pages/LambdaOmega/doc/)**
