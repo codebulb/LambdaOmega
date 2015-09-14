@@ -35,7 +35,11 @@ Use [JitPack](https://jitpack.io/) to add its dependency to your Maven project:
     <version>0.1</version>
 </dependency>
 ```
-Replace the version by the tag / commit hash of your choice or `-SNAPSHOT` to get the newest SNAPSHOT. Visit [JitPack's docs](https://jitpack.io/docs/) for more information.
+Replace the version by the tag / commit hash of your choice or `-SNAPSHOT` to get the newest SNAPSHOT.
+
+Not using Maven? You can [download the JAR directly from JitPack’s servers](https://jitpack.io/com/github/codebulb/LambdaOmega/0.1/LambdaOmega-0.1.jar).
+
+Visit [JitPack’s docs](https://jitpack.io/docs/) for more information.
 
 ## Getting started with Collections
 The heart of LambdaOmega are the wrapper classes `L` and `M` which wrap around vanilla Java Collection `List` or `Map`, respectively (decorator pattern) to provide a more concise and more enjoyable API to the underlying collection.
@@ -84,7 +88,7 @@ When constructing a Map, you make intense use of method chaining:
 ```
 Map<String, Integer> map = m("a", 0).Insert("b", 1).i("c", 2).m;
 ```
-(we cover Map' `insert()` method in a bit.)
+(we cover Map’s `insert()` method in a bit.)
 
 There’s a two-arg constructor for empty Maps of an explicit key / value type. If the “key” class is omitted, it’s assumed to be String:
 ```
