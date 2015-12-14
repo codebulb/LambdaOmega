@@ -29,7 +29,17 @@ import java.util.function.Supplier;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import java.util.function.UnaryOperator;
 
+/**
+ * A multi-interface providing a single unified API for all 1-ary {@link FunctionalInterface}s of Java 8 and LambdaOmega.
+ * Implement / use {@link #call(Object)} / {@link #call()} to call this function.<p/>
+ * 
+ * Note: {@link UnaryOperator} is not covered by this interface as it is mutually incompatible with {@link Function}.
+ * 
+ * @param <T> the type of the input to the function
+ * @param <R> the type of the result of the function
+ */
 @FunctionalInterface
 public interface FunctionalI<T, R> extends Function<T, R>, Predicate<T>, Consumer<T>, Supplier<R>,
         IntUnaryOperator, LongUnaryOperator, DoubleUnaryOperator,
@@ -39,8 +49,15 @@ public interface FunctionalI<T, R> extends Function<T, R>, Predicate<T>, Consume
         IntPredicate, LongPredicate, DoublePredicate,
         IntConsumer, LongConsumer, DoubleConsumer,
         IntSupplier, LongSupplier, DoubleSupplier, BooleanSupplier {
+    
+    /**
+     * Calls this function with the given arguments.
+     */
     public R call(T t);
     
+    /**
+     * Calls this function without arguments / with <code>null</code> as argument.
+     */
     public default R call() {
         return call(null);
     }

@@ -1,16 +1,26 @@
 package ch.codebulb.lambdaomega;
 
 import static ch.codebulb.lambdaomega.F.F;
+import static ch.codebulb.lambdaomega.F.biFunctional;
 import static ch.codebulb.lambdaomega.F.f;
+import static ch.codebulb.lambdaomega.F.functional;
 import static ch.codebulb.lambdaomega.L.*;
 import ch.codebulb.lambdaomega.M.E;
 import static ch.codebulb.lambdaomega.M.e;
 import static ch.codebulb.lambdaomega.TestUtil.assertEquals;
+import ch.codebulb.lambdaomega.abstractions.BiFunctionalI;
+import ch.codebulb.lambdaomega.abstractions.functions.LongBiFunction;
 import ch.codebulb.lambdaomega.abstractions.FunctionalI;
 import ch.codebulb.lambdaomega.abstractions.I;
+import ch.codebulb.lambdaomega.abstractions.functions.DoubleBiFunction;
+import ch.codebulb.lambdaomega.abstractions.functions.IntBiFunction;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleFunction;
 import java.util.function.DoublePredicate;
@@ -19,6 +29,7 @@ import java.util.function.DoubleToIntFunction;
 import java.util.function.DoubleToLongFunction;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
@@ -26,6 +37,7 @@ import java.util.function.IntSupplier;
 import java.util.function.IntToDoubleFunction;
 import java.util.function.IntToLongFunction;
 import java.util.function.IntUnaryOperator;
+import java.util.function.LongBinaryOperator;
 import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
 import java.util.function.LongPredicate;
@@ -33,10 +45,16 @@ import java.util.function.LongSupplier;
 import java.util.function.LongToDoubleFunction;
 import java.util.function.LongToIntFunction;
 import java.util.function.LongUnaryOperator;
+import java.util.function.ObjDoubleConsumer;
+import java.util.function.ObjIntConsumer;
+import java.util.function.ObjLongConsumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntBiFunction;
 import java.util.function.ToIntFunction;
+import java.util.function.ToLongBiFunction;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 import static org.junit.Assert.assertTrue;
@@ -44,7 +62,7 @@ import org.junit.Test;
 
 public class FTest {
     @Test
-    public void testCall() {
+    public void testCallFunction() {
         // Function
         assertEquals(1, f((Integer it) -> new Integer(it + 1)).call(0));
         // Consumer
@@ -116,7 +134,10 @@ public class FTest {
         assertEquals(1l, f(() -> 1l).call());
         // DoubleSupplier
         assertEquals(1d, f(() -> 1d).call());
-        
+    }
+    
+    @Test
+    public void testCallBiFunction() {
         // BiFunction
         assertEquals(3, f((Integer x, Integer y) -> x + y).call(1, 2));
         // BiConsumer
@@ -125,6 +146,40 @@ public class FTest {
         assertEquals(l(1, 2), consumerList2);
         // BiPredicate
         assertTrue(f((Integer x, Integer y) -> x > 0 && y < 0).call(2, -1));
+        
+        // IntBiFunction
+        assertEquals("3", f((int it1, int it2) -> String.valueOf(it1 + it2)).call(1, 2));
+        // LongBiFunction
+        assertEquals("3", f((long it1, long it2) -> String.valueOf(it1 + it2)).call(1l, 2l));
+        // DoubleBiFunction
+        assertEquals("3.0", f((double it1, double it2) -> String.valueOf(it1 + it2)).call(1d, 2d));
+        
+        // IntBinaryOperator
+        assertEquals(3, f((int it1, int it2) -> it1 + it2).call(1, 2));
+        // LongBinaryOperator
+        assertEquals(3l, f((long it1, long it2) -> it1 + it2).call(1l, 2l));
+        // DoubleBinaryOperator
+        assertEquals(3d, f((double it1, double it2) -> it1 + it2).call(1d, 2d));
+        
+        // ToIntBiFunction
+        assertEquals(3, f((String it1, String it2) -> Integer.parseInt(it1) + Integer.parseInt(it2)).call("1", "2"));
+        // ToLongBiFunction
+        assertEquals(3l, f((String it1, String it2) -> Long.parseLong(it1) + Long.parseLong(it2)).call("1", "2"));
+        // ToDoubleBiFunction
+        assertEquals(3d, f((String it1, String it2) -> Double.parseDouble(it1) + Double.parseDouble(it2)).call("1", "2"));
+        
+        // ObjIntConsumer
+        L<Integer> intConsumerList = l();
+        f((String it1, int it2) -> {intConsumerList.a(Integer.parseInt(it1)).a(it2);}).call("1", 2);
+        assertEquals(l(1, 2), intConsumerList.g(0, 1));
+        // ObjLongConsumer
+        L<Long> longConsumerList = l();
+        f((String it1, long it2) -> {longConsumerList.a(Long.parseLong(it1)).a(it2);}).call("1", 2l);
+        assertEquals(l(1l, 2l), longConsumerList.g(0, 1));
+        // ObjDoubleConsumer
+        L<Double> doubleConsumerList = l();
+        f((String it1, double it2) -> {doubleConsumerList.a(Double.parseDouble(it1)).a(it2);}).call("1", 2d);
+        assertEquals(l(1d, 2d), doubleConsumerList.g(0, 1));
     }
     
     @Test
@@ -185,7 +240,7 @@ public class FTest {
         // Function
         Function<Integer, Integer> function = x -> x*2;
         assertEquals(6, function.apply(3));
-        FunctionalI<Integer, Integer> functional = x -> x*2;
+        FunctionalI<Integer, Integer> functional = functional(x -> x*2);
         assertEquals(6, functional.call(3));
         functional = x -> x*2;
         assertEquals(6, functional.call(3));
@@ -225,7 +280,7 @@ public class FTest {
         // IntUnaryOperator
         IntUnaryOperator intUnaryOperator = (int x) -> x*2;
         assertEquals(6, intUnaryOperator.applyAsInt(3));
-        FunctionalI<Integer, Integer> intUnaryOperatorFunctional = F((int x) -> x*2);
+        FunctionalI<Integer, Integer> intUnaryOperatorFunctional = f((int x) -> x*2).f;
         assertEquals(6, intUnaryOperatorFunctional.call(3));
         intUnaryOperator = F((int x) -> x*2);
         assertEquals(6, intUnaryOperator.applyAsInt(3));
@@ -447,27 +502,194 @@ public class FTest {
         assertEquals(6, intSupplier.getAsInt());
         
         // LongSupplier
-        LongSupplier LongSupplier = () -> 6l;
-        assertEquals(6l, LongSupplier.getAsLong());
+        LongSupplier longSupplier = () -> 6l;
+        assertEquals(6l, longSupplier.getAsLong());
         FunctionalI<Void, Long> LongSupplierFunctional = F(() -> 6l);
         assertEquals(6l, LongSupplierFunctional.call());
-        LongSupplier = F(() -> 6l);
-        assertEquals(6l, LongSupplier.getAsLong());
+        longSupplier = F(() -> 6l);
+        assertEquals(6l, longSupplier.getAsLong());
         
         // DoubleSupplier
-        DoubleSupplier DoubleSupplier = () -> 6d;
-        assertEquals(6d, DoubleSupplier.getAsDouble());
+        DoubleSupplier doubleSupplier = () -> 6d;
+        assertEquals(6d, doubleSupplier.getAsDouble());
         FunctionalI<Void, Double> DoubleSupplierFunctional = F(() -> 6d);
         assertEquals(6d, DoubleSupplierFunctional.call());
-        DoubleSupplier = F(() -> 6d);
-        assertEquals(6d, DoubleSupplier.getAsDouble());
+        doubleSupplier = F(() -> 6d);
+        assertEquals(6d, doubleSupplier.getAsDouble());
         
         // BooleanSupplier
-        BooleanSupplier BooleanSupplier = () -> true;
-        assertEquals(true, BooleanSupplier.getAsBoolean());
+        BooleanSupplier booleanSupplier = () -> true;
+        assertEquals(true, booleanSupplier.getAsBoolean());
         FunctionalI<Void, Boolean> BooleanSupplierFunctional = F(() -> true);
         assertEquals(true, BooleanSupplierFunctional.call());
-        BooleanSupplier = F(() -> true);
-        assertEquals(true, BooleanSupplierFunctional.get());
+        booleanSupplier = F(() -> true);
+        assertEquals(true, booleanSupplier.getAsBoolean());
+    }
+    
+    @Test
+    public void testBiFunctional() {
+        // BiFunction
+        BiFunction<Integer, Integer, Integer> function = (x1, x2) -> x1 + x2;
+        assertEquals(3, function.apply(1, 2));
+        BiFunctionalI<Integer, Integer, Integer> functional = biFunctional((x1, x2) -> x1 + x2);
+        assertEquals(3, functional.call(1, 2));
+        functional = (x1, x2) -> x1 + x2;
+        assertEquals(3, functional.call(1, 2));
+        function = F((x1, x2) -> x1 + x2);
+        assertEquals(3, function.apply(1, 2));
+        
+        // BiConsumer
+        L<Integer> consumerList = l();
+        BiConsumer<Integer, Integer> consumer = (x1, x2) -> consumerList.a(x1).a(x2);
+        consumer.accept(1, 2);
+        assertEquals(l(1, 2), consumerList.g(0, 1));
+        consumerList.clear();
+        BiFunctionalI<Integer, Integer, Void> consumerFunctional = F((x1, x2) -> {consumerList.a(x1).a(x2);});
+        consumerFunctional.call(1, 2);
+        assertEquals(l(1, 2), consumerList.g(0, 1));
+        consumerList.clear();
+        consumer = F((x1, x2) -> {consumerList.a(x1).a(x2);});
+        consumer.accept(1, 2);
+        assertEquals(l(1, 2), consumerList.g(0, 1));
+        consumerList.clear();
+        
+        // BiPredicate
+        BiPredicate<Integer, Integer> predicate = (x1, x2) -> x1 < x2;
+        assertEquals(true, predicate.test(1, 2));
+        BiFunctionalI<Integer, Integer, Boolean> predicateFunctional = f((Integer x1, Integer x2) -> x1 < x2).f2;
+        assertEquals(true, predicateFunctional.call(1, 2));
+        predicateFunctional = (x1, x2) -> x1 < x2;
+        assertEquals(true, predicateFunctional.call(1, 2));
+        predicate = F((Integer x1, Integer x2) -> x1 < x2);
+        assertEquals(true, predicate.test(1, 2));
+        
+        // IntBinaryOperator
+        IntBinaryOperator intBinaryOperator = (int x1, int x2) -> x1+x2;
+        assertEquals(3, intBinaryOperator.applyAsInt(1, 2));
+        BiFunctionalI<Integer, Integer, Integer> intBinaryOperatorFunctional = f((int x1, int x2) -> x1+x2).f2;
+        assertEquals(3, intBinaryOperatorFunctional.call(1, 2));
+        intBinaryOperator = f((int x1, int x2) -> x1+x2).f2;
+        assertEquals(3, intBinaryOperator.applyAsInt(1, 2));
+        
+        // LongBinaryOperator
+        LongBinaryOperator longBinaryOperator = (long x1, long x2) -> x1+x2;
+        assertEquals(3l, longBinaryOperator.applyAsLong(1l, 2l));
+        BiFunctionalI<Long, Long, Long> longBinaryOperatorFunctional = f((long x1, long x2) -> x1+x2).f2;
+        assertEquals(3l, longBinaryOperatorFunctional.call(1l, 2l));
+        longBinaryOperator = f((long x1, long x2) -> x1+x2).f2;
+        assertEquals(3l, longBinaryOperator.applyAsLong(1l, 2l));
+        
+        // DoubleBinaryOperator
+        DoubleBinaryOperator doubleBinaryOperator = (double x1, double x2) -> x1+x2;
+        assertEquals(3d, doubleBinaryOperator.applyAsDouble(1d, 2d));
+        BiFunctionalI<Double, Double, Double> doubleBinaryOperatorFunctional = f((double x1, double x2) -> x1+x2).f2;
+        assertEquals(3d, doubleBinaryOperatorFunctional.call(1d, 2d));
+        doubleBinaryOperator = f((double x1, double x2) -> x1+x2).f2;
+        assertEquals(3d, doubleBinaryOperator.applyAsDouble(1d, 2d));
+        
+        // IntegerBiFunction
+        IntBiFunction<String> intBiFunction = (x1, x2) -> String.valueOf(x1 + x2);
+        assertEquals("3", intBiFunction.apply(1, 2));
+        BiFunctionalI<Integer, Integer, String> intBiFunctional = f((int x1, int x2) -> String.valueOf(x1 + x2)).f2;
+        assertEquals("3", intBiFunctional.call(1, 2));
+        intBiFunction = f((int x1, int x2) -> String.valueOf(x1 + x2)).f2;
+        assertEquals("3", intBiFunction.apply(1, 2));
+        
+        // LongBiFunction
+        LongBiFunction<String> longBiFunction = (x1, x2) -> String.valueOf(x1 + x2);
+        assertEquals("3", longBiFunction.apply(1l, 2l));
+        BiFunctionalI<Long, Long, String> longBiFunctional = f((long x1, long x2) -> String.valueOf(x1 + x2)).f2;
+        assertEquals("3", longBiFunctional.call(1l, 2l));
+        longBiFunction = f((long x1, long x2) -> String.valueOf(x1 + x2)).f2;
+        assertEquals("3", longBiFunction.apply(1l, 2l));
+        
+        // DoubleBiFunction
+        DoubleBiFunction<String> doubleBiFunction = (x1, x2) -> String.valueOf(x1 + x2);
+        assertEquals("3.0", doubleBiFunction.apply(1d, 2d));
+        BiFunctionalI<Double, Double, String> doubleBiFunctional = f((double x1, double x2) -> String.valueOf(x1 + x2)).f2;
+        assertEquals("3.0", doubleBiFunctional.call(1d, 2d));
+        doubleBiFunction = f((double x1, double x2) -> String.valueOf(x1 + x2)).f2;
+        assertEquals("3.0", doubleBiFunction.apply(1d, 2d));
+        
+        // ToIntegerBiFunction
+        ToIntBiFunction<String, String> toIntFunction = (x1, x2) -> Integer.valueOf(x1) + Integer.valueOf(x2);
+        assertEquals(3, toIntFunction.applyAsInt("1", "2"));
+        BiFunctionalI<String, String, Integer> toIntegerFunctional = f((String x1, String x2) -> (Integer.valueOf(x1) + Integer.valueOf(x2))).f2;
+        assertEquals(3, toIntegerFunctional.call("1", "2"));
+        toIntegerFunctional = F((String x1, String x2) -> (Integer.valueOf(x1) + Integer.valueOf(x2)));
+        assertEquals(3, toIntegerFunctional.call("1", "2"));
+        toIntegerFunctional = (String x1, String x2) -> (Integer.valueOf(x1) + Integer.valueOf(x2));
+        assertEquals(3, toIntegerFunctional.call("1", "2"));
+        toIntFunction = F((String x1, String x2) -> (Integer.valueOf(x1) + Integer.valueOf(x2)));
+        assertEquals(3, toIntFunction.applyAsInt("1", "2"));
+        
+        // ToLongBiFunction
+        ToLongBiFunction<String, String> toLongFunction = (x1, x2) -> Long.valueOf(x1) + Long.valueOf(x2);
+        assertEquals(3l, toLongFunction.applyAsLong("1", "2"));
+        BiFunctionalI<String, String, Long> toLongFunctional = f((String x1, String x2) -> (Long.valueOf(x1) + Long.valueOf(x2))).f2;
+        assertEquals(3l, toLongFunctional.call("1", "2"));
+        toLongFunctional = F((String x1, String x2) -> (Long.valueOf(x1) + Long.valueOf(x2)));
+        assertEquals(3l, toLongFunctional.call("1", "2"));
+        toLongFunctional = (String x1, String x2) -> (Long.valueOf(x1) + Long.valueOf(x2));
+        assertEquals(3l, toLongFunctional.call("1", "2"));
+        toLongFunction = F((String x1, String x2) -> (Long.valueOf(x1) + Long.valueOf(x2)));
+        assertEquals(3l, toLongFunction.applyAsLong("1", "2"));
+        
+        // ToDoubleBiFunction
+        ToDoubleBiFunction<String, String> toDoubleFunction = (x1, x2) -> Double.valueOf(x1) + Double.valueOf(x2);
+        assertEquals(3d, toDoubleFunction.applyAsDouble("1", "2"));
+        BiFunctionalI<String, String, Double> toDoubleFunctional = f((String x1, String x2) -> (Double.valueOf(x1) + Double.valueOf(x2))).f2;
+        assertEquals(3d, toDoubleFunctional.call("1", "2"));
+        toDoubleFunctional = F((String x1, String x2) -> (Double.valueOf(x1) + Double.valueOf(x2)));
+        assertEquals(3d, toDoubleFunctional.call("1", "2"));
+        toDoubleFunctional = (String x1, String x2) -> (Double.valueOf(x1) + Double.valueOf(x2));
+        assertEquals(3d, toDoubleFunctional.call("1", "2"));
+        toDoubleFunction = F((String x1, String x2) -> (Double.valueOf(x1) + Double.valueOf(x2)));
+        assertEquals(3d, toDoubleFunction.applyAsDouble("1", "2"));
+        
+        // ObjIntConsumer
+        L<Integer> intConsumerList = l();
+        ObjIntConsumer<String> intConsumer = (String x1, int x2) -> {intConsumerList.a(Integer.valueOf(x1)).a(x2);};
+        intConsumer.accept("1", 2);
+        assertEquals(l(1, 2), intConsumerList.g(0, 1));
+        intConsumerList.clear();
+        BiFunctionalI<String, Integer, Void> intConsumerFunctional = f((String x1, int x2) -> {intConsumerList.a(Integer.valueOf(x1)).a(x2);}).f2;
+        intConsumerFunctional.call("1", 2);
+        assertEquals(l(1, 2), intConsumerList.g(0, 1));
+        intConsumerList.clear();
+        intConsumer = f((String x1, int x2) -> {intConsumerList.a(Integer.valueOf(x1)).a(x2);}).f2;
+        intConsumer.accept("1", 2);
+        assertEquals(l(1, 2), intConsumerList.g(0, 1));
+        intConsumerList.clear();
+        
+        // ObjLongConsumer
+        L<Long> longConsumerList = l();
+        ObjLongConsumer<String> longConsumer = (String x1, long x2) -> {longConsumerList.a(Long.valueOf(x1)).a(x2);};
+        longConsumer.accept("1", 2l);
+        assertEquals(l(1l, 2l), longConsumerList.g(0, 1));
+        longConsumerList.clear();
+        BiFunctionalI<String, Long, Void> longConsumerFunctional = f((String x1, long x2) -> {longConsumerList.a(Long.valueOf(x1)).a(x2);}).f2;
+        longConsumerFunctional.call("1", 2l);
+        assertEquals(l(1l, 2l), longConsumerList.g(0, 1));
+        longConsumerList.clear();
+        longConsumer = f((String x1, long x2) -> {longConsumerList.a(Long.valueOf(x1)).a(x2);}).f2;
+        longConsumer.accept("1", 2l);
+        assertEquals(l(1l, 2l), longConsumerList.g(0, 1));
+        longConsumerList.clear();
+        
+        // ObjDoubleConsumer
+        L<Double> doubleConsumerList = l();
+        ObjDoubleConsumer<String> doubleConsumer = (String x1, double x2) -> {doubleConsumerList.a(Double.valueOf(x1)).a(x2);};
+        doubleConsumer.accept("1", 2d);
+        assertEquals(l(1d, 2d), doubleConsumerList.g(0, 1));
+        doubleConsumerList.clear();
+        BiFunctionalI<String, Double, Void> doubleConsumerFunctional = f((String x1, double x2) -> {doubleConsumerList.a(Double.valueOf(x1)).a(x2);}).f2;
+        doubleConsumerFunctional.call("1", 2d);
+        assertEquals(l(1d, 2d), doubleConsumerList.g(0, 1));
+        doubleConsumerList.clear();
+        doubleConsumer = f((String x1, double x2) -> {doubleConsumerList.a(Double.valueOf(x1)).a(x2);}).f2;
+        doubleConsumer.accept("1", 2l);
+        assertEquals(l(1d, 2d), doubleConsumerList.g(0, 1));
+        doubleConsumerList.clear();
     }
 }

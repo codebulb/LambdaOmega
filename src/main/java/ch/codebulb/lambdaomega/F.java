@@ -2,6 +2,9 @@ package ch.codebulb.lambdaomega;
 
 import ch.codebulb.lambdaomega.M.*;
 import ch.codebulb.lambdaomega.abstractions.BiFunctionalI;
+import ch.codebulb.lambdaomega.abstractions.functions.DoubleBiFunction;
+import ch.codebulb.lambdaomega.abstractions.functions.IntBiFunction;
+import ch.codebulb.lambdaomega.abstractions.functions.LongBiFunction;
 import ch.codebulb.lambdaomega.abstractions.FunctionalI;
 import ch.codebulb.lambdaomega.abstractions.OmegaObject;
 import ch.codebulb.lambdaomega.abstractions.ReadonlyIndexedI;
@@ -12,6 +15,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleFunction;
 import java.util.function.DoublePredicate;
@@ -20,6 +24,7 @@ import java.util.function.DoubleToIntFunction;
 import java.util.function.DoubleToLongFunction;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
+import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
@@ -27,6 +32,7 @@ import java.util.function.IntSupplier;
 import java.util.function.IntToDoubleFunction;
 import java.util.function.IntToLongFunction;
 import java.util.function.IntUnaryOperator;
+import java.util.function.LongBinaryOperator;
 import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
 import java.util.function.LongPredicate;
@@ -34,11 +40,16 @@ import java.util.function.LongSupplier;
 import java.util.function.LongToDoubleFunction;
 import java.util.function.LongToIntFunction;
 import java.util.function.LongUnaryOperator;
+import java.util.function.ObjDoubleConsumer;
+import java.util.function.ObjIntConsumer;
+import java.util.function.ObjLongConsumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntBiFunction;
 import java.util.function.ToIntFunction;
+import java.util.function.ToLongBiFunction;
 import java.util.function.ToLongFunction;
 
 /**
@@ -56,7 +67,6 @@ import java.util.function.ToLongFunction;
  * @param <T2> the type of the 2nd function input if it takes two inputs; must be same as <code>T</code> otherwise
  * @param <R> the function return type
  */
-// TODO Complete implementation, supporting all available functional interfaces
 public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements ReadonlyIndexedI<T, R> {
     private Function<T, R> function;
     
@@ -351,11 +361,113 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
         });
     }
     
+    F(IntBinaryOperator intBinaryOperator) {
+        this((BiFunction<T1, T2, R>) new BiFunction<Integer, Integer, Integer>() {
+            @Override
+            public Integer apply(Integer t, Integer u) {
+                return intBinaryOperator.applyAsInt(t, u);
+            }
+        });
+    }
+    
+    F(LongBinaryOperator longBinaryOperator) {
+        this((BiFunction<T1, T2, R>) new BiFunction<Long, Long, Long>() {
+            @Override
+            public Long apply(Long t, Long u) {
+                return longBinaryOperator.applyAsLong(t, u);
+            }
+        });
+    }
+    
+    F(DoubleBinaryOperator doubleBinaryOperator) {
+        this((BiFunction<T1, T2, R>) new BiFunction<Double, Double, Double>() {
+            @Override
+            public Double apply(Double t, Double u) {
+                return doubleBinaryOperator.applyAsDouble(t, u);
+            }
+        });
+    }
+    
+    F(IntBiFunction<R> intBiFunction) {
+        this((BiFunction<T1, T2, R>) new BiFunction<Integer, Integer, R>() {
+            @Override
+            public R apply(Integer t, Integer u) {
+                return intBiFunction.apply(t, u);
+            }
+        });
+    }
+    
+    F(LongBiFunction<R> longBiFunction) {
+        this((BiFunction<T1, T2, R>) new BiFunction<Long, Long, R>() {
+            @Override
+            public R apply(Long t, Long u) {
+                return longBiFunction.apply(t, u);
+            }
+        });
+    }
+    
+    F(DoubleBiFunction<R> doubleBiFunction) {
+        this((BiFunction<T1, T2, R>) new BiFunction<Double, Double, R>() {
+            @Override
+            public R apply(Double t, Double u) {
+                return doubleBiFunction.apply(t, u);
+            }
+        });
+    }
+    
+    F(ToIntBiFunction<T1, T2> toIntBiFunction) {
+        this(new BiFunction<T1, T2, R>() {
+            @Override
+            public R apply(T1 t, T2 u) {
+                return (R)(Integer)toIntBiFunction.applyAsInt(t, u);
+            }
+        });
+    }
+    
+    F(ToLongBiFunction<T1, T2> toLongBiFunction) {
+        this(new BiFunction<T1, T2, R>() {
+            @Override
+            public R apply(T1 t, T2 u) {
+                return (R)(Long)toLongBiFunction.applyAsLong(t, u);
+            }
+        });
+    }
+    
     F(ToDoubleBiFunction<T1, T2> toDoubleBiFunction) {
         this(new BiFunction<T1, T2, R>() {
             @Override
             public R apply(T1 t, T2 u) {
                 return (R)(Double)toDoubleBiFunction.applyAsDouble(t, u);
+            }
+        });
+    }
+    
+    F(ObjIntConsumer<T1> objIntConsumer) {
+        this((BiFunction<T1, T2, R>) new BiFunction<T1, Integer, R>() {
+            @Override
+            public R apply(T1 t, Integer u) {
+                objIntConsumer.accept(t, u);
+                return null;
+            }
+        });
+    }
+    
+    F(ObjLongConsumer<T1> objLongConsumer) {
+        this((BiFunction<T1, T2, R>) new BiFunction<T1, Long, R>() {
+            @Override
+            public R apply(T1 t, Long u) {
+                objLongConsumer.accept(t, u);
+                return null;
+            }
+        });
+    }
+    
+    F(ObjDoubleConsumer<T1> objDoubleConsumer) {
+        this((BiFunction<T1, T2, R>) new BiFunction<T1, Double, R>() {
+            @Override
+            public R apply(T1 t, Double u) {
+                objDoubleConsumer.accept(t, u);
+                return null;
             }
         });
     }
@@ -507,10 +619,24 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     }
     
     /**
+     * @see #f(Function)
+     */
+    public static <T, R> F<T, T, T, R> function(Function<T, R> function) {
+        return f(function);
+    }
+    
+    /**
      * Shorthand for {@link #f(Function)} followed by {@link #functional()}.
      */
     public static <T, R> FunctionalI<T, R> F(Function<T, R> function) {
         return f(function).functional();
+    }
+    
+    /**
+     * @see #F(Function)
+     */
+    public static <T, R> FunctionalI<T, R> functional(Function<T, R> function) {
+        return F(function);
     }
     
     /**
@@ -553,13 +679,6 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
      */
     public static F<Integer, Integer, Integer, Integer> f(IntUnaryOperator function) {
         return new F<>(function);
-    }
-    
-    /**
-     * @see #F(Function)
-     */
-    public static FunctionalI<Integer, Integer> F(IntUnaryOperator function) {
-        return f(function).functional();
     }
     
     /**
@@ -787,16 +906,121 @@ public class F<T, T1 extends T, T2 extends T, R> extends OmegaObject implements 
     }
     
     /**
+     * Shorthand for {@link #f(BiFunction)} followed by {@link #biFunctional()}.
+     */
+    public static <T1, T2, R> BiFunctionalI<T1, T2, R> F(BiFunction<T1, T2, R> function) {
+        return f(function).biFunctional();
+    }
+    
+    /**
+     * @see #F(BiFunction)
+     */
+    public static <T1, T2, R> BiFunctionalI<T1, T2, R> biFunctional(BiFunction<T1, T2, R> function) {
+        return F(function);
+    }
+    
+    /**
      * @see #f(Function)
+     */
+    public static <T, T1 extends T, T2 extends T> F<T, T1, T2, Void> f(BiConsumer<T1, T2> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #F(Function)
+     */
+    public static <T1, T2> BiFunctionalI<T1, T2, Void> F(BiConsumer<T1, T2> function) {
+        return f(function).biFunctional();
+    }
+    
+    /**
+     * @see #f(BiFunction)
      */
     public static <T, K extends T, V extends T> F<T, K, V, Boolean> f(BiPredicate<K, V> function) {
         return new F<>(function);
     }
     
     /**
-     * @see #f(Function)
+     * @see #f(BiFunction)
      */
-    public static <T, K extends T, V extends T> F<T, K, V, Void> f(BiConsumer<K, V> function) {
+    public static F<Integer, Integer, Integer, Integer> f(IntBinaryOperator function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(BiFunction)
+     */
+    public static F<Long, Long, Long, Long> f(LongBinaryOperator function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(BiFunction)
+     */
+    public static F<Double, Double, Double, Double> f(DoubleBinaryOperator function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(BiFunction)
+     */
+    public static <R> F<Integer, Integer, Integer, R> f(IntBiFunction<R> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(BiFunction)
+     */
+    public static <R> F<Long, Long, Long, R> f(LongBiFunction<R> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(BiFunction)
+     */
+    public static <R> F<Double, Double, Double, R> f(DoubleBiFunction<R> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(BiFunction)
+     */
+    public static <T, K extends T, V extends T> F<T, K, V, Integer> f(ToIntBiFunction<K, V> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(BiFunction)
+     */
+    public static <T, K extends T, V extends T> F<T, K, V, Long> f(ToLongBiFunction<K, V> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(BiFunction)
+     */
+    public static <T, K extends T, V extends T> F<T, K, V, Double> f(ToDoubleBiFunction<K, V> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(BiFunction)
+     */
+    public static <K> F<Object, K, Integer, Void> f(ObjIntConsumer<K> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(BiFunction)
+     */
+    public static <K> F<Object, K, Long, Void> f(ObjLongConsumer<K> function) {
+        return new F<>(function);
+    }
+    
+    /**
+     * @see #f(BiFunction)
+     */
+    public static <K> F<Object, K, Double, Void> f(ObjDoubleConsumer<K> function) {
         return new F<>(function);
     }
     
