@@ -21,8 +21,8 @@ LambdaOmega consists of only a few classes. For brevity reasons, most of their n
 * It perfectly fits unit tests where fluid, maintainable code is key.
 
 Other benefits:
-* Small footprint (JAR < 120KB), no other dependencies.
-* Thoroughly tested (coverage > 80%).
+* Small footprint (JAR < 125KB), no other dependencies.
+* Thoroughly tested (coverage >= 90%).
 * Human-readable documentation (here and in the API docs).
 * Free & Open source ([New BSD license](https://github.com/codebulb/LambdaOmega/blob/master/LICENSE)).
 
@@ -134,7 +134,7 @@ Set<Integer> set = l(0, 1, 2).toSet();
 ```
 These conversion methods internally use the `C.to…(…)` static helper methods. You can call them directly to convert collection without the need to create intermediate L / M instances.
 
-There are a lot of additional methods for L and M. For more information, visit the API docs ([V. 0.1 RC-2](http://codebulb.github.io/pages/LambdaOmega/doc/0.1_RC-2/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
+There are a lot of additional methods for L and M. For more information, visit the API docs ([V. 0.1 RC-2](http://codebulb.github.io/pages/LambdaOmega/doc/0.1/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
 
 
 ## A List is a Map and a Map is a List
@@ -201,7 +201,7 @@ M<String, L> withDefault = m(L.class).WithDefault(it -> l());
 withDefault.g("a").a(1);
 println(withDefault); // prints M{a=L[1]}
 ```
-Take a look at the API docs to see all available functional operations ([V. 0.1 RC-2](http://codebulb.github.io/pages/LambdaOmega/doc/0.1_RC-2/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
+Take a look at the API docs to see all available functional operations ([V. 0.1 RC-2](http://codebulb.github.io/pages/LambdaOmega/doc/0.1/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
 
 ## Functions
 The `F` class serves as a simple wrapper around any kind of `FunctionalInterface`, providing a unified API to any kind of function:
@@ -215,7 +215,49 @@ It also features some useful transformation methods for Java’s FunctionalInter
 F.function((Integer k, Integer v) -> k - v).apply(e(3, 2))
 F.biFunction((E<Integer, Integer> it) -> it.k - it.v).apply(3, 2)
 ```
-…expect more FunctionalInterface transformations in future LambdaOmega releases!
+As of V. 0.2, LambdaOmega features two additional interfaces which act as a convenient multi-interface to Java’s FunctionalInterfaces:
+* `FunctionalI` combines all 1-ary function interfaces (except for `UnaryOperator` which is mutually incompatible with `Function`)
+* `BiFunctionalI` combines all 2-ary function interfaces (except for `BinaryOperator` which is mutually incompatible with `BiFunction`)
+This allows you to use “one interface to rule them all”, instead of being forced to choose from 29 / 12 mutually incompatible interfaces when defining a lambda function:
+```
+private static boolean javaTestMethod(Function<Integer, Boolean> function) {
+    return function.apply(SYSTEM_PROPERTY);
+}
+
+Predicate<Integer> javaPredicate = it -> it > 0;
+// different functions have different APIs
+boolean oneIsPositive = javaPredicate.test(1);
+// primitive functions are incompatible with object functions
+javaTestMethod(javaPredicate); // COMPILE ERROR
+Function<Integer, Boolean> javaPredicateAsFunction = it -> javaPredicate.test(it);
+boolean testOutput = javaTestMethod(javaPredicateAsFunction);
+```
+Use only one interface with LambdaOmega:
+```
+FunctionalI<Integer, Boolean> predicate = it -> it > 0;
+// every FunctionalI has the method "call"
+boolean twoIsPositive = predicate.call(2);
+// can be used with any FunctionalInterface API
+testOutput = javaTestMethod(predicate);
+```
+Having only one common functional interface has these benefits:
+* `#call(…)` as a single common interface method
+* plug the interface everywhere a lambda function is expected (with above constraints).
+You can use the `F` class to explicitly create a `FunctionalI` / `BiFunctionalI`. For every `F`, the respective `FunctionalI` / `BiFunctionalI` is available:
+```
+// vanilla Java function casting not supported because of primitives
+Function<Integer, Integer> primitivePred1 = (int x) -> x + 1; // COMPILE ERROR
+FunctionalI<Integer, Boolean> primitivePred2 = (int x) -> x > 1; // COMPILE ERROR
+FunctionalI<Integer, Boolean> primitivePred = f((int x) -> x > 1).f;
+```
+For the most important `FunctionalInterface`s, there’s a shorthand:
+```
+FunctionalI<Integer, Boolean> pred = F((int x) -> x > 1);
+```
+That way, any lambda function can be turned into a `FunctionalI` / `BiFunctionalI` for global compatibility with all `FunctionalInterface`s (again, with above constraints):
+```
+javaTestMethod(F((int it) -> it > 0));
+```
 
 ## Ranges
 The `R` class represents an int range. It’s basically syntactic sugar to create ranges using the Java 8 stream API.
@@ -247,7 +289,7 @@ This library also features a drop-in-replacement for CompletableFuture, simplify
 * However, LambdaOmega fits perfectly where you make intense use of Java’s collection API and keeping your code clean and concise is key. It’s thus especially useful for e.g. JUnit test code which typically involves lots of collection boilerplate code.
 
 ## Project status and future plans
-LambdaOmega is now RELEASED, feedback is welcome.
+LambdaOmega is RELEASED, feedback is welcome.
 
 I will use the issue tracker to plan features for future releases. Feel free to use it to submit feature requests or bug reports, or make your own contribution to the project.
 
