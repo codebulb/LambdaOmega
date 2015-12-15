@@ -270,7 +270,59 @@ boolean yes = f((Integer it) -&gt; it &gt; 0).call(1); // Predicate
 F.biFunction((E&lt;Integer, Integer&gt; it) -&gt; it.k - it.v).apply(3, 2)
 </code></pre>
 
-<p>…expect more FunctionalInterface transformations in future LambdaOmega releases!</p>
+<p>As of V. 0.2, LambdaOmega features two additional interfaces which act as a convenient multi-interface to Java’s FunctionalInterfaces:</p>
+
+<ul>
+<li><code>FunctionalI</code> combines all 1-ary function interfaces (except for <code>UnaryOperator</code> which is mutually incompatible with <code>Function</code>)</li>
+<li><code>BiFunctionalI</code> combines all 2-ary function interfaces (except for <code>BinaryOperator</code> which is mutually incompatible with <code>BiFunction</code>)
+This allows you to use “one interface to rule them all”, instead of being forced to choose from 29 / 12 mutually incompatible interfaces when defining a lambda function:</li>
+</ul>
+
+<pre><code>private static boolean javaTestMethod(Function&lt;Integer, Boolean&gt; function) {
+    return function.apply(SYSTEM_PROPERTY);
+}
+
+Predicate&lt;Integer&gt; javaPredicate = it -&gt; it &gt; 0;
+// different functions have different APIs
+boolean oneIsPositive = javaPredicate.test(1);
+// primitive functions are incompatible with object functions
+javaTestMethod(javaPredicate); // COMPILE ERROR
+Function&lt;Integer, Boolean&gt; javaPredicateAsFunction = it -&gt; javaPredicate.test(it);
+boolean testOutput = javaTestMethod(javaPredicateAsFunction);
+</code></pre>
+
+<p>Use only one interface with LambdaOmega:</p>
+
+<pre><code>FunctionalI&lt;Integer, Boolean&gt; predicate = it -&gt; it &gt; 0;
+// every FunctionalI has the method "call"
+boolean twoIsPositive = predicate.call(2);
+// can be used with any FunctionalInterface API
+testOutput = javaTestMethod(predicate);
+</code></pre>
+
+<p>Having only one common functional interface has these benefits:</p>
+
+<ul>
+<li><code>#call(…)</code> as a single common interface method</li>
+<li>plug the interface everywhere a lambda function is expected (with above constraints).
+You can use the <code>F</code> class to explicitly create a <code>FunctionalI</code> / <code>BiFunctionalI</code>. For every <code>F</code>, the respective <code>FunctionalI</code> / <code>BiFunctionalI</code> is available:</li>
+</ul>
+
+<pre><code>// vanilla Java function casting not supported because of primitives
+Function&lt;Integer, Integer&gt; primitivePred1 = (int x) -&gt; x + 1; // COMPILE ERROR
+FunctionalI&lt;Integer, Boolean&gt; primitivePred2 = (int x) -&gt; x &gt; 1; // COMPILE ERROR
+FunctionalI&lt;Integer, Boolean&gt; primitivePred = f((int x) -&gt; x &gt; 1).f;
+</code></pre>
+
+<p>For the most important <code>FunctionalInterface</code>s, there’s a shorthand:</p>
+
+<pre><code>FunctionalI&lt;Integer, Boolean&gt; pred = F((int x) -&gt; x &gt; 1);
+</code></pre>
+
+<p>That way, any lambda function can be turned into a <code>FunctionalI</code> / <code>BiFunctionalI</code> for global compatibility with all <code>FunctionalInterface</code>s (again, with above constraints):</p>
+
+<pre><code>javaTestMethod(F((int it) -&gt; it &gt; 0));
+</code></pre>
 
 <h2><a aria-hidden="true" href="#ranges" class="anchor" id="user-content-ranges"><span class="octicon octicon-link"></span></a>Ranges</h2>
 
