@@ -5,6 +5,8 @@
  */
 package ch.codebulb.lambdaomega.abstractions.functions;
 
+import java.util.function.BiFunction;
+
 /**
  * Represents a function <i>f: (<code>double</code>, <code>double</code>) &rarr; <code>R</code></i> that accepts  two {@code double}-valued operands and produces a
  * result.  This is the {@code double}-consuming primitive specialization for

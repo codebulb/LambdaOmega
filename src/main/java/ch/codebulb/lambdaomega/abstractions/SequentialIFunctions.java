@@ -132,7 +132,7 @@ public interface SequentialIFunctions<T> extends SequentialI<T>, FunctionsI {
     }
     
     /**
-     * @see #findAll(BiPredicate)
+     * @see #findAll(Predicate)
      */
     public default Collection<T> filter(Predicate<T> predicate) {
         return findAll(predicate);
@@ -150,7 +150,7 @@ public interface SequentialIFunctions<T> extends SequentialI<T>, FunctionsI {
      * Returns a {@link List} where the elements are sorted <i>in ascending order</i> using the <code>keyExtractors</code> provided in order
      * as a comparator on every element.
      * 
-     * @see {@link #sortDescBy(Function...)}, {@link #sortBy(Function...)}
+     * @see {@link #sortDescBy(Function)}, {@link #sortBy(Function...)}
      */
     public default List<T> sortAscBy(Function<T, Comparable>... keyExtractors) {
         return stream().sorted(compareAsc(keyExtractors)).collect(Collectors.toList());

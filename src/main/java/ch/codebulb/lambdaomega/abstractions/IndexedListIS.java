@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Adds syntactic sugar to a {@link IndexedListIAdd}.
+ * Adds syntactic sugar to a {@link IndexedListI}.
  */
 public interface IndexedListIS<K, V> extends IndexedListI<K, V> {
     /**
