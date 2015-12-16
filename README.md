@@ -1,7 +1,7 @@
 # LambdaOmega
 A simple wrapper API to make usage of Java collections, lambdas and CompletableFuture more simple, concise and enjoyable.
 
-[![Build Status](https://travis-ci.org/codebulb/LambdaOmega.svg?branch=0.2_RC-2)](https://travis-ci.org/codebulb/LambdaOmega) [![codecov.io](http://codecov.io/github/codebulb/LambdaOmega/coverage.svg?branch=master)](http://codecov.io/github/codebulb/LambdaOmega?branch=master)
+[![Build Status](https://travis-ci.org/codebulb/LambdaOmega.svg?branch=0.2)](https://travis-ci.org/codebulb/LambdaOmega) [![codecov.io](https://codecov.io/github/codebulb/LambdaOmega/coverage.svg?branch=0.2)](https://codecov.io/github/codebulb/LambdaOmega?branch=0.2)
 
 ## What’s in the box?
 LambdaOmega consists of only a few classes. For brevity reasons, most of their names consist of a single letter.
@@ -32,12 +32,12 @@ Use [JitPack](https://jitpack.io/) to add its dependency to your Maven project:
 <dependency>
     <groupId>com.github.codebulb</groupId>
     <artifactId>LambdaOmega</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
 </dependency>
 ```
 Replace the version by the tag / commit hash of your choice or `-SNAPSHOT` to get the newest SNAPSHOT.
 
-Not using Maven? You can [download the JAR directly from JitPack’s servers](https://jitpack.io/com/github/codebulb/LambdaOmega/0.1/LambdaOmega-0.1.jar).
+Not using Maven? You can [download the JAR directly from JitPack’s servers](https://jitpack.io/com/github/codebulb/LambdaOmega/0.2/LambdaOmega-0.2.jar).
 
 Visit [JitPack’s docs](https://jitpack.io/docs/) for more information.
 
@@ -134,7 +134,7 @@ Set<Integer> set = l(0, 1, 2).toSet();
 ```
 These conversion methods internally use the `C.to…(…)` static helper methods. You can call them directly to convert collection without the need to create intermediate L / M instances.
 
-There are a lot of additional methods for L and M. For more information, visit the API docs ([V. 0.1 RC-2](http://codebulb.github.io/pages/LambdaOmega/doc/0.1/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
+There are a lot of additional methods for L and M. For more information, visit the API docs ([V. 0.2 RC-2](http://codebulb.github.io/pages/LambdaOmega/doc/0.2/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
 
 
 ## A List is a Map and a Map is a List
@@ -201,7 +201,7 @@ M<String, L> withDefault = m(L.class).WithDefault(it -> l());
 withDefault.g("a").a(1);
 println(withDefault); // prints M{a=L[1]}
 ```
-Take a look at the API docs to see all available functional operations ([V. 0.1 RC-2](http://codebulb.github.io/pages/LambdaOmega/doc/0.1/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
+Take a look at the API docs to see all available functional operations ([V. 0.2](http://codebulb.github.io/pages/LambdaOmega/doc/0.2/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
 
 ## Functions
 The `F` class serves as a simple wrapper around any kind of `FunctionalInterface`, providing a unified API to any kind of function:
@@ -304,5 +304,5 @@ This is a private project I’ve started for my own pleasure and usage and to le
 
 ## For more information
 Please visit the **[accompanying blog post](http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html)** to learn more about why I created this library or check out the API docs:
-* **[V. 0.1 docs](http://codebulb.github.io/pages/LambdaOmega/doc/0.1/)**
+* **[V. 0.2 docs](http://codebulb.github.io/pages/LambdaOmega/doc/0.2/)**
 * **[Current SNAPSHOT docs](http://codebulb.github.io/pages/LambdaOmega/doc/)**
