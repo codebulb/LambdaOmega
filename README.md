@@ -1,7 +1,7 @@
 # LambdaOmega
 A simple wrapper API to make usage of Java collections, lambdas and CompletableFuture more simple, concise and enjoyable.
 
-[![Build Status](https://travis-ci.org/codebulb/LambdaOmega.svg)](https://travis-ci.org/codebulb/0.2_RC-1) [![codecov.io](http://codecov.io/github/codebulb/LambdaOmega/coverage.svg?branch=master)](http://codecov.io/github/codebulb/LambdaOmega?branch=master)
+[![Build Status](https://travis-ci.org/codebulb/LambdaOmega.svg?branch=0.1_RC-2)](https://travis-ci.org/codebulb/LambdaOmega) [![codecov.io](http://codecov.io/github/codebulb/LambdaOmega/coverage.svg?branch=master)](http://codecov.io/github/codebulb/LambdaOmega?branch=master)
 
 ## What’s in the box?
 LambdaOmega consists of only a few classes. For brevity reasons, most of their names consist of a single letter.
@@ -215,9 +215,10 @@ It also features some useful transformation methods for Java’s FunctionalInter
 F.function((Integer k, Integer v) -> k - v).apply(e(3, 2))
 F.biFunction((E<Integer, Integer> it) -> it.k - it.v).apply(3, 2)
 ```
-As of V. 0.2, LambdaOmega features two additional interfaces which act as a convenient multi-interface to Java’s FunctionalInterfaces:
+As of V. 0.2, LambdaOmega features two additional interfaces which act as a convenient multi-interface to Java’s `FunctionalInterface`s:
 * `FunctionalI` combines all 1-ary function interfaces (except for `UnaryOperator` which is mutually incompatible with `Function`)
 * `BiFunctionalI` combines all 2-ary function interfaces (except for `BinaryOperator` which is mutually incompatible with `BiFunction`)
+
 This allows you to use “one interface to rule them all”, instead of being forced to choose from 29 / 12 mutually incompatible interfaces when defining a lambda function:
 ```
 private static boolean javaTestMethod(Function<Integer, Boolean> function) {
@@ -243,6 +244,7 @@ testOutput = javaTestMethod(predicate);
 Having only one common functional interface has these benefits:
 * `#call(…)` as a single common interface method
 * plug the interface everywhere a lambda function is expected (with above constraints).
+
 You can use the `F` class to explicitly create a `FunctionalI` / `BiFunctionalI`. For every `F`, the respective `FunctionalI` / `BiFunctionalI` is available:
 ```
 // vanilla Java function casting not supported because of primitives

@@ -270,13 +270,14 @@ boolean yes = f((Integer it) -&gt; it &gt; 0).call(1); // Predicate
 F.biFunction((E&lt;Integer, Integer&gt; it) -&gt; it.k - it.v).apply(3, 2)
 </code></pre>
 
-<p>As of V. 0.2, LambdaOmega features two additional interfaces which act as a convenient multi-interface to Java’s FunctionalInterfaces:</p>
+<p>As of V. 0.2, LambdaOmega features two additional interfaces which act as a convenient multi-interface to Java’s <code>FunctionalInterface</code>s:</p>
 
 <ul>
 <li><code>FunctionalI</code> combines all 1-ary function interfaces (except for <code>UnaryOperator</code> which is mutually incompatible with <code>Function</code>)</li>
-<li><code>BiFunctionalI</code> combines all 2-ary function interfaces (except for <code>BinaryOperator</code> which is mutually incompatible with <code>BiFunction</code>)
-This allows you to use “one interface to rule them all”, instead of being forced to choose from 29 / 12 mutually incompatible interfaces when defining a lambda function:</li>
+<li><code>BiFunctionalI</code> combines all 2-ary function interfaces (except for <code>BinaryOperator</code> which is mutually incompatible with <code>BiFunction</code>)</li>
 </ul>
+
+<p>This allows you to use “one interface to rule them all”, instead of being forced to choose from 29 / 12 mutually incompatible interfaces when defining a lambda function:</p>
 
 <pre><code>private static boolean javaTestMethod(Function&lt;Integer, Boolean&gt; function) {
     return function.apply(SYSTEM_PROPERTY);
@@ -304,9 +305,10 @@ testOutput = javaTestMethod(predicate);
 
 <ul>
 <li><code>#call(…)</code> as a single common interface method</li>
-<li>plug the interface everywhere a lambda function is expected (with above constraints).
-You can use the <code>F</code> class to explicitly create a <code>FunctionalI</code> / <code>BiFunctionalI</code>. For every <code>F</code>, the respective <code>FunctionalI</code> / <code>BiFunctionalI</code> is available:</li>
+<li>plug the interface everywhere a lambda function is expected (with above constraints).</li>
 </ul>
+
+<p>You can use the <code>F</code> class to explicitly create a <code>FunctionalI</code> / <code>BiFunctionalI</code>. For every <code>F</code>, the respective <code>FunctionalI</code> / <code>BiFunctionalI</code> is available:</p>
 
 <pre><code>// vanilla Java function casting not supported because of primitives
 Function&lt;Integer, Integer&gt; primitivePred1 = (int x) -&gt; x + 1; // COMPILE ERROR
