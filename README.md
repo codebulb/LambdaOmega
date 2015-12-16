@@ -1,7 +1,7 @@
 # LambdaOmega
 A simple wrapper API to make usage of Java collections, lambdas and CompletableFuture more simple, concise and enjoyable.
 
-[![Build Status](https://travis-ci.org/codebulb/LambdaOmega.svg?branch=0.2)](https://travis-ci.org/codebulb/LambdaOmega) [![codecov.io](https://codecov.io/github/codebulb/LambdaOmega/coverage.svg?branch=0.2)](https://codecov.io/github/codebulb/LambdaOmega?branch=0.2)
+[![Build Status](https://travis-ci.org/codebulb/LambdaOmega.svg?branch=master)](https://travis-ci.org/codebulb/LambdaOmega) [![codecov.io](https://codecov.io/github/codebulb/LambdaOmega/coverage.svg?branch=master)](https://codecov.io/github/codebulb/LambdaOmega?branch=master)
 
 ## What’s in the box?
 LambdaOmega consists of only a few classes. For brevity reasons, most of their names consist of a single letter.
