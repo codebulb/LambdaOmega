@@ -21,6 +21,10 @@ public interface SequentialI<T> {
      */
     public Collection<T> toCollection();
     
+    public default List<T> toList() {
+        return C.toList(toCollection());
+    }
+    
     public default Set<T> toSet() {
         return C.toSet(toCollection());
     }

@@ -23,6 +23,7 @@ public interface OrderedSequential<T> extends SequentialIS<T> {
      * Gets the wrapped {@link List} or, if not backed by a {@link List}, 
      * returns the wrapped objects after being transformed into a {@link List}
      */
+    @Override
     public default List<T> toList() {
         return C.toList(toCollection());
     }
@@ -106,6 +107,16 @@ public interface OrderedSequential<T> extends SequentialIS<T> {
     @Override
     public default <R> List<R> map(Function<T, R> function) {
         return (List<R>)SequentialIS.super.map(function);
+    }
+
+    @Override
+    public default <N> List<N> flatten() {
+        return (List<N>)SequentialIS.super.flatten();
+    }
+
+    @Override
+    public default <N> List<N> flattenDeep() {
+        return (List<N>)SequentialIS.super.flattenDeep();
     }
 
     @Override

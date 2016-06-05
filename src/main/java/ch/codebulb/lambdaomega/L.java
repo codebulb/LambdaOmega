@@ -116,7 +116,7 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
     }
     
     /**
-     * Like {@link #l(int, Function)}, but turning the result into a {@link L}.
+     * Like {@link #l(int, Function)}, but turning the result into a {@link List}.
      */
     public static <T> List<T> list(int times, Function<Integer, T> generator) {
         return l(times, generator).l;
@@ -536,6 +536,36 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
     }
     
     @Override
+    public <R> L<R> Map(Function<T, R> function) {
+        return L(map(function));
+    }
+
+    @Override
+    public <N> L<N> Flatten() {
+        return L(flatten());
+    }
+
+    @Override
+    public <N> L<N> FlattenDeep() {
+        return L(flattenDeep());
+    }
+    
+    @Override
+    public L<T> FindAll(Predicate<T> predicate) {
+        return L(findAll(predicate));
+    }
+    
+    @Override
+    public L<T> Filter(Predicate<T> predicate) {
+        return L(filter(predicate));
+    }
+
+    @Override
+    public L<T> Reject(Predicate<T> predicate) {
+        return L(reject(predicate));
+    }
+    
+    @Override
     public L<T> S(IndexedI<? extends Integer, ? extends T>... m) {
         return (L<T>) IndexedListIS.super.S(m);
     }
@@ -737,7 +767,8 @@ public class L<T> extends C<T, Integer, T> implements OrderedSequentialS<T>, Ind
 
     @Override
     public L<T> WithDefault(Function<Integer, T> defaultValue) {
-        return (L<T>) super.WithDefault(defaultValue);
+        this.defaultFunction = defaultValue;
+        return this;
     }
 
     @Override

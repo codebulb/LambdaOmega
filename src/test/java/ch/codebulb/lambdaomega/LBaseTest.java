@@ -1,10 +1,13 @@
 package ch.codebulb.lambdaomega;
 
+import static ch.codebulb.lambdaomega.L.L;
 import static ch.codebulb.lambdaomega.L.l;
 import static ch.codebulb.lambdaomega.L.list;
 import static ch.codebulb.lambdaomega.TestUtil.EXPECTED_LIST;
+import static ch.codebulb.lambdaomega.TestUtil.EXPECTED_NESTED_LIST;
 import static ch.codebulb.lambdaomega.TestUtil.assertEquals;
 import ch.codebulb.lambdaomega.abstractions.I;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertFalse;
@@ -26,8 +29,6 @@ public class LBaseTest {
         assertTrue(l().equals(l()));
         assertTrue(l(0, 1, 2).equals(l(0, 1, 2)));
         assertFalse(l(9, 1, 2).equals(l(0, 1, 2)));
-        assertTrue(EXPECTED_LIST.equals(list(0, 1, 2)));
-        assertTrue(EXPECTED_LIST.equals(l(0, 1, 2).l));
         assertTrue(list(0, 1, 2).equals(l(0, 1, 2).l));
         
         assertEquals("L[0, 1, 2]", "L" + EXPECTED_LIST.toString(), l(0, 1, 2).toString());
@@ -52,6 +53,29 @@ public class LBaseTest {
         listWithDefault.get(5).add(9);
         // return a newly created element
         assertEquals(list(10), listWithDefault.get(5));
+    }
+    
+    @Test
+    public void testLiteralConstruction() {
+        assertEquals(L.class, l().getClass());
+        assertEquals(new ArrayList<Integer>(), l().l);
+        assertEquals(new ArrayList<Integer>(), l().toList());
+        assertEquals(new ArrayList<Integer>(), l().to(ArrayList.class));
+        assertEquals(new ArrayList<Integer>(), list());
+        
+        assertEquals(EXPECTED_LIST, l(0, 1, 2).l);
+        assertEquals(EXPECTED_LIST, list(0, 1, 2));
+        
+        assertEquals(EXPECTED_LIST, L(EXPECTED_LIST).l);
+        assertEquals(EXPECTED_LIST, l(new Integer[]{0, 1, 2}).l);
+        
+        assertEquals(EXPECTED_LIST, l(Integer.class).a(0, 1, 2).l);
+        
+        assertEquals(EXPECTED_NESTED_LIST, l(l(0, 1, 2).l, l(0, 1, 2).l).l);
+        assertEquals(EXPECTED_NESTED_LIST, L(l(0, 1, 2), l(0, 1, 2)).l);
+        
+        assertEquals(EXPECTED_LIST, l(3, it -> it).l);
+        assertEquals(EXPECTED_LIST, list(3, it -> it));
     }
     
     @AfterClass

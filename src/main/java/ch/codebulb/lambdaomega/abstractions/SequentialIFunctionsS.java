@@ -16,51 +16,39 @@ public interface SequentialIFunctionsS<T> extends SequentialIFunctions<T> {
     /**
      * @see #map(Function)
      */
-    public default <R> L<R> Map(Function<T, R> function) {
-        return L(map(function));
-    }
+    public <R> SequentialIFunctionsS<R> Map(Function<T, R> function);
     
     /**
      * @see #mapEntries(Function)
      */
     public default <RK, RV> M<RK, RV> MapEntries(Function<T, M.E<RK, RV>> function) {
-        return m(mapEntries(function));
+        return M.m(mapEntries(function));
     }
     
     /**
      * @see #flatten()
      */
-    default <N> L<N> Flatten() {
-        return L(flatten());
-    }
+    public <N> SequentialIFunctionsS<N> Flatten();
     
     /**
      * @see #flattenDeep()
      */
-    public default <N> L<N> FlattenDeep() {
-        return L(flattenDeep());
-    }
+    public <N> SequentialIFunctionsS<N> FlattenDeep();
     
     /**
      * @see #findAll(Predicate)
      */
-    public default L<T> FindAll(Predicate<T> predicate) {
-        return L(findAll(predicate));
-    }
+    public SequentialIFunctionsS<T> FindAll(Predicate<T> predicate);
     
     /**
      * @see #filter(Predicate)
      */
-    public default L<T> Filter(Predicate<T> predicate) {
-        return L(filter(predicate));
-    }
+    public SequentialIFunctionsS<T> Filter(Predicate<T> predicate);
     
     /**
      * @see #reject(Predicate)
      */
-    public default L<T> Reject(Predicate<T> predicate) {
-        return L(reject(predicate));
-    }
+    public SequentialIFunctionsS<T> Reject(Predicate<T> predicate);
     
     /**
      * @see #sortAscBy(Function...)

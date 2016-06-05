@@ -6,8 +6,8 @@ A simple wrapper API to make usage of Java collections, lambdas and CompletableF
 ## What’s in the box?
 LambdaOmega consists of only a few classes. For brevity reasons, most of their names consist of a single letter.
 * `L` (“List”) is a wrapper for List.
-* `M` (“Map”) is a wrapper for Map.
 * `S` (“Set”) is a wrapper for Set.
+* `M` (“Map”) is a wrapper for Map.
 * `R` (“Range”) is a wrapper for an IntStream range.
 * `V2` (“Vector 2D”) represents a 2D vector (= a 2-ary tuple). It can be converted into a Map.Entry.
 * `F` (“Function”) is a wrapper for functional interfaces (lambda expressions) which also provides helper methods to convert functions.
@@ -21,7 +21,7 @@ LambdaOmega consists of only a few classes. For brevity reasons, most of their n
 * It perfectly fits unit tests where fluid, maintainable code is key.
 
 Other benefits:
-* Small footprint (JAR < 125KB), no other dependencies.
+* Small footprint (JAR < 130KB), no other dependencies.
 * Thoroughly tested (coverage >= 90%).
 * Human-readable documentation (here and in the API docs).
 * Free & Open source ([New BSD license](https://github.com/codebulb/LambdaOmega/blob/master/LICENSE)).
@@ -34,6 +34,11 @@ Use [JitPack](https://jitpack.io/) to add its dependency to your Maven project:
     <artifactId>LambdaOmega</artifactId>
     <version>0.2</version>
 </dependency>
+...
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
 ```
 Replace the version by the tag / commit hash of your choice or `-SNAPSHOT` to get the newest SNAPSHOT.
 
@@ -42,7 +47,7 @@ Not using Maven? You can [download the JAR directly from JitPack’s servers](ht
 Visit [JitPack’s docs](https://jitpack.io/docs/) for more information.
 
 ## Getting started with Collections
-The heart of LambdaOmega are the wrapper classes `L` and `M` which wrap around vanilla Java Collection `List` or `Map`, respectively (decorator pattern) to provide a more concise and more enjoyable API to the underlying collection.
+The heart of LambdaOmega are the wrapper classes `L`, `S` and `M` which wrap around vanilla Java Collection `List`, `Set` or `Map`, respectively (decorator pattern) to provide a more concise and more enjoyable API to the underlying collection.
 You can wrap an L around everything which can be turned into a List: a List, a `Stream`, varargs:
 ```
 import static ch.codebulb.lambdaomega.L.*;
@@ -51,9 +56,11 @@ L<Integer> myL = l(0, 1, 2);
 ```
 The wrapper function invokes the L constructor and returns the L. You can’t invoke that constructor explicitly, always use the convenience wrapper function instead.
 
-It’s best practice to statically import the `l()` method so you can write just `l()` instead of `L.l()`.
-
-In the most simple case, you just want to return the underlying List:
+It’s best practice to statically import the `l()` method so you can write just `l()` instead of `L.l()`. The same goes for the other collections, e.g. `S.s()`:
+```
+S<Integer> myS = s(0, 1, 2);
+```
+In the most simple case, you just want to return the underlying Collection:
 ```
 List<Integer> mylist = l(0, 1, 2).l;
 ```
@@ -99,11 +106,11 @@ None of the LambdaOmega collections implements Java’s Collection or Map interf
 * We don’t want to inherit this bloated, flawed API.
 * It encourages us to use LambdaOmega collections locally only and unwrap them into Java collections for external method calls.
 
-However, L and M implement a set of methods closely inspired by Collection and Map; most methods are actually the same, others are augmented to e.g. accept varargs or to provide a more reasonable return type.
+However, L, S and M implement a set of methods closely inspired by Collection and Map; most methods are actually the same, others are augmented to e.g. accept varargs or to provide a more reasonable return type.
 
 Some of these methods exist both as intermediate and terminal function. For the most common methods, a shorthand one-letter variant exists.
 
-We’ve already met the `add` / `Add` / `a` method on L. There’s also `addAll` / `AddAll` / `A`; all of these also works with varargs:
+We’ve already met the `add` / `Add` / `a` method on L and S. There’s also `addAll` / `AddAll` / `A`; all of these also works with varargs:
 ```
 List<Integer> zeroToSix = l(0, 1, 2).A(list(3, 4)).addAll(l(5, 6));
 ```
@@ -120,7 +127,7 @@ For L or M, you can get a single element or multiple elements with `get` / `Get`
 String a = l("a", "b", "c").g(0);
 L<String> aAndC = l("a", "b", "c").g(0, 2);
 ```
-For L, you can remove a single element or a collection with `remove` / `Remove` / `r` / `removeAll` / `RemoveAll` / `R`:
+For L or S, you can remove a single element or a collection with `remove` / `Remove` / `r` / `removeAll` / `RemoveAll` / `R`:
 ```
 L<String> aAndB = l("a", "b", "c", "d", "e").r("c").R(list("d", "e"));
 ```
@@ -128,24 +135,23 @@ For M, you can remove a single element or a collection with `deleteKey` / `Delet
 ```
 M<String, Integer> bAndC = m("a", 0).i("b", 1).i("c", 2).d("a");
 ```
-Also, you can convert an L / M into almost any collection with a corresponding `to…(…)` method:
+Also, you can convert an L / S / M into almost any collection with a corresponding `to…(…)` method:
 ```
 Set<Integer> set = l(0, 1, 2).toSet();
 ```
-These conversion methods internally use the `C.to…(…)` static helper methods. You can call them directly to convert collection without the need to create intermediate L / M instances.
+These conversion methods internally use the `C.to…(…)` static helper methods. You can call them directly to convert collection without the need to create intermediate L / S / M instances.
 
-There are a lot of additional methods for L and M. For more information, visit the API docs ([V. 0.2 RC-2](http://codebulb.github.io/pages/LambdaOmega/doc/0.2/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
-
+There are a lot of additional methods for L, S and M. For more information, visit the ([API docs](http://codebulb.github.io/pages/LambdaOmega/doc/).
 
 ## A List is a Map and a Map is a List
 Now comes the fun part. Because the LambdaOmega API lives independently of vanilla Java Collection / Map API, it features its own API which is more simple, consistent and powerful at the same time, whilst keeping it as close to the original Java APIs as possible.
 
-Most importantly, a List is also a Map from int to T, and a Map is also a List of entries. More precisely, both L and M implement the `SequencedI` (Collection-like access) interface as well as the `IndexedI` (Map-like access) interface.
-Thus, you can call L methods such as `indexOf()` on a M:
+Most importantly, a List is also a Map from int to T, and a Map is also a List of entries. More precisely, both L and M implement the `SequentialI` (Collection-like access) interface as well as the `IndexedI` (Map-like access) interface. Note that similar to its plain Java Set counterpart, S only implements the `SequentialI` interface.
+Thus, you can call L methods such as `remove(M.E)` on a M:
 ```
-String c = m("a", 0).i("b", 1).i("c", 2).indexOf(2);
+m("a", 0).i("b", 1).i("c", 2).remove(e("b", 1));
 ```
-and M methods such as `insert()` on a L:
+and M methods such as `insert(Integer, T)` on a L:
 ```
 L<String> abcd = l("a", "b").I(m(2, "c").i(3, "d"));
 ```
@@ -177,7 +183,7 @@ Again note how intermediary functions are marked by a name starting with an Uppe
 ```
 List<Integer> list246 = l(0, 1, 2).Map(it -> it + 1).map(it -> it * 2);
 ```
-Some functions incorporate syntax changes (when compared to their vanilla Java couterpart) to facilitate their usage. With mapEntries(), you can map list elements to a Map. Note that the lambda returns a `M.E` Map Entry which is much simpler than having two separate return values as in the corresponding vanilla Java method.
+Some functions incorporate syntax changes (when compared to their vanilla Java couterpart) to facilitate their usage. With `mapEntries()`, you can map list elements to a Map. Note that the lambda returns a `M.E` Map Entry which is much simpler than having two separate return values as in the corresponding vanilla Java method.
 ```
 Map<String, Integer> stringsToSize = l("a", "ab", "abc").mapEntries(it -> e(it, it.length()));
 ```
@@ -201,7 +207,7 @@ M<String, L> withDefault = m(L.class).WithDefault(it -> l());
 withDefault.g("a").a(1);
 println(withDefault); // prints M{a=L[1]}
 ```
-Take a look at the API docs to see all available functional operations ([V. 0.2](http://codebulb.github.io/pages/LambdaOmega/doc/0.2/) / [SNAPSHOT](http://codebulb.github.io/pages/LambdaOmega/doc/)).
+Take a look at the [API docs](http://codebulb.github.io/pages/LambdaOmega/doc/) to see all available functional operations.
 
 ## Functions
 The `F` class serves as a simple wrapper around any kind of `FunctionalInterface`, providing a unified API to any kind of function:
@@ -215,7 +221,7 @@ It also features some useful transformation methods for Java’s FunctionalInter
 F.function((Integer k, Integer v) -> k - v).apply(e(3, 2))
 F.biFunction((E<Integer, Integer> it) -> it.k - it.v).apply(3, 2)
 ```
-As of V. 0.2, LambdaOmega features two additional interfaces which act as a convenient multi-interface to Java’s `FunctionalInterface`s:
+Moreover, LambdaOmega features two additional interfaces which act as a convenient multi-interface to Java’s `FunctionalInterface`s:
 * `FunctionalI` combines all 1-ary function interfaces (except for `UnaryOperator` which is mutually incompatible with `Function`)
 * `BiFunctionalI` combines all 2-ary function interfaces (except for `BinaryOperator` which is mutually incompatible with `BiFunction`)
 
@@ -298,11 +304,12 @@ I will use the issue tracker to plan features for future releases. Feel free to 
 This is a private project I’ve started for my own pleasure and usage and to learn more about Java 8’s collection API, and I have no plans for (commercial) support. I decided to publish it open sourced so that everyone who is interested is free to use it at his own discretion.
 
 ## Version history
+* V. 0.3:
+ * [S enhancements](https://github.com/codebulb/LambdaOmega/issues/2): Fully implement `S` (`Set`).
 * V. 0.2:
  * [F enhancements](https://github.com/codebulb/LambdaOmega/issues/1): Support for all `FunctionalInterface`s and more transformations in the `F` class.
 * V. 0.1: First release
 
 ## For more information
 Please visit the **[accompanying blog post](http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html)** to learn more about why I created this library or check out the API docs:
-* **[V. 0.2 docs](http://codebulb.github.io/pages/LambdaOmega/doc/0.2/)**
-* **[Current SNAPSHOT docs](http://codebulb.github.io/pages/LambdaOmega/doc/)**
+* **[Newest release](http://codebulb.github.io/pages/LambdaOmega/doc/)**

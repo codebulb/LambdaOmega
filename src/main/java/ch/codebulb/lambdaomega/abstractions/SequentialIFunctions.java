@@ -67,8 +67,8 @@ public interface SequentialIFunctions<T> extends SequentialI<T>, FunctionsI {
      * 
      * @see #flattenDeep()
      */
-    public default <N> List<N> flatten() {
-        return (List<N>)(flatten(stream()).collect(Collectors.toList()));
+    public default <N> Collection<N> flatten() {
+        return (Collection<N>)(flatten(stream()).collect(createCollector()));
     }
     
     static <N, T> Stream<N> flatten(Stream<T> stream) {
@@ -90,7 +90,7 @@ public interface SequentialIFunctions<T> extends SequentialI<T>, FunctionsI {
      * 
      * @see #flatten()
      */
-    public default <N> List<N> flattenDeep() {
+    public default <N> Collection<N> flattenDeep() {
         // TODO This seems a bit shaky. Rewrite.
         Collection<?> ret = toCollection();
         while (ret.stream().anyMatch(it -> it instanceof SequentialI || it instanceof Collection)) {
@@ -104,9 +104,9 @@ public interface SequentialIFunctions<T> extends SequentialI<T>, FunctionsI {
                 else {
                     return Stream.of((N)(it));
                 }
-            }).collect(Collectors.toList());
+            }).collect(createCollector());
         }
-        return ((Stream<N>)(ret.stream())).collect(Collectors.toList());
+        return ((Stream<N>)(ret.stream())).collect(createCollector());
     }
     
     /**

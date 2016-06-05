@@ -52,7 +52,7 @@ import java.util.stream.StreamSupport;
  * @param <V> the type of a value for indexed access
  */
 // TODO Complete implementation with more converters
-public abstract class C<T, K, V> extends OmegaObject implements StreamableI, ReadonlyIndexedI<K, V> {
+public abstract class C<T, K, V> extends OmegaObject implements StreamableI {
     private boolean parallel;
     protected Function<K, V> defaultFunction;
     
@@ -100,12 +100,6 @@ public abstract class C<T, K, V> extends OmegaObject implements StreamableI, Rea
      */
     public C<T, K, V> Seq() {
         return Sequential();
-    }
-    
-    @Override
-    public C<T, K, V> WithDefault(Function<K, V> defaultValue) {
-        this.defaultFunction = defaultValue;
-        return this;
     }
     
     public <C> C to(Class<C> format) {

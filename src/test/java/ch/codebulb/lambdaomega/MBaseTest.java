@@ -4,6 +4,7 @@ import static ch.codebulb.lambdaomega.L.*;
 import static ch.codebulb.lambdaomega.M.*;
 import static ch.codebulb.lambdaomega.TestUtil.*;
 import ch.codebulb.lambdaomega.abstractions.I;
+import java.util.LinkedHashMap;
 import java.util.List;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -18,7 +19,6 @@ public class MBaseTest {
         assertTrue(m().equals(m()));
         assertTrue(m("a", 0).equals(m("a", 0)));
         assertFalse(m("a", 1).equals(m("a", 0)));
-        assertTrue(EXPECTED_MAP.equals(m("a", 0).i("b", 1).i("c", 2).m));
         
         assertEquals("M{a=0, b=1, c=2}", "M" + EXPECTED_MAP.toString(), m("a", 0).i("b", 1).i("c", 2).toString());
     }
@@ -70,5 +70,22 @@ public class MBaseTest {
         
         assertEquals("a", e("a", 1).toEntry().getKey());
         assertEquals(1, e("a", 1).toEntry().getValue());
+    }
+    
+    @Test
+    public void testLiteralConstruction() {
+        assertEquals(M.class, m().getClass());
+        assertEquals(new LinkedHashMap<String, Integer>(), m(String.class, Integer.class).m);
+        assertEquals(new LinkedHashMap<String, Integer>(), m(Integer.class).m);
+        assertEquals(new LinkedHashMap<String, Integer>(), m(String.class, Integer.class).toMap());
+        assertEquals(new LinkedHashMap<String, Integer>(), map(String.class, Integer.class));        
+        
+        assertEquals(EXPECTED_MAP, m().i("a", 0).i("b", 1).i("c", 2).m);
+        assertEquals(EXPECTED_MAP, m("a", 0).i("b", 1).i("c", 2).m);
+        assertEquals(EXPECTED_MAP, m(e("a", 0), e("b", 1), e("c", 2)).m);
+        assertEquals(EXPECTED_MAP, map(e("a", 0), e("b", 1), e("c", 2)));
+        
+        assertEquals(EXPECTED_MAP, m(String.class, Integer.class).i("a", 0).i("b", 1).i("c", 2).m);
+        assertEquals(EXPECTED_MAP, m(Integer.class).i("a", 0).i("b", 1).i("c", 2).m);
     }
 }

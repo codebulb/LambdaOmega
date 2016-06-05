@@ -1,5 +1,6 @@
 package ch.codebulb.lambdaomega;
 
+import static ch.codebulb.lambdaomega.L.L;
 import ch.codebulb.lambdaomega.M.E;
 import ch.codebulb.lambdaomega.abstractions.IndexedI;
 import ch.codebulb.lambdaomega.abstractions.SequentialIS;
@@ -229,17 +230,37 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
     public <N> List<N> flattenDeep() {
         throw new UnsupportedOperationException("Flatten is not supported by map.");
     }
-
+    
     @Override
-    @Deprecated
-    public <N> L<N> FlattenDeep() {
-        return SequentialIS.super.FlattenDeep();
+    public <R> L<R> Map(Function<E<K, V>, R> function) {
+        return L(map(function));
     }
 
     @Override
     @Deprecated
     public <N> L<N> Flatten() {
-        return SequentialIS.super.Flatten();
+        return L(flatten());
+    }
+
+    @Override
+    @Deprecated
+    public <N> L<N> FlattenDeep() {
+        return L(flattenDeep());
+    }
+    
+    @Override
+    public L<E<K, V>> FindAll(Predicate<E<K, V>> predicate) {
+        return L(findAll(predicate));
+    }
+
+    @Override
+    public L<E<K, V>> Filter(Predicate<E<K, V>> predicate) {
+        return L(filter(predicate));
+    }
+
+    @Override
+    public L<E<K, V>> Reject(Predicate<E<K, V>> predicate) {
+        return L(reject(predicate));
     }
 
     @Override
@@ -474,7 +495,8 @@ public class M<K, V> extends C<M.E<K, V>, K, V> implements SequentialIS<M.E<K, V
     
     @Override
     public M<K, V> WithDefault(Function<K, V> defaultValue) {
-        return (M<K, V>) super.WithDefault(defaultValue);
+        this.defaultFunction = defaultValue;
+        return this;
     }
 
     @Override
