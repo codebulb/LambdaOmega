@@ -42,7 +42,7 @@ public class S<T> extends C<T, Integer, T> implements SequentialIS<T> {
     }
     
     /**
-     * Creates a new {@link S}. Use {@link #S(Collection)} to create a {@link S} out of an existing Collection rather than a nested {@sink S}.
+     * Creates a new {@link S}. Use {@link #S(Collection)} to create a {@link S} out of an existing Collection rather than a nested {@link S}.
      */
     public static <T> S<T> s(T... ts) {
         return S(C.toStream(ts));

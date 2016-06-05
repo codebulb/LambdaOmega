@@ -39,7 +39,7 @@ public interface SequentialIFunctions<T> extends SequentialI<T>, FunctionsI {
     }
     
     /**
-     * Collects the result of a map with a function <i>f: (T) &rarr; R</i> as a {@link List}.
+     * Collects the result of a map with a function <i>f: (T) &rarr; R</i> as a {@link Collection}.
      */
     public default <R> Collection<R> map(Function<T, R> function) {
         return stream().map(function).collect(createCollector());
@@ -63,7 +63,7 @@ public interface SequentialIFunctions<T> extends SequentialI<T>, FunctionsI {
     }
     
     /**
-     * Returns a transformation of a list of one depth level into a flat list.
+     * Returns a transformation of a collection of one depth level into a flat collection.
      * 
      * @see #flattenDeep()
      */
@@ -86,7 +86,7 @@ public interface SequentialIFunctions<T> extends SequentialI<T>, FunctionsI {
     }
     
     /**
-     * Returns a transformation of a list of an arbitrary depth level into a flat list.
+     * Returns a transformation of a collection of an arbitrary depth level into a flat collection.
      * 
      * @see #flatten()
      */
@@ -124,7 +124,7 @@ public interface SequentialIFunctions<T> extends SequentialI<T>, FunctionsI {
     }
     
     /**
-     * Returns a {@link Collection} with every element for with the <code>predicate</code> provided returns <code>true</code>.
+     * Returns a {@link Collection} with every element for which the <code>predicate</code> provided returns <code>true</code>.
      * This is the opposite of {@link #reject(Predicate)}.
      */
     public default Collection<T> findAll(Predicate<T> predicate) {
@@ -139,7 +139,7 @@ public interface SequentialIFunctions<T> extends SequentialI<T>, FunctionsI {
     }
     
     /**
-     * Returns a {@link Map} with every element for with the <code>predicate</code> provided returns <code>false</code>.
+     * Returns a {@link Collection} with every element for with the <code>predicate</code> provided returns <code>false</code>.
      * This is the opposite of {@link #findAll(Predicate)} / {@link #filter(Predicate)}.
      */
     public default Collection<T> reject(Predicate<T> predicate) {
