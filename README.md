@@ -32,7 +32,7 @@ Use [JitPack](https://jitpack.io/) to add its dependency to your Maven project:
 <dependency>
     <groupId>com.github.codebulb</groupId>
     <artifactId>LambdaOmega</artifactId>
-    <version>0.3_RC-1</version>
+    <version>0.2</version>
 </dependency>
 ...
 <repository>
