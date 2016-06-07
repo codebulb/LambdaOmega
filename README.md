@@ -11,7 +11,7 @@ LambdaOmega consists of only a few classes. For brevity reasons, most of their n
 * `R` (“Range”) is a wrapper for an IntStream range.
 * `V2` (“Vector 2D”) represents a 2D vector (= a 2-ary tuple). It can be converted into a Map.Entry.
 * `F` (“Function”) is a wrapper for functional interfaces (lambda expressions) which also provides helper methods to convert functions.
-* `C` (“Collection”) is the base class for L and M and provides additional helper methods to convert collections.
+* `C` (“Collection”) is the base class for L, S and M and provides additional helper methods to convert collections.
 * `U` (“Utils”) provides additional miscellaneous helper methods.
 * `Promise` is a wrapper and a drop-in replacement for CompletableFuture, providing several simplifications and fixes for the API. It can be used independently of all the other classes. It’s discussed in a separate section.
 
@@ -141,7 +141,7 @@ Set<Integer> set = l(0, 1, 2).toSet();
 ```
 These conversion methods internally use the `C.to…(…)` static helper methods. You can call them directly to convert collection without the need to create intermediate L / S / M instances.
 
-There are a lot of additional methods for L, S and M. For more information, visit the ([API docs](http://codebulb.github.io/pages/LambdaOmega/doc/).
+There are a lot of additional methods for L, S and M. For more information, visit the [API docs](http://codebulb.github.io/pages/LambdaOmega/doc/).
 
 ## A List is a Map and a Map is a List
 Now comes the fun part. Because the LambdaOmega API lives independently of vanilla Java Collection / Map API, it features its own API which is more simple, consistent and powerful at the same time, whilst keeping it as close to the original Java APIs as possible.
@@ -312,4 +312,4 @@ This is a private project I’ve started for my own pleasure and usage and to le
 
 ## For more information
 Please visit the **[accompanying blog post](http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html)** to learn more about why I created this library or check out the API docs:
-* **[Newest release](http://codebulb.github.io/pages/LambdaOmega/doc/)**
+* **[Current release API](http://codebulb.github.io/pages/LambdaOmega/doc/)**
