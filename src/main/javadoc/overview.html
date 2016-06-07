@@ -18,7 +18,7 @@
 <li><code>R</code> (“Range”) is a wrapper for an IntStream range.</li>
 <li><code>V2</code> (“Vector 2D”) represents a 2D vector (= a 2-ary tuple). It can be converted into a Map.Entry.</li>
 <li><code>F</code> (“Function”) is a wrapper for functional interfaces (lambda expressions) which also provides helper methods to convert functions.</li>
-<li><code>C</code> (“Collection”) is the base class for L and M and provides additional helper methods to convert collections.</li>
+<li><code>C</code> (“Collection”) is the base class for L, S and M and provides additional helper methods to convert collections.</li>
 <li><code>U</code> (“Utils”) provides additional miscellaneous helper methods.</li>
 <li><code>Promise</code> is a wrapper and a drop-in replacement for CompletableFuture, providing several simplifications and fixes for the API. It can be used independently of all the other classes. It’s discussed in a separate section.</li>
 </ul>
@@ -182,7 +182,7 @@ L&lt;String&gt; aAndC = l("a", "b", "c").g(0, 2);
 
 <p>These conversion methods internally use the <code>C.to…(…)</code> static helper methods. You can call them directly to convert collection without the need to create intermediate L / S / M instances.</p>
 
-<p>There are a lot of additional methods for L, S and M. For more information, visit the (<a href="http://codebulb.github.io/pages/LambdaOmega/doc/">API docs</a>.</p>
+<p>There are a lot of additional methods for L, S and M. For more information, visit the <a href="http://codebulb.github.io/pages/LambdaOmega/doc/">API docs</a>.</p>
 
 <h2><a aria-hidden="true" href="#a-list-is-a-map-and-a-map-is-a-list" class="anchor" id="user-content-a-list-is-a-map-and-a-map-is-a-list"></a>A List is a Map and a Map is a List</h2>
 
@@ -405,7 +405,7 @@ FunctionalI&lt;Integer, Boolean&gt; primitivePred = f((int x) -&gt; x &gt; 1).f;
 <p>Please visit the <strong><a href="http://www.codebulb.ch/2015/08/lambdaomega-java-collections-lambdas-promises-simplified.html">accompanying blog post</a></strong> to learn more about why I created this library or check out the API docs:</p>
 
 <ul>
-<li><strong><a href="http://codebulb.github.io/pages/LambdaOmega/doc/">Newest release</a></strong></li>
+<li><strong><a href="http://codebulb.github.io/pages/LambdaOmega/doc/">Current release API</a></strong></li>
 </ul>
 
 </body>
