@@ -1,7 +1,7 @@
 # LambdaOmega
 A simple wrapper API to make usage of Java collections, lambdas and CompletableFuture more simple, concise and enjoyable.
 
-[![Build Status](https://travis-ci.org/codebulb/LambdaOmega.svg?branch=master)](https://travis-ci.org/codebulb/LambdaOmega) [![codecov.io](https://codecov.io/github/codebulb/LambdaOmega/coverage.svg?branch=master)](https://codecov.io/github/codebulb/LambdaOmega?branch=master)
+[![Build Status](https://travis-ci.org/codebulb/LambdaOmega.svg?branch=0.3)](https://travis-ci.org/codebulb/LambdaOmega) [![codecov.io](https://codecov.io/github/codebulb/LambdaOmega/coverage.svg?branch=0.3)](https://codecov.io/github/codebulb/LambdaOmega?branch=0.3)
 
 ## What’s in the box?
 LambdaOmega consists of only a few classes. For brevity reasons, most of their names consist of a single letter.
@@ -32,7 +32,7 @@ Use [JitPack](https://jitpack.io/) to add its dependency to your Maven project:
 <dependency>
     <groupId>com.github.codebulb</groupId>
     <artifactId>LambdaOmega</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
 </dependency>
 ...
 <repository>
@@ -42,7 +42,7 @@ Use [JitPack](https://jitpack.io/) to add its dependency to your Maven project:
 ```
 Replace the version by the tag / commit hash of your choice or `-SNAPSHOT` to get the newest SNAPSHOT.
 
-Not using Maven? You can [download the JAR directly from JitPack’s servers](https://jitpack.io/com/github/codebulb/LambdaOmega/0.2/LambdaOmega-0.2.jar).
+Not using Maven? You can [download the JAR directly from JitPack’s servers](https://jitpack.io/com/github/codebulb/LambdaOmega/0.3/LambdaOmega-0.3.jar).
 
 Visit [JitPack’s docs](https://jitpack.io/docs/) for more information.
 
